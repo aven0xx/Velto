@@ -1,0 +1,30 @@
+spawn:
+  enabled: true
+setspawn:
+  enabled: true
+time:
+  enabled: true
+day:
+  enabled: true
+night:
+  enabled: true
+craft:
+  enabled: true
+anvil:
+  enabled: true
+gamemode:
+  enabled: true
+gms:
+  enabled: true
+gmc:
+  enabled: true
+gma:
+  enabled: true
+gmsp:
+  enabled: true
+feed:
+  enabled: true
+heal:
+  enabled: true
+broadcast:
+  enabled: true

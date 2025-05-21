@@ -1,0 +1,20 @@
+name: Xcore
+version: 0.1
+main: com.aven0x.xcore.Xcore
+api-version: 1.21
+commands:
+  spawn: {}
+  setspawn: {}
+  time: {}
+  day: {}
+  night: {}
+  craft: {}
+  anvil: {}
+  gamemode: {}
+  gms: {}
+  gmc: {}
+  gma: {}
+  gmsp: {}
+  feed: {}
+  heal: {}
+  broadcast: {}
