@@ -9,6 +9,7 @@ commands:
   thunder: {}
   spawn: {}
   setspawn: {}
+  speed: {}
   kill: {}
   time: {}
   day: {}

@@ -21,5 +21,6 @@ public class CommandManager {
         new BroadcastCommand();
         new WeatherCommand();
         new KillCommand();
+        new SpeedCommand();
     }
 }
