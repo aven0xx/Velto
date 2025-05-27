@@ -28,3 +28,9 @@ heal:
   enabled: true
 broadcast:
   enabled: true
+weather:
+  enabled: true
+speed:
+  enabled: true
+kill:
+  enabled: true
