@@ -20,5 +20,6 @@ public class CommandManager {
         new HealCommand();
         new BroadcastCommand();
         new WeatherCommand();
+        new KillCommand();
     }
 }
