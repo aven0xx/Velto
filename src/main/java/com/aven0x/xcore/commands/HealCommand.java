@@ -1,15 +1,16 @@
 package com.aven0x.xcore.commands;
 
-import com.aven0x.xcore.utils.MessageUtil;
+import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HealCommand extends BaseCommand {
-    public HealCommand() {
-        super("heal");
-    }
+    public HealCommand() { super("heal"); }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -19,7 +20,7 @@ public class HealCommand extends BaseCommand {
 
         if (!hasPermission(sender, perm)) return true;
         if (target == null || !target.isOnline()) {
-            sendMessage(sender, "invalid-player");
+            NotificationUtil.send(sender, "invalid-player");
             return true;
         }
 
@@ -27,11 +28,12 @@ public class HealCommand extends BaseCommand {
         target.setFoodLevel(20);
 
         if (self) {
-            sendMessage(target, "healed-self");
+            NotificationUtil.send(target, "healed-self");
         } else {
-            String msg = MessageUtil.get("healed-other").replace("%target%", target.getName());
-            sender.sendMessage(msg);
-            sendMessage(target, "healed-self");
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("%target%", target.getName());
+            NotificationUtil.send(sender, "healed-other", placeholders);
+            NotificationUtil.send(target, "healed-self");
         }
 
         return true;
