@@ -19,5 +19,6 @@ public class CommandManager {
         new FeedCommand();
         new HealCommand();
         new BroadcastCommand();
+        new WeatherCommand();
     }
 }
