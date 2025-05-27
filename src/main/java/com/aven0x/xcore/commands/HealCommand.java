@@ -1,12 +1,15 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class HealCommand extends BaseCommand {
-    public HealCommand() { super("heal"); }
+    public HealCommand() {
+        super("heal");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -22,7 +25,15 @@ public class HealCommand extends BaseCommand {
 
         target.setHealth(target.getMaxHealth());
         target.setFoodLevel(20);
-        sendMessage(sender, "healed-success");
+
+        if (self) {
+            sendMessage(target, "healed-self");
+        } else {
+            String msg = MessageUtil.get("healed-other").replace("%target%", target.getName());
+            sender.sendMessage(msg);
+            sendMessage(target, "healed-self");
+        }
+
         return true;
     }
 }

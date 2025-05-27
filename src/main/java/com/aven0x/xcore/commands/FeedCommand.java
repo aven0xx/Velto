@@ -1,12 +1,15 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class FeedCommand extends BaseCommand {
-    public FeedCommand() { super("feed"); }
+    public FeedCommand() {
+        super("feed");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -21,7 +24,15 @@ public class FeedCommand extends BaseCommand {
         }
 
         target.setFoodLevel(20);
-        sendMessage(sender, "fed-success");
+
+        if (self) {
+            sendMessage(target, "fed-self");
+        } else {
+            String msg = MessageUtil.get("fed-other").replace("%target%", target.getName());
+            sender.sendMessage(msg);
+            sendMessage(target, "fed-self");
+        }
+
         return true;
     }
 }
