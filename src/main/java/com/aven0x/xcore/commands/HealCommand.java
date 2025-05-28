@@ -10,17 +10,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HealCommand extends BaseCommand {
-    public HealCommand() { super("heal"); }
+    public HealCommand() {
+        super("heal");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : sender instanceof Player ? (Player) sender : null;
+        Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (sender instanceof Player ? (Player) sender : null);
         boolean self = args.length == 0;
-        String perm = self ? "xcore.heal" : "xcore.heal.others";
 
+        String perm = self ? "xcore.heal" : "xcore.heal.others";
         if (!hasPermission(sender, perm)) return true;
+
         if (target == null || !target.isOnline()) {
-            NotificationUtil.send(sender, "invalid-player");
+            if (sender instanceof Player playerSender) {
+                NotificationUtil.send(playerSender, "invalid-player");
+            } else {
+                sender.sendMessage("§cInvalid player.");
+            }
             return true;
         }
 
@@ -30,9 +37,13 @@ public class HealCommand extends BaseCommand {
         if (self) {
             NotificationUtil.send(target, "healed-self");
         } else {
-            Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("%target%", target.getName());
-            NotificationUtil.send(sender, "healed-other", placeholders);
+            if (sender instanceof Player playerSender) {
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("%target%", target.getName());
+                NotificationUtil.send(playerSender, "healed-other", placeholders);
+            } else {
+                sender.sendMessage("§aHealed: " + target.getName());
+            }
             NotificationUtil.send(target, "healed-self");
         }
 

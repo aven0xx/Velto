@@ -3,7 +3,6 @@ package com.aven0x.xcore;
 import com.aven0x.xcore.manager.CommandManager;
 import com.aven0x.xcore.manager.TeleportManager;
 import com.aven0x.xcore.utils.ConfigUtil;
-import com.aven0x.xcore.utils.MessageUtil;
 import com.aven0x.xcore.utils.NotificationUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,7 +20,6 @@ public class Xcore extends JavaPlugin {
         saveDefaultConfig();
         ConfigUtil.loadMessages();
         ConfigUtil.loadCommands();
-        MessageUtil.load();
         NotificationUtil.load();
 
         this.adventure = BukkitAudiences.create(this);

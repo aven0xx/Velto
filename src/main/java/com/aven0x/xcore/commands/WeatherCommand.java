@@ -1,5 +1,6 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -16,13 +17,24 @@ public class WeatherCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.weather")) return true;
-        if (args.length < 1) {
-            sendMessage(sender, "invalid-usage");
+        if (!hasPermission(sender, "xcore.weather")) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
             return true;
         }
+
+        if (args.length < 1) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-usage");
+            }
+            return true;
+        }
+
         String mode = args[0].toLowerCase();
-        World world = sender instanceof Player ? ((Player) sender).getWorld() : Bukkit.getWorlds().get(0);
+        World world = (sender instanceof Player player)
+                ? player.getWorld()
+                : Bukkit.getWorlds().get(0);
 
         switch (mode) {
             case "clear", "sun" -> {
@@ -38,25 +50,37 @@ public class WeatherCommand extends BaseCommand {
                 world.setThundering(true);
             }
             default -> {
-                sendMessage(sender, "invalid-usage");
+                if (sender instanceof Player player) {
+                    NotificationUtil.send(player, "invalid-usage");
+                }
                 return true;
             }
         }
-        sendMessage(sender, "weather-updated");
+
+        if (sender instanceof Player player) {
+            NotificationUtil.send(player, "weather-updated");
+        }
+
         return true;
     }
 }
 
 class SunCommand extends BaseCommand {
-    public SunCommand() { super("sun"); }
+    public SunCommand() {
+        super("sun");
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return Bukkit.dispatchCommand(sender, "weather clear");
+        return Bukkit.dispatchCommand(sender, "weather sun");
     }
 }
 
 class RainCommand extends BaseCommand {
-    public RainCommand() { super("rain"); }
+    public RainCommand() {
+        super("rain");
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return Bukkit.dispatchCommand(sender, "weather rain");
@@ -64,7 +88,10 @@ class RainCommand extends BaseCommand {
 }
 
 class ThunderCommand extends BaseCommand {
-    public ThunderCommand() { super("thunder"); }
+    public ThunderCommand() {
+        super("thunder");
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return Bukkit.dispatchCommand(sender, "weather thunder");
