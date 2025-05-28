@@ -1,6 +1,7 @@
 package com.aven0x.xcore.commands;
 
 import com.aven0x.xcore.Xcore;
+import com.aven0x.xcore.utils.ConfigUtil;
 import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -14,23 +15,18 @@ public class SpawnCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.spawn")) {
-            if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
-            }
+        if (!hasPermission(sender, "xcore.spawn")) return true;
+        if (!(sender instanceof Player player)) {
+            NotificationUtil.send((Player) sender, "only-player");
             return true;
         }
 
-        if (!(sender instanceof Player player)) {
-            return true; // tu peux aussi activer `only-player` ici si tu veux l’indiquer
-        }
-
-        if (!Xcore.getInstance().getConfig().contains("spawn")) {
+        Location spawn = ConfigUtil.getSpawn();
+        if (spawn == null) {
             NotificationUtil.send(player, "spawn-not-set");
             return true;
         }
 
-        Location spawn = (Location) Xcore.getInstance().getConfig().get("spawn");
         Xcore.getInstance().getTeleportManager().teleportAsync(player, spawn);
         NotificationUtil.send(player, "teleporting-spawn");
         return true;
