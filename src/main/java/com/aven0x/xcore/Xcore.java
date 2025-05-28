@@ -2,7 +2,7 @@ package com.aven0x.xcore;
 
 import com.aven0x.xcore.manager.CommandManager;
 import com.aven0x.xcore.manager.TeleportManager;
-import com.aven0x.xcore.utils.ConfigUtil;
+import com.aven0x.xcore.utils.CommandUtil;
 import com.aven0x.xcore.utils.NotificationUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,14 +17,18 @@ public class Xcore extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        // Load config.yml if not already created
         saveDefaultConfig();
-        ConfigUtil.loadMessages();
-        ConfigUtil.loadCommands();
-        NotificationUtil.load();
 
+        // Load custom configs
+        NotificationUtil.load();
+        CommandUtil.load();
+
+        // Setup Adventure + managers
         this.adventure = BukkitAudiences.create(this);
         this.teleportManager = new TeleportManager();
 
+        // Register all commands
         CommandManager.registerAllCommands();
     }
 

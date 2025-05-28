@@ -1,6 +1,6 @@
 package com.aven0x.xcore.commands;
 
-import com.aven0x.xcore.Xcore;
+import com.aven0x.xcore.utils.ConfigUtil;
 import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,20 +13,13 @@ public class SetSpawnCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.setspawn")) {
-            if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
-            }
+        if (!hasPermission(sender, "xcore.setspawn")) return true;
+        if (!(sender instanceof Player player)) {
+            NotificationUtil.send((Player) sender, "only-player");
             return true;
         }
 
-        if (!(sender instanceof Player player)) {
-            return true; // tu peux aussi ajouter NotificationUtil pour only-player ici si tu veux
-        }
-
-        Xcore.getInstance().getConfig().set("spawn", player.getLocation());
-        Xcore.getInstance().saveConfig();
-
+        ConfigUtil.setSpawn(player.getLocation());
         NotificationUtil.send(player, "spawn-set");
         return true;
     }

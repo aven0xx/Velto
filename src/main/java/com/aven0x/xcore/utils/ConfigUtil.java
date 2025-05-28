@@ -1,20 +1,20 @@
 package com.aven0x.xcore.utils;
 
 import com.aven0x.xcore.Xcore;
-import java.io.File;
+import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigUtil {
-    public static void loadMessages() {
-        File file = new File(Xcore.getInstance().getDataFolder(), "messages.yml");
-        if (!file.exists()) {
-            Xcore.getInstance().saveResource("messages.yml", false);
-        }
+
+    private static final FileConfiguration config = Xcore.getInstance().getConfig();
+
+    public static void setSpawn(Location location) {
+        config.set("spawn", location);
+        Xcore.getInstance().saveConfig();
     }
 
-    public static void loadCommands() {
-        File file = new File(Xcore.getInstance().getDataFolder(), "commands.yml");
-        if (!file.exists()) {
-            Xcore.getInstance().saveResource("commands.yml", false);
-        }
+    public static Location getSpawn() {
+        return config.contains("spawn") ? config.getLocation("spawn") : null;
     }
 }
+
