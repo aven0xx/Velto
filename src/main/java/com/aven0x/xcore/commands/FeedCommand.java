@@ -30,7 +30,9 @@ public class FeedCommand extends BaseCommand {
             return true;
         }
 
+        // ✅ Fill hunger and saturation
         target.setFoodLevel(20);
+        target.setSaturation(20f);
 
         if (self) {
             NotificationUtil.send(target, "fed-self");
