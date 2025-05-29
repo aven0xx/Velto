@@ -1,5 +1,6 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,7 +14,9 @@ public class SpeedCommand extends BaseCommand {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
-            sendMessage(sender, "invalid-usage");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-usage");
+            }
             return true;
         }
 
@@ -21,23 +24,37 @@ public class SpeedCommand extends BaseCommand {
         try {
             speedLevel = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
-            sendMessage(sender, "invalid-speed");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-speed");
+            }
             return true;
         }
 
         if (speedLevel < 1 || speedLevel > 10) {
-            sendMessage(sender, "invalid-speed");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-speed");
+            }
             return true;
         }
 
-        Player target = args.length > 1 ? Bukkit.getPlayer(args[1]) : sender instanceof Player ? (Player) sender : null;
-        boolean self = args.length == 1;
+        Player target = args.length > 1
+                ? Bukkit.getPlayer(args[1])
+                : sender instanceof Player ? (Player) sender : null;
 
+        boolean self = args.length == 1;
         String perm = self ? "xcore.speed" : "xcore.speed.others";
-        if (!hasPermission(sender, perm)) return true;
+
+        if (!hasPermission(sender, perm)) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
+            return true;
+        }
 
         if (target == null || !target.isOnline()) {
-            sendMessage(sender, "invalid-player");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-player");
+            }
             return true;
         }
 
@@ -48,8 +65,10 @@ public class SpeedCommand extends BaseCommand {
             target.setWalkSpeed(speed);
         }
 
-        sendMessage(sender, "speed-updated");
+        if (sender instanceof Player player) {
+            NotificationUtil.send(player, "speed-updated");
+        }
+
         return true;
     }
 }
-

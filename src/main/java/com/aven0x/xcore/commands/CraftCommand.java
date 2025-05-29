@@ -1,22 +1,33 @@
-// CraftCommand.java
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CraftCommand extends BaseCommand {
-    public CraftCommand() { super("craft"); }
+    public CraftCommand() {
+        super("craft");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.craft")) return true;
-        if (!isPlayer(sender)) return true;
-        Player player = (Player) sender;
+        if (!hasPermission(sender, "xcore.craft")) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
+            return true;
+        }
 
-        // ✅ Ouvre une table de craft (3x3)
+        if (!(sender instanceof Player player)) {
+            if (sender instanceof Player p) {
+                NotificationUtil.send(p, "only-player");
+            }
+            return true;
+        }
+
         player.openWorkbench(null, true);
-        sendMessage(player, "opened-craft");
+        NotificationUtil.send(player, "opened-craft");
         return true;
     }
 }

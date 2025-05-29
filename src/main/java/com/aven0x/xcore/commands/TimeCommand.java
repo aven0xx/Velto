@@ -1,5 +1,6 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -7,17 +8,29 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class TimeCommand extends BaseCommand {
-    public TimeCommand() { super("time"); }
+    public TimeCommand() {
+        super("time");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.timeset")) return true;
-        if (args.length < 2) {
-            sendMessage(sender, "invalid-usage");
+        if (!hasPermission(sender, "xcore.timeset")) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
             return true;
         }
+
+        if (args.length < 2) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-usage");
+            }
+            return true;
+        }
+
         String timeArg = args[1].toLowerCase();
         long time;
+
         try {
             time = switch (timeArg) {
                 case "day" -> 1000L;
@@ -25,16 +38,29 @@ public class TimeCommand extends BaseCommand {
                 default -> Long.parseLong(timeArg);
             };
         } catch (NumberFormatException e) {
-            sendMessage(sender, "invalid-time");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-time");
+            }
             return true;
         }
-        World world = args.length > 2 ? Bukkit.getWorld(args[2]) : sender instanceof Player ? ((Player) sender).getWorld() : null;
+
+        World world = args.length > 2
+                ? Bukkit.getWorld(args[2])
+                : sender instanceof Player ? ((Player) sender).getWorld() : null;
+
         if (world == null) {
-            sendMessage(sender, "invalid-world");
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-world");
+            }
             return true;
         }
+
         world.setTime(time);
-        sendMessage(sender, "time-set");
+
+        if (sender instanceof Player player) {
+            NotificationUtil.send(player, "time-set");
+        }
+
         return true;
     }
 }
