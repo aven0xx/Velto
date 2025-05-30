@@ -1,5 +1,5 @@
 name: Xcore
-version: 0.2
+version: 0.3
 main: com.aven0x.xcore.Xcore
 api-version: 1.21
 commands:
