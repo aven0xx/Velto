@@ -24,3 +24,4 @@ commands:
   feed: {}
   heal: {}
   broadcast: {}
+  god: {}
