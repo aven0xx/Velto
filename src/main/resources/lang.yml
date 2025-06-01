@@ -22,6 +22,10 @@ invalid-usage:
   type: chat
   message: "&cInvalid command usage."
 
+invalid-usage-gamemode:
+  type: chat
+  message: "&cUsage: /gamemode <mode> [player]"
+
 invalid-time:
   type: chat
   message: "&cInvalid time specified."
@@ -74,24 +78,20 @@ healed-other:
   type: chat
   message: "&aYou have healed &e%target%&a."
 
-gamemode-usage:
-  type: chat
-  message: "&cUsage: /gamemode <mode> [player]"
-
 invalid-gamemode:
   type: chat
   message: "&cInvalid gamemode."
 
-gamemode-self:
-  type: actionbar
-  message: "&aYour gamemode has been updated to %target%!"
-
-gamemode-other:
+gamemode-set-self:
   type: chat
-  message: "&aYou have changed the gamemode of %target%."
+  message: "&aYour gamemode has been updated to &e%gamemode%&a."
+
+gamemode-set-other:
+  type: chat
+  message: "&aYou have changed the gamemode of &e%target%&a to &e%gamemode%&a."
 
 gamemode-updated-by-other:
-  type: actionbar
+  type: chat
   message: "&eYour gamemode was updated by someone."
 
 player-killed:
@@ -113,9 +113,9 @@ weather-updated:
 god-enabled:
   type: actionbar
   message: "&aGod mode enabled."
-  duration: 60  # 3 secondes
+  duration: 60
 
 god-disabled:
   type: actionbar
   message: "&cGod mode disabled."
-  duration: 60  # 3 secondes
+  duration: 60

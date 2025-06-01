@@ -17,14 +17,30 @@ public class GamemodeCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length < 1) {
-            if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-usage");
+        String labelLower = label.toLowerCase();
+
+        // Supporte les alias directs sans avoir besoin du plugin.yml
+        GameMode modeFromLabel = switch (labelLower) {
+            case "gms" -> GameMode.SURVIVAL;
+            case "gmc" -> GameMode.CREATIVE;
+            case "gma" -> GameMode.ADVENTURE;
+            case "gmsp" -> GameMode.SPECTATOR;
+            default -> null;
+        };
+
+        GameMode mode = modeFromLabel;
+
+        if (mode == null) {
+            if (args.length < 1) {
+                if (sender instanceof Player player) {
+                    NotificationUtil.send(player, "gamemode-usage");
+                }
+                return true;
             }
-            return true;
+
+            mode = parseGameMode(args[0]);
         }
 
-        GameMode mode = parseGameMode(args[0]);
         if (mode == null) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "invalid-gamemode");
@@ -33,7 +49,7 @@ public class GamemodeCommand extends BaseCommand {
         }
 
         Player target = args.length > 1 ? Bukkit.getPlayer(args[1]) : (sender instanceof Player ? (Player) sender : null);
-        boolean self = args.length == 1 || sender.equals(target);
+        boolean self = args.length <= 1 || sender.equals(target);
 
         String permission = self ? "xcore.gamemode" : "xcore.gamemode.others";
         if (!hasPermission(sender, permission)) return true;
@@ -49,12 +65,17 @@ public class GamemodeCommand extends BaseCommand {
 
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%target%", target.getName());
+        placeholders.put("%gamemode%", mode.name());
 
         if (sender instanceof Player player) {
-            NotificationUtil.send(player, self ? "gamemode-set-self" : "gamemode-set-other", placeholders);
+            NotificationUtil.send(player, self ? "gamemode-self" : "gamemode-other", placeholders);
         }
 
-        // Always log to console
+        if (!sender.equals(target)) {
+            NotificationUtil.send(target, "gamemode-updated-by-other");
+        }
+
+        // Log dans la console
         Bukkit.getLogger().info(sender.getName() + " set gamemode of " + target.getName() + " to " + mode.name());
 
         return true;
@@ -62,10 +83,10 @@ public class GamemodeCommand extends BaseCommand {
 
     private GameMode parseGameMode(String input) {
         return switch (input.toLowerCase()) {
-            case "0", "survival", "gms" -> GameMode.SURVIVAL;
-            case "1", "creative", "gmc" -> GameMode.CREATIVE;
-            case "2", "adventure", "gma" -> GameMode.ADVENTURE;
-            case "3", "spectator", "gmsp" -> GameMode.SPECTATOR;
+            case "0", "survival" -> GameMode.SURVIVAL;
+            case "1", "creative" -> GameMode.CREATIVE;
+            case "2", "adventure" -> GameMode.ADVENTURE;
+            case "3", "spectator" -> GameMode.SPECTATOR;
             default -> null;
         };
     }
