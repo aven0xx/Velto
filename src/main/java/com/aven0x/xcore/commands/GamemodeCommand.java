@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class GamemodeCommand extends BaseCommand {
@@ -17,67 +16,99 @@ public class GamemodeCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String modeArg = args.length > 0 ? args[0] : null;
-        String targetArg = args.length > 1 ? args[1] : null;
+        if (label.equalsIgnoreCase("gmc")) {
+            return handleShortcut(sender, args, GameMode.CREATIVE, "xcore.gamemode.c", "xcore.gamemode.c.others");
+        } else if (label.equalsIgnoreCase("gms")) {
+            return handleShortcut(sender, args, GameMode.SURVIVAL, "xcore.gamemode.s", "xcore.gamemode.s.others");
+        } else if (label.equalsIgnoreCase("gma")) {
+            return handleShortcut(sender, args, GameMode.ADVENTURE, "xcore.gamemode.a", "xcore.gamemode.a.others");
+        } else if (label.equalsIgnoreCase("gmsp")) {
+            return handleShortcut(sender, args, GameMode.SPECTATOR, "xcore.gamemode.sp", "xcore.gamemode.sp.others");
+        }
 
-        GameMode mode = parseGameMode(label, modeArg);
-        if (mode == null) {
+        if (args.length < 1) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-gamemode");
+                NotificationUtil.send(player, "gamemode-usage");
             }
             return true;
         }
 
-        Player target = targetArg != null ? Bukkit.getPlayer(targetArg)
-                : sender instanceof Player ? (Player) sender : null;
-
-        if (target == null || !target.isOnline()) {
-            if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-player");
-            } else {
-                sender.sendMessage("Player not found.");
-            }
-            return true;
-        }
-
-        boolean self = sender.equals(target);
-
-        String permission = self ? "xcore.gamemode" : "xcore.gamemode.others";
-        if (!hasPermission(sender, permission)) return true;
-
-        target.setGameMode(mode);
-
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("%target%", target.getName());
-        placeholders.put("%gamemode%", mode.name());
-
-        if (sender instanceof Player player) {
-            NotificationUtil.send(player, self ? "gamemode-set-self" : "gamemode-set-other", placeholders);
-        }
-
-        if (!self && target.isOnline()) {
-            NotificationUtil.send(target, "gamemode-updated-by-other", placeholders);
-        }
-
-        Bukkit.getLogger().info(sender.getName() + " set gamemode of " + target.getName() + " to " + mode.name());
-        return true;
-    }
-
-    private GameMode parseGameMode(String label, String input) {
-        String source = label.toLowerCase();
-        if (source.equals("gms")) return GameMode.SURVIVAL;
-        if (source.equals("gmc")) return GameMode.CREATIVE;
-        if (source.equals("gma")) return GameMode.ADVENTURE;
-        if (source.equals("gmsp")) return GameMode.SPECTATOR;
-
-        if (input == null) return null;
-
-        return switch (input.toLowerCase()) {
+        GameMode gm = switch (args[0].toLowerCase()) {
             case "0", "survival" -> GameMode.SURVIVAL;
             case "1", "creative" -> GameMode.CREATIVE;
             case "2", "adventure" -> GameMode.ADVENTURE;
             case "3", "spectator" -> GameMode.SPECTATOR;
             default -> null;
         };
+
+        if (gm == null) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-gamemode");
+            }
+            return true;
+        }
+
+        Player target = args.length > 1
+                ? Bukkit.getPlayer(args[1])
+                : sender instanceof Player ? (Player) sender : null;
+
+        boolean self = args.length == 1;
+        String perm = "xcore.gamemode" + (self ? "" : ".others");
+
+        if (!hasPermission(sender, perm)) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
+            return true;
+        }
+
+        if (target == null || !target.isOnline()) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-player");
+            }
+            return true;
+        }
+
+        target.setGameMode(gm);
+        if (sender instanceof Player player) {
+            NotificationUtil.send(player, "gamemode-set");
+        }
+
+        return true;
+    }
+
+    private boolean handleShortcut(CommandSender sender, String[] args, GameMode mode, String selfPerm, String otherPerm) {
+        Player target = args.length > 0
+                ? Bukkit.getPlayer(args[0])
+                : sender instanceof Player ? (Player) sender : null;
+
+        boolean self = args.length == 0;
+
+        String permission = self ? selfPerm : otherPerm;
+        if (!hasPermission(sender, permission)) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "no-permission");
+            }
+            return true;
+        }
+
+        if (target == null || !target.isOnline()) {
+            if (sender instanceof Player player) {
+                NotificationUtil.send(player, "invalid-player");
+            }
+            return true;
+        }
+
+        target.setGameMode(mode);
+
+        if (sender instanceof Player playerSender) {
+            if (self) {
+                NotificationUtil.send(playerSender, "gamemode-set");
+            } else {
+                NotificationUtil.send(playerSender, "gamemode-set", Map.of("%target%", target.getName()));
+            }
+        }
+
+        return true;
     }
 }

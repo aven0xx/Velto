@@ -78,21 +78,24 @@ healed-other:
   type: chat
   message: "&aYou have healed &e%target%&a."
 
+# Used when the sender doesn't provide enough arguments
+gamemode-usage:
+  type: chat
+  message: "&cUsage: /gamemode <mode> [player]"
+
+# Used when an invalid gamemode is specified
 invalid-gamemode:
   type: chat
-  message: "&cInvalid gamemode."
+  message: "&cInvalid gamemode. Use survival, creative, adventure, or spectator."
 
-gamemode-set-self:
-  type: chat
-  message: "&aYour gamemode has been updated to &e%gamemode%&a."
+  gamemode-set:
+    type: chat
+    message: "&aGamemode updated successfully."
 
-gamemode-set-other:
-  type: chat
-  message: "&aYou have changed the gamemode of &e%target%&a to &e%gamemode%&a."
-
-gamemode-updated-by-other:
-  type: chat
-  message: "&eYour gamemode was updated by someone."
+  # Optional: Used when setting another player’s gamemode (with placeholder)
+  gamemode-set-other:
+    type: chat
+    message: "&aGamemode updated for &e%target%&a."
 
 player-killed:
   type: chat
