@@ -14,6 +14,10 @@ public class CommandManager {
         if (CommandUtil.isEnabled("craft")) new CraftCommand();
         if (CommandUtil.isEnabled("anvil")) new AnvilCommand();
         if (CommandUtil.isEnabled("gamemode")) new GamemodeCommand();
+        if (CommandUtil.isEnabled("gmc")) new GamemodeCommand();
+        if (CommandUtil.isEnabled("gms")) new GamemodeCommand();
+        if (CommandUtil.isEnabled("gma")) new GamemodeCommand();
+        if (CommandUtil.isEnabled("gmsp")) new GamemodeCommand();
         if (CommandUtil.isEnabled("feed")) new FeedCommand();
         if (CommandUtil.isEnabled("heal")) new HealCommand();
         if (CommandUtil.isEnabled("broadcast")) new BroadcastCommand();
