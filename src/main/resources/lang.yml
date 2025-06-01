@@ -3,7 +3,7 @@ only-player:
   message: "&cOnly players can use this command."
 
 no-permission:
-  type: actionbar
+  type: chat
   message: "&cYou do not have permission."
 
 spawn-not-set:
@@ -77,8 +77,6 @@ healed-self:
 healed-other:
   type: chat
   message: "&aYou have healed &e%target%&a."
-
-# Used when the sender doesn't provide enough arguments
 
 player-killed:
   type: chat
