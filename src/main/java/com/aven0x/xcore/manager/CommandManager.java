@@ -4,6 +4,7 @@ import com.aven0x.xcore.commands.*;
 import com.aven0x.xcore.utils.CommandUtil;
 
 public class CommandManager {
+
     public static void registerAllCommands() {
         if (CommandUtil.isEnabled("spawn")) new SpawnCommand();
         if (CommandUtil.isEnabled("setspawn")) new SetSpawnCommand();
@@ -23,5 +24,6 @@ public class CommandManager {
         if (CommandUtil.isEnabled("weather")) new WeatherCommand();
         if (CommandUtil.isEnabled("kill")) new KillCommand();
         if (CommandUtil.isEnabled("speed")) new SpeedCommand();
+        if (CommandUtil.isEnabled("god")) new GodCommand();
     }
 }

@@ -1,5 +1,6 @@
 package com.aven0x.xcore;
 
+import com.aven0x.xcore.listeners.GodListener;
 import com.aven0x.xcore.manager.CommandManager;
 import com.aven0x.xcore.manager.TeleportManager;
 import com.aven0x.xcore.utils.CommandUtil;
@@ -28,8 +29,11 @@ public class Xcore extends JavaPlugin {
         this.adventure = BukkitAudiences.create(this);
         this.teleportManager = new TeleportManager();
 
-        // Register all commands
+        // Register commands
         CommandManager.registerAllCommands();
+
+        // Register listeners
+        getServer().getPluginManager().registerEvents(new GodListener(), this);
     }
 
     @Override

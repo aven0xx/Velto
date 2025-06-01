@@ -101,3 +101,13 @@ invalid-speed:
 weather-updated:
   type: chat
   message: "&aWeather has been updated."
+
+god-enabled:
+  type: actionbar
+  message: "&aGod mode enabled."
+  duration: 60  # 3 secondes
+
+god-disabled:
+  type: actionbar
+  message: "&cGod mode disabled."
+  duration: 60  # 3 secondes
