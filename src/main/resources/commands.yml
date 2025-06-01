@@ -12,8 +12,6 @@ craft:
   enabled: true
 anvil:
   enabled: true
-gamemode:
-  enabled: true
 feed:
   enabled: true
 heal:
