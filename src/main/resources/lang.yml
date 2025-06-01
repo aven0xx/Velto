@@ -82,10 +82,6 @@ invalid-gamemode:
   type: chat
   message: "&cInvalid gamemode."
 
-invalid-player:
-  type: chat
-  message: "&cPlayer not found."
-
 gamemode-self:
   type: actionbar
   message: "&aYour gamemode has been updated to %target%!"
@@ -97,7 +93,6 @@ gamemode-other:
 gamemode-updated-by-other:
   type: actionbar
   message: "&eYour gamemode was updated by someone."
-
 
 player-killed:
   type: chat

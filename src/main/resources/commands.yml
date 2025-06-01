@@ -14,14 +14,6 @@ anvil:
   enabled: true
 gamemode:
   enabled: true
-gms:
-  enabled: true
-gmc:
-  enabled: true
-gma:
-  enabled: true
-gmsp:
-  enabled: true
 feed:
   enabled: true
 heal:
@@ -33,4 +25,6 @@ weather:
 speed:
   enabled: true
 kill:
+  enabled: true
+god:
   enabled: true
