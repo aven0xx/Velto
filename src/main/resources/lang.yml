@@ -104,3 +104,15 @@ god-disabled:
   message: "&cGod mode disabled."
   duration: 60
 
+invalid-gamemode:
+  type: chat
+  message: "&cInvalid gamemode. Use 0-3 or survival, creative, adventure, spectator."
+
+gamemode-set-self:
+  type: chat
+  message: "&aYour gamemode has been set to &f%mode%&a."
+
+gamemode-set-other:
+  type: chat
+  message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
+

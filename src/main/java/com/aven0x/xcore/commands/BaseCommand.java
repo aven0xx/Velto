@@ -1,17 +1,21 @@
 package com.aven0x.xcore.commands;
 
+import com.aven0x.xcore.utils.CommandUtil;
 import com.aven0x.xcore.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
 public abstract class BaseCommand implements CommandExecutor {
 
     public BaseCommand(String name) {
-        if (Bukkit.getPluginCommand(name) != null) {
-            Bukkit.getPluginCommand(name).setExecutor(this);
+        PluginCommand cmd = Bukkit.getPluginCommand(name);
+        if (cmd != null) {
+            cmd.setExecutor(this);
+            cmd.setAliases(CommandUtil.getAliases(name)); // ✅ Set aliases from commands.yml
         }
     }
 

@@ -1,10 +1,10 @@
 THIS IS XCORE 0.3 ROADMAP
 
--Recode of the Gamemode Command
--Possibility of adding alias to command
+-Recode of the Gamemode Command / Done
+-Possibility of adding alias to command / Done
 -/list command (Listing online players)
 -Automessaging system
--/god command
+-/god command / Done
 -/itemlore command for changing item lore
 -Improvement to the notification sytem (Bossbar Color, subtitle)
 -Other optimizations

@@ -1,0 +1,39 @@
+package com.aven0x.xcore.utils;
+
+import com.aven0x.xcore.Xcore;
+import com.aven0x.xcore.commands.BaseCommand;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
+
+import java.lang.reflect.Field;
+
+public class DynamicCommandRegistrar {
+
+    private static CommandMap commandMap;
+
+    static {
+        try {
+            Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            field.setAccessible(true);
+            commandMap = (CommandMap) field.get(Bukkit.getServer());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void registerAlias(String alias, BaseCommand command) {
+        if (commandMap == null) return;
+
+        Command cmd = new BukkitCommand(alias) {
+            @Override
+            public boolean execute(CommandSender sender, String label, String[] args) {
+                return command.onCommand(sender, this, label, args);
+            }
+        };
+        commandMap.register(Xcore.getInstance().getName(), cmd);
+    }
+}
+

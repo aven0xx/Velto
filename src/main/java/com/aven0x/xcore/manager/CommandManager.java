@@ -2,23 +2,40 @@ package com.aven0x.xcore.manager;
 
 import com.aven0x.xcore.commands.*;
 import com.aven0x.xcore.utils.CommandUtil;
+import com.aven0x.xcore.utils.DynamicCommandRegistrar;
+import static com.aven0x.xcore.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
     public static void registerAllCommands() {
-        if (CommandUtil.isEnabled("spawn")) new SpawnCommand();
-        if (CommandUtil.isEnabled("setspawn")) new SetSpawnCommand();
-        if (CommandUtil.isEnabled("time")) new TimeCommand();
-        if (CommandUtil.isEnabled("day")) new DayCommand();
-        if (CommandUtil.isEnabled("night")) new NightCommand();
-        if (CommandUtil.isEnabled("craft")) new CraftCommand();
-        if (CommandUtil.isEnabled("anvil")) new AnvilCommand();
-        if (CommandUtil.isEnabled("feed")) new FeedCommand();
-        if (CommandUtil.isEnabled("heal")) new HealCommand();
-        if (CommandUtil.isEnabled("broadcast")) new BroadcastCommand();
-        if (CommandUtil.isEnabled("weather")) new WeatherCommand();
-        if (CommandUtil.isEnabled("kill")) new KillCommand();
-        if (CommandUtil.isEnabled("speed")) new SpeedCommand();
-        if (CommandUtil.isEnabled("god")) new GodCommand();
+        register("spawn", new SpawnCommand());
+        register("setspawn", new SetSpawnCommand());
+        register("time", new TimeCommand());
+        register("day", new DayCommand());
+        register("night", new NightCommand());
+        register("craft", new CraftCommand());
+        register("anvil", new AnvilCommand());
+        register("feed", new FeedCommand());
+        register("heal", new HealCommand());
+        register("broadcast", new BroadcastCommand());
+        register("weather", new WeatherCommand());
+        register("kill", new KillCommand());
+        register("speed", new SpeedCommand());
+        register("god", new GodCommand());
+
+        register("gamemode", new GamemodeCommand());
+        register("gmc", new GmcCommand());
+        register("gms", new GmsCommand());
+        register("gma", new GmaCommand());
+        register("gmsp", new GmspCommand());
+    }
+
+    private static void register(String name, BaseCommand command) {
+        if (!CommandUtil.isEnabled(name)) return;
+
+        // Register aliases
+        for (String alias : CommandUtil.getAliases(name)) {
+            DynamicCommandRegistrar.registerAlias(alias, command);
+        }
     }
 }
