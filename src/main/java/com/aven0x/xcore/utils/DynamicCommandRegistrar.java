@@ -3,12 +3,11 @@ package com.aven0x.xcore.utils;
 import com.aven0x.xcore.Xcore;
 import com.aven0x.xcore.commands.BaseCommand;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.command.defaults.BukkitCommand;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class DynamicCommandRegistrar {
 
@@ -32,8 +31,13 @@ public class DynamicCommandRegistrar {
             public boolean execute(CommandSender sender, String label, String[] args) {
                 return command.onCommand(sender, this, label, args);
             }
+
+            @Override
+            public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+                return command.onTabComplete(sender, this, alias, args);
+            }
         };
+
         commandMap.register(Xcore.getInstance().getName(), cmd);
     }
 }
-

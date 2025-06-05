@@ -1,15 +1,17 @@
 package com.aven0x.xcore.commands;
 
 import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.xcore.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HealCommand extends BaseCommand {
+
     public HealCommand() {
         super("heal");
     }
@@ -38,9 +40,7 @@ public class HealCommand extends BaseCommand {
             NotificationUtil.send(target, "healed-self");
         } else {
             if (sender instanceof Player playerSender) {
-                Map<String, String> placeholders = new HashMap<>();
-                placeholders.put("%target%", target.getName());
-                NotificationUtil.send(playerSender, "healed-other", placeholders);
+                NotificationUtil.send(playerSender, "healed-other", Map.of("%target%", target.getName()));
             } else {
                 sender.sendMessage("§aHealed: " + target.getName());
             }
@@ -48,5 +48,17 @@ public class HealCommand extends BaseCommand {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1 && sender.hasPermission("xcore.heal.others")) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .filter(player -> !PlayerUtil.isVanished(player))
+                    .map(Player::getName)
+                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .toList();
+        }
+        return List.of();
     }
 }

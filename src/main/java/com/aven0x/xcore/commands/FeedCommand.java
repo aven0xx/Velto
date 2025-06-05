@@ -1,14 +1,17 @@
 package com.aven0x.xcore.commands;
 
 import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.xcore.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 
 public class FeedCommand extends BaseCommand {
+
     public FeedCommand() {
         super("feed");
     }
@@ -30,7 +33,6 @@ public class FeedCommand extends BaseCommand {
             return true;
         }
 
-        // ✅ Fill hunger and saturation
         target.setFoodLevel(20);
         target.setSaturation(20f);
 
@@ -46,5 +48,17 @@ public class FeedCommand extends BaseCommand {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1 && sender.hasPermission("xcore.feed.others")) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .filter(player -> !PlayerUtil.isVanished(player))
+                    .map(Player::getName)
+                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .toList();
+        }
+        return List.of();
     }
 }
