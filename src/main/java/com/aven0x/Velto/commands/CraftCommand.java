@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ public class CraftCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.craft")) {
+        if (!hasPermission(sender, "velto.craft")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
             }

@@ -1,7 +1,7 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.manager.GodManager;
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.manager.GodManager;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,7 +20,7 @@ public class GodCommand extends BaseCommand {
         Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : sender instanceof Player ? (Player) sender : null;
         boolean self = args.length == 0;
 
-        String perm = self ? "xcore.god" : "xcore.god.others";
+        String perm = self ? "velto.god" : "velto.god.others";
         if (!hasPermission(sender, perm)) return true;
 
         if (target == null || !target.isOnline()) {

@@ -1,7 +1,7 @@
-Xylus # Xylus
+Velto # Velto
 
 Starting with version 0.3 the project 
-will be named Xylus instead of Xcore.
+will be named Velto instead of Xcore.
 
 **Xylus** is a modern core plugin with basic command for Minecraft server. 
 All commands and messages are configurable. Open source plugin and easy to extand.

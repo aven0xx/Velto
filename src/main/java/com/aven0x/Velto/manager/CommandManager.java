@@ -1,9 +1,9 @@
-package com.aven0x.xcore.manager;
+package com.aven0x.Velto.manager;
 
-import com.aven0x.xcore.commands.*;
-import com.aven0x.xcore.utils.CommandUtil;
-import com.aven0x.xcore.utils.DynamicCommandRegistrar;
-import static com.aven0x.xcore.commands.GamemodeCommands.*;
+import com.aven0x.Velto.commands.*;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.DynamicCommandRegistrar;
+import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
 public class CommandManager {
 

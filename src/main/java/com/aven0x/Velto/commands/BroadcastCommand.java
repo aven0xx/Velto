@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ public class BroadcastCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.broadcast")) {
+        if (!hasPermission(sender, "velto.broadcast")) {
             if (sender instanceof Player playerSender) {
                 NotificationUtil.send(playerSender, "no-permission");
             }

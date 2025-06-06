@@ -1,16 +1,16 @@
-package com.aven0x.xcore;
+package com.aven0x.Velto;
 
-import com.aven0x.xcore.listeners.GodListener;
-import com.aven0x.xcore.manager.CommandManager;
-import com.aven0x.xcore.manager.TeleportManager;
-import com.aven0x.xcore.utils.CommandUtil;
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.Velto.manager.CommandManager;
+import com.aven0x.Velto.manager.TeleportManager;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Xcore extends JavaPlugin {
+public class Velto extends JavaPlugin {
 
-    private static Xcore instance;
+    private static Velto instance;
     private TeleportManager teleportManager;
     private BukkitAudiences adventure;
 
@@ -43,7 +43,7 @@ public class Xcore extends JavaPlugin {
         }
     }
 
-    public static Xcore getInstance() {
+    public static Velto getInstance() {
         return instance;
     }
 

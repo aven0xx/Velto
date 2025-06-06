@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -42,7 +42,7 @@ public class SpeedCommand extends BaseCommand {
                 : sender instanceof Player ? (Player) sender : null;
 
         boolean self = args.length == 1;
-        String perm = self ? "xcore.speed" : "xcore.speed.others";
+        String perm = self ? "velto.speed" : "velto.speed.others";
 
         if (!hasPermission(sender, perm)) {
             if (sender instanceof Player player) {

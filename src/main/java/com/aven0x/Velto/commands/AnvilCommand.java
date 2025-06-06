@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +13,7 @@ public class AnvilCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.anvil")) {
+        if (!hasPermission(sender, "velto.anvil")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
             }

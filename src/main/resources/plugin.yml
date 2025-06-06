@@ -1,6 +1,6 @@
-name: Xcore
+name: Velto
 version: 0.3
-main: com.aven0x.xcore.Xcore
+main: com.aven0x.Velto.Velto
 api-version: 1.21
 commands:
   weather: {}

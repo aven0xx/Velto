@@ -1,6 +1,6 @@
-package com.aven0x.xcore.utils;
+package com.aven0x.Velto.utils;
 
-import com.aven0x.xcore.Xcore;
+import com.aven0x.Velto.Velto;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -12,9 +12,9 @@ public class CommandUtil {
     private static FileConfiguration commands;
 
     public static void load() {
-        File file = new File(Xcore.getInstance().getDataFolder(), "commands.yml");
+        File file = new File(Velto.getInstance().getDataFolder(), "commands.yml");
         if (!file.exists()) {
-            Xcore.getInstance().saveResource("commands.yml", false);
+            Velto.getInstance().saveResource("commands.yml", false);
         }
         commands = YamlConfiguration.loadConfiguration(file);
     }

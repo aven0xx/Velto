@@ -1,7 +1,7 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.ConfigUtil;
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.ConfigUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

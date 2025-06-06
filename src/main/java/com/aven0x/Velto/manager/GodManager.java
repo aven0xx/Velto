@@ -1,4 +1,4 @@
-package com.aven0x.xcore.manager;
+package com.aven0x.Velto.manager;
 
 import org.bukkit.entity.Player;
 

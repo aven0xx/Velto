@@ -1,7 +1,7 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
-import com.aven0x.xcore.utils.PlayerUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,7 +20,7 @@ public class FeedCommand extends BaseCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (sender instanceof Player ? (Player) sender : null);
         boolean self = args.length == 0;
-        String perm = self ? "xcore.feed" : "xcore.feed.others";
+        String perm = self ? "velto.feed" : "velto.feed.others";
 
         if (!hasPermission(sender, perm)) return true;
 
@@ -52,7 +52,7 @@ public class FeedCommand extends BaseCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1 && sender.hasPermission("xcore.feed.others")) {
+        if (args.length == 1 && sender.hasPermission("velto.feed.others")) {
             return Bukkit.getOnlinePlayers().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .map(Player::getName)

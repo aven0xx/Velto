@@ -1,7 +1,7 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
-import com.aven0x.xcore.utils.PlayerUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,7 @@ public class KillCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.kill")) {
+        if (!hasPermission(sender, "velto.kill")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
             } else {

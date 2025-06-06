@@ -1,16 +1,16 @@
-package com.aven0x.xcore.utils;
+package com.aven0x.Velto.utils;
 
-import com.aven0x.xcore.Xcore;
+import com.aven0x.Velto.Velto;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigUtil {
 
-    private static final FileConfiguration config = Xcore.getInstance().getConfig();
+    private static final FileConfiguration config = Velto.getInstance().getConfig();
 
     public static void setSpawn(Location location) {
         config.set("spawn", location);
-        Xcore.getInstance().saveConfig();
+        Velto.getInstance().saveConfig();
     }
 
     public static Location getSpawn() {

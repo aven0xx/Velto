@@ -1,7 +1,7 @@
-package com.aven0x.xcore.utils;
+package com.aven0x.Velto.utils;
 
-import com.aven0x.xcore.Xcore;
-import com.aven0x.xcore.commands.BaseCommand;
+import com.aven0x.Velto.Velto;
+import com.aven0x.Velto.commands.BaseCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -38,6 +38,6 @@ public class DynamicCommandRegistrar {
             }
         };
 
-        commandMap.register(Xcore.getInstance().getName(), cmd);
+        commandMap.register(Velto.getInstance().getName(), cmd);
     }
 }

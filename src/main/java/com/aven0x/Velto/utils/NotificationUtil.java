@@ -1,6 +1,6 @@
-package com.aven0x.xcore.utils;
+package com.aven0x.Velto.utils;
 
-import com.aven0x.xcore.Xcore;
+import com.aven0x.Velto.Velto;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -20,9 +20,9 @@ public class NotificationUtil {
     private static FileConfiguration lang;
 
     public static void load() {
-        File file = new File(Xcore.getInstance().getDataFolder(), "lang.yml");
+        File file = new File(Velto.getInstance().getDataFolder(), "lang.yml");
         if (!file.exists()) {
-            Xcore.getInstance().saveResource("lang.yml", false);
+            Velto.getInstance().saveResource("lang.yml", false);
         }
         lang = YamlConfiguration.loadConfiguration(file);
     }
@@ -65,7 +65,7 @@ public class NotificationUtil {
             case "bossbar" -> {
                 BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
                 player.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(Xcore.getInstance(), () -> player.hideBossBar(bar), duration);
+                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> player.hideBossBar(bar), duration);
             }
 
             default -> player.sendMessage("§cInvalid notification type: " + type);
@@ -86,6 +86,6 @@ public class NotificationUtil {
                 }
                 player.sendActionBar(message);
             }
-        }.runTaskTimer(Xcore.getInstance(), 0L, interval);
+        }.runTaskTimer(Velto.getInstance(), 0L, interval);
     }
 }

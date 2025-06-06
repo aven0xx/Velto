@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -17,7 +17,7 @@ public class WeatherCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "xcore.weather")) {
+        if (!hasPermission(sender, "velto.weather")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
             }

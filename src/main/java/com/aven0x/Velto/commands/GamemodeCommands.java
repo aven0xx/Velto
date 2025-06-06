@@ -1,6 +1,6 @@
-package com.aven0x.xcore.commands;
+package com.aven0x.Velto.commands;
 
-import com.aven0x.xcore.utils.NotificationUtil;
+import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -51,8 +51,8 @@ public class GamemodeCommands {
             boolean self = args.length < 2;
 
             String perm = self
-                    ? "xcore.gamemode." + mode.name().toLowerCase()
-                    : "xcore.gamemode." + mode.name().toLowerCase() + ".others";
+                    ? "velto.gamemode." + mode.name().toLowerCase()
+                    : "velto.gamemode." + mode.name().toLowerCase() + ".others";
             if (!hasPermission(sender, perm)) return true;
 
             if (target == null || !target.isOnline()) {
