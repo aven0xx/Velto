@@ -8,4 +8,4 @@ THIS IS XCORE 0.3 ROADMAP
 -/itemlore command for changing item lore
 -Improvement to the notification sytem (Bossbar Color, subtitle)
 -Other optimizations
--Namechange to Xylus
+-Namechange to Velto
