@@ -27,4 +27,4 @@ All commands and messages are configurable. Open source plugin and easy to extan
 ```plaintext
 config.yml         # Stores spawn point, and other data
 lang.yml           # All messages (type + content) are defined here
-commands.yml       # Enable or disable commands from Xcore
+commands.yml       # Enable or disable commands from Velto
