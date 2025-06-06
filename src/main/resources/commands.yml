@@ -40,7 +40,6 @@ kill:
 god:
   enabled: true
   aliases: ["invincible"]
-
 gamemode:
   enabled: true
   aliases: ["gm"]
