@@ -1,6 +1,7 @@
 package com.aven0x.Velto;
 
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.Velto.manager.AutoMsgManager;
 import com.aven0x.Velto.manager.CommandManager;
 import com.aven0x.Velto.manager.TeleportManager;
 import com.aven0x.Velto.utils.CommandUtil;
@@ -13,6 +14,7 @@ public class Velto extends JavaPlugin {
     private static Velto instance;
     private TeleportManager teleportManager;
     private BukkitAudiences adventure;
+    private AutoMsgManager autoMsgManager;
 
     @Override
     public void onEnable() {
@@ -28,6 +30,8 @@ public class Velto extends JavaPlugin {
         // Setup Adventure + managers
         this.adventure = BukkitAudiences.create(this);
         this.teleportManager = new TeleportManager();
+        this.autoMsgManager = new AutoMsgManager();
+        this.autoMsgManager.start();
 
         // Register commands
         CommandManager.registerAllCommands();

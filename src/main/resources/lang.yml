@@ -116,3 +116,19 @@ gamemode-set-other:
   type: chat
   message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
 
+automsg.1:
+  type: chat
+  message: "&bJoin our Discord to get updates and support!"
+
+automsg.2:
+  type: actionbar
+  message: "&aNeed help? Type &f/help &afor commands."
+
+automsg.3:
+  type: bossbar
+  message: "&dVote for rewards every day!"
+  duration: 100
+
+automsg.4:
+  type: title
+  message: "&eRemember to claim your daily kit!"

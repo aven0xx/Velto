@@ -4,3 +4,14 @@
 #
 # Configure the spawn point related to /spawn command
 spawn: null
+#
+#
+# Auto-messaging system
+auto-messages:
+  enabled: true
+  interval-seconds: 120
+  random: true
+  messages:
+    - key: automsg.1
+    - key: automsg.2
+    - key: automsg.3
