@@ -9,3 +9,4 @@ THIS IS XCORE 0.3 ROADMAP
 -Improvement to the notification sytem (Bossbar Color, subtitle)
 -Other optimizations
 -Namechange to Velto
+-Recode of the Anvil command so it works (for real only on PaperMC)
