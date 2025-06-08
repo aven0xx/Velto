@@ -12,39 +12,38 @@ import java.util.Random;
 
 public class AutoMsgManager {
 
-    private final List<String> messages;
-    private final boolean random;
-    private final int intervalTicks;
+    private int index = 0;
     private final Random rng = new Random();
 
-    public AutoMsgManager() {
-        this.messages = ConfigUtil.getAutoMessageKeys();
-        this.random = ConfigUtil.isAutoMessagesRandom();
-        this.intervalTicks = ConfigUtil.getAutoMessagesIntervalTicks();
-    }
-
     public void start() {
-        if (messages.isEmpty()) return;
+        List<String> keys = ConfigUtil.getAutoMessageKeys();
+
+        if (keys.isEmpty()) {
+            Bukkit.getLogger().warning("[Velto] No auto-messages defined in config.");
+            return;
+        }
+
+        int interval = ConfigUtil.getAutoMessagesIntervalTicks();
+        boolean random = ConfigUtil.isAutoMessagesRandom();
 
         new BukkitRunnable() {
-            private int currentIndex = 0;
-
             @Override
             public void run() {
-                if (!ConfigUtil.isAutoMessagesEnabled()) return;
-
-                String key;
-                if (random) {
-                    key = messages.get(rng.nextInt(messages.size()));
-                } else {
-                    key = messages.get(currentIndex);
-                    currentIndex = (currentIndex + 1) % messages.size();
+                if (!ConfigUtil.isAutoMessagesEnabled()) {
+                    Bukkit.getLogger().info("[Velto] Auto-messages disabled in config.");
+                    return;
                 }
+
+                String key = random
+                        ? keys.get(rng.nextInt(keys.size()))
+                        : keys.get(index++ % keys.size());
+
+                Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     NotificationUtil.send(player, key);
                 }
             }
-        }.runTaskTimer(Velto.getInstance(), intervalTicks, intervalTicks);
+        }.runTaskTimer(Velto.getInstance(), interval, interval);
     }
 }
