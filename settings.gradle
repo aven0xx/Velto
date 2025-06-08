@@ -1,1 +1,26 @@
-rootProject.name = 'Velto'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "spigotmc-repo"
+            url = "https://hub.spigotmc.org/nexus/content/repositories/public/"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/groups/public/"
+        }
+        maven {
+            name = "sonatype-snapshots"
+            url = "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+}
+
+rootProject.name = "Velto"

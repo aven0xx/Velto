@@ -3,6 +3,8 @@ package com.aven0x.Velto.manager;
 import com.aven0x.Velto.commands.*;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.DynamicCommandRegistrar;
+import com.aven0x.Velto.utils.ServerUtil;
+
 import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
 public class CommandManager {
@@ -14,7 +16,12 @@ public class CommandManager {
         register("day", new DayCommand());
         register("night", new NightCommand());
         register("craft", new CraftCommand());
-        register("anvil", new AnvilCommand());
+
+        // Paper-only command
+        if (ServerUtil.isPaper()) {
+            register("anvil", new AnvilCommand());
+        }
+
         register("feed", new FeedCommand());
         register("heal", new HealCommand());
         register("broadcast", new BroadcastCommand());
@@ -33,7 +40,6 @@ public class CommandManager {
     private static void register(String name, BaseCommand command) {
         if (!CommandUtil.isEnabled(name)) return;
 
-        // Register aliases
         for (String alias : CommandUtil.getAliases(name)) {
             DynamicCommandRegistrar.registerAlias(alias, command);
         }

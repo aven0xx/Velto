@@ -55,36 +55,40 @@ public class NotificationUtil {
         String colored = rawMessage.replace('&', '§');
         Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
 
+        // Adventure sender
+        var audience = Velto.getInstance().adventure().player(player);
+
         switch (type) {
-            case "chat" -> player.sendMessage(component);
+            case "chat" -> audience.sendMessage(component);
 
-            case "actionbar" -> sendActionBar(player, component, duration);
+            case "actionbar" -> sendActionBar(audience, component, duration);
 
-            case "title" -> player.showTitle(Title.title(component, Component.empty()));
+            case "title" -> audience.showTitle(Title.title(component, Component.empty()));
 
             case "bossbar" -> {
                 BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
-                player.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> player.hideBossBar(bar), duration);
+                audience.showBossBar(bar);
+                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
             }
 
             default -> player.sendMessage("§cInvalid notification type: " + type);
         }
     }
 
-    private static void sendActionBar(Player player, Component message, int durationTicks) {
+    private static void sendActionBar(net.kyori.adventure.audience.Audience audience, Component message, int durationTicks) {
         int interval = 20;
         int repetitions = Math.max(1, durationTicks / interval);
 
         new BukkitRunnable() {
             int count = 0;
+
             @Override
             public void run() {
-                if (!player.isOnline() || count++ >= repetitions) {
+                if (count++ >= repetitions) {
                     cancel();
                     return;
                 }
-                player.sendActionBar(message);
+                audience.sendActionBar(message);
             }
         }.runTaskTimer(Velto.getInstance(), 0L, interval);
     }
