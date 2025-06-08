@@ -13,6 +13,7 @@ spawn-not-set:
 teleporting-spawn:
   type: bossbar
   message: "&aTeleporting to spawn..."
+  color: GREEN
 
 spawn-set:
   type: chat
@@ -128,7 +129,10 @@ automsg.3:
   type: bossbar
   message: "&dVote for rewards every day!"
   duration: 100
+  color: PURPLE
 
 automsg.4:
   type: title
   message: "&eRemember to claim your daily kit!"
+  subtitle: "&7Use &b/kit daily &7to receive it!"
+  duration: 80

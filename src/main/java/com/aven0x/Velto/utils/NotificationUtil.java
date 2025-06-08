@@ -55,7 +55,6 @@ public class NotificationUtil {
         String colored = rawMessage.replace('&', '§');
         Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
 
-        // Adventure sender
         var audience = Velto.getInstance().adventure().player(player);
 
         switch (type) {
@@ -63,10 +62,27 @@ public class NotificationUtil {
 
             case "actionbar" -> sendActionBar(audience, component, duration);
 
-            case "title" -> audience.showTitle(Title.title(component, Component.empty()));
+            case "title" -> {
+                String subtitleRaw = section.getString("subtitle", "");
+                if (placeholders != null) {
+                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                        subtitleRaw = subtitleRaw.replace(entry.getKey(), entry.getValue());
+                    }
+                }
+                Component subtitle = LegacyComponentSerializer.legacySection().deserialize(subtitleRaw.replace('&', '§'));
+                audience.showTitle(Title.title(component, subtitle));
+            }
 
             case "bossbar" -> {
-                BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
+                String colorName = section.getString("color", "blue").toUpperCase();
+                BossBar.Color color;
+                try {
+                    color = BossBar.Color.valueOf(colorName);
+                } catch (IllegalArgumentException e) {
+                    color = BossBar.Color.BLUE;
+                }
+
+                BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
                 audience.showBossBar(bar);
                 Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
             }

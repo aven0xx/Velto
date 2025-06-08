@@ -45,6 +45,6 @@ public class AutoMsgManager {
                     NotificationUtil.send(player, key);
                 }
             }
-        }.runTaskTimerAsynchronously(Velto.getInstance(), intervalTicks, intervalTicks);
+        }.runTaskTimer(Velto.getInstance(), intervalTicks, intervalTicks);
     }
 }
