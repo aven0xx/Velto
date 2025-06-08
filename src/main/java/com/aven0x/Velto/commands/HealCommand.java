@@ -3,6 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.NotificationUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,8 +35,13 @@ public class HealCommand extends BaseCommand {
             return true;
         }
 
-        target.setHealth(target.getMaxHealth());
+        AttributeInstance attr = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        if (attr != null) {
+            target.setHealth(attr.getValue());
+        }
+
         target.setFoodLevel(20);
+        target.setSaturation(20f);
 
         if (self) {
             NotificationUtil.send(target, "healed-self");
