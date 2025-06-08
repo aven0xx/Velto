@@ -58,11 +58,14 @@ public class SpeedCommand extends BaseCommand {
             return true;
         }
 
-        float speed = speedLevel / 10.0f;
+        // ✅ Adjusted speed logic
+        float baseSpeed = target.isFlying() ? 0.1f : 0.2f;
+        float speed = baseSpeed * speedLevel;
+
         if (target.isFlying()) {
-            target.setFlySpeed(speed);
+            target.setFlySpeed(Math.min(speed, 1.0f));
         } else {
-            target.setWalkSpeed(speed);
+            target.setWalkSpeed(Math.min(speed, 1.0f));
         }
 
         if (sender instanceof Player player) {
