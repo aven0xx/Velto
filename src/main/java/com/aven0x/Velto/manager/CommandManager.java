@@ -17,6 +17,7 @@ public class CommandManager {
         register("night", new NightCommand());
         register("craft", new CraftCommand());
         register("list", new ListCommand());
+        register("notiftest", new NotifTestCommand());
 
         // Paper-only command
         if (ServerUtil.isPaper()) {

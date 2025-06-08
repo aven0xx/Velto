@@ -122,20 +122,16 @@ automsg1:
   message: "&bJoin our Discord to get updates and support!"
 
 automsg2:
-  type: actionbar
+  type: chat
   message: "&aNeed help? Type &f/help &afor commands."
 
 automsg3:
-  type: bossbar
+  type: chat
   message: "&dVote for rewards every day!"
-  duration: 100
-  color: PURPLE
 
 automsg4:
-  type: title
+  type: chat
   message: "&eRemember to claim your daily kit!"
-  subtitle: "&7Use &b/kit daily &7to receive it!"
-  duration: 80
 
 list-command:
   type: chat

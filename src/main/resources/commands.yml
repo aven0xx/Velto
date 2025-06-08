@@ -58,3 +58,6 @@ gmsp:
 list:
   enabled: true
   aliases: []
+notiftest:
+  enabled: true
+  aliases: []

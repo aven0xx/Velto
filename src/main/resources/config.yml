@@ -12,6 +12,6 @@ auto-messages:
   interval-seconds: 120
   random: true
   messages:
-    - key: automsg1
-    - key: automsg2
-    - key: automsg3
+    - automsg1
+    - automsg2
+    - automsg3

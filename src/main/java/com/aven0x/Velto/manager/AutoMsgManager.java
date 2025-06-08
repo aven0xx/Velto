@@ -13,30 +13,39 @@ import java.util.Random;
 public class AutoMsgManager {
 
     private int index = 0;
+    private String lastKey = null;
     private final Random rng = new Random();
 
     public void start() {
-        List<String> keys = ConfigUtil.getAutoMessageKeys();
-
-        if (keys.isEmpty()) {
-            Bukkit.getLogger().warning("[Velto] No auto-messages defined in config.");
-            return;
-        }
-
-        int interval = ConfigUtil.getAutoMessagesIntervalTicks();
-        boolean random = ConfigUtil.isAutoMessagesRandom();
-
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (!ConfigUtil.isAutoMessagesEnabled()) {
-                    Bukkit.getLogger().info("[Velto] Auto-messages disabled in config.");
+                    return; // Silently skip if disabled
+                }
+
+                List<String> keys = ConfigUtil.getAutoMessageKeys();
+                if (keys.isEmpty()) {
+                    Bukkit.getLogger().warning("[Velto] No auto-messages defined in config.");
                     return;
                 }
 
-                String key = random
-                        ? keys.get(rng.nextInt(keys.size()))
-                        : keys.get(index++ % keys.size());
+                boolean random = ConfigUtil.isAutoMessagesRandom();
+                String key;
+
+                if (random) {
+                    // Prevent repeating the same message twice in a row
+                    if (keys.size() == 1) {
+                        key = keys.get(0);
+                    } else {
+                        do {
+                            key = keys.get(rng.nextInt(keys.size()));
+                        } while (key.equals(lastKey));
+                    }
+                    lastKey = key;
+                } else {
+                    key = keys.get(index++ % keys.size());
+                }
 
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
 
@@ -44,6 +53,8 @@ public class AutoMsgManager {
                     NotificationUtil.send(player, key);
                 }
             }
-        }.runTaskTimer(Velto.getInstance(), interval, interval);
+        }.runTaskTimer(Velto.getInstance(),
+                ConfigUtil.getAutoMessagesIntervalTicks(),
+                ConfigUtil.getAutoMessagesIntervalTicks());
     }
 }
