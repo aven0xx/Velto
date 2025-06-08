@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class TimeCommand extends BaseCommand {
     public TimeCommand() {
@@ -13,7 +14,7 @@ public class TimeCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.timeset")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");

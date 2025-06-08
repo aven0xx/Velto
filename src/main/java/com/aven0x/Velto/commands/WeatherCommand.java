@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class WeatherCommand extends BaseCommand {
     public WeatherCommand() {
@@ -16,7 +17,7 @@ public class WeatherCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.weather")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
@@ -71,7 +72,7 @@ class SunCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         return Bukkit.dispatchCommand(sender, "weather sun");
     }
 }
@@ -82,7 +83,7 @@ class RainCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         return Bukkit.dispatchCommand(sender, "weather rain");
     }
 }
@@ -93,7 +94,7 @@ class ThunderCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         return Bukkit.dispatchCommand(sender, "weather thunder");
     }
 }

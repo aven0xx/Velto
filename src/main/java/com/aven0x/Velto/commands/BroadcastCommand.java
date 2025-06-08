@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class BroadcastCommand extends BaseCommand {
     public BroadcastCommand() {
@@ -15,7 +16,7 @@ public class BroadcastCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.broadcast")) {
             if (sender instanceof Player playerSender) {
                 NotificationUtil.send(playerSender, "no-permission");

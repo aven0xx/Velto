@@ -5,6 +5,7 @@ import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,18 +22,17 @@ public abstract class BaseCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
+    public abstract boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args);
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         return Collections.emptyList(); // Default: no suggestions
     }
 
+    // Remove if unused; otherwise keep for future use
     protected boolean isPlayer(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            if (sender instanceof Player player) {
-                NotificationUtil.send(player, "only-player");
-            }
+            sender.sendMessage("§cOnly players can use this command.");
             return false;
         }
         return true;
@@ -42,6 +42,8 @@ public abstract class BaseCommand implements CommandExecutor, TabCompleter {
         if (!sender.hasPermission(perm)) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
+            } else {
+                sender.sendMessage("§cYou do not have permission.");
             }
             return false;
         }

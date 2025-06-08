@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
             if (args.length < 1) {
                 if (sender instanceof Player player) {
                     NotificationUtil.send(player, "invalid-usage-gamemode");
@@ -122,7 +123,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
             Player target = args.length > 0
                     ? Bukkit.getPlayer(args[0])
                     : (sender instanceof Player ? (Player) sender : null);
