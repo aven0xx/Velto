@@ -2,11 +2,10 @@ THIS IS XCORE 0.3 ROADMAP
 
 -Recode of the Gamemode Command / Done
 -Possibility of adding alias to command / Done
--/list command (Listing online players)
--Automessaging system
+-/list command (Listing online players) / Done
+-Automessaging system / Done
 -/god command / Done
--/itemlore command for changing item lore
 -Improvement to the notification sytem (Bossbar Color, subtitle) / Done
--Other optimizations
+-Other optimizations / Done
 -Namechange to Velto / Done
--Recode of the Anvil command so it works (for real only on PaperMC)
+-Recode of the Anvil command so it works (for real only on PaperMC) / Done

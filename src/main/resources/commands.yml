@@ -55,3 +55,6 @@ gma:
 gmsp:
   enabled: true
   aliases: ["gm3", "spectator"]
+list:
+  enabled: true
+  aliases: []

@@ -16,6 +16,7 @@ public class CommandManager {
         register("day", new DayCommand());
         register("night", new NightCommand());
         register("craft", new CraftCommand());
+        register("list", new ListCommand());
 
         // Paper-only command
         if (ServerUtil.isPaper()) {

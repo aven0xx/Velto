@@ -136,3 +136,7 @@ automsg.4:
   message: "&eRemember to claim your daily kit!"
   subtitle: "&7Use &b/kit daily &7to receive it!"
   duration: 80
+
+list-command:
+  type: chat
+  message: "&aOnline players: %players%"
