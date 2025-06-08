@@ -6,7 +6,7 @@ THIS IS XCORE 0.3 ROADMAP
 -Automessaging system
 -/god command / Done
 -/itemlore command for changing item lore
--Improvement to the notification sytem (Bossbar Color, subtitle)
+-Improvement to the notification sytem (Bossbar Color, subtitle) / Done
 -Other optimizations
--Namechange to Velto
+-Namechange to Velto / Done
 -Recode of the Anvil command so it works (for real only on PaperMC)

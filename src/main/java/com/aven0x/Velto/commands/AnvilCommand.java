@@ -4,7 +4,6 @@ import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 
 public class AnvilCommand extends BaseCommand {
     public AnvilCommand() {
@@ -21,11 +20,12 @@ public class AnvilCommand extends BaseCommand {
         }
 
         if (!(sender instanceof Player player)) {
-            // Console or command block trying to use this
-            return true; // NotificationUtil only supports Player, so we silently ignore
+            // Command used by console or non-player source
+            return true;
         }
 
-        player.openInventory(player.getServer().createInventory(null, InventoryType.ANVIL));
+        // Open the Paper anvil UI
+        player.openAnvil(null, true);
         NotificationUtil.send(player, "opened-anvil");
         return true;
     }

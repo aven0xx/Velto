@@ -2,12 +2,20 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
+        maven {
+            name = "papermc"
+            url = "https://repo.papermc.io/repository/maven-public/"
+        }
     }
 }
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        maven {
+            name = "papermc"
+            url = "https://repo.papermc.io/repository/maven-public/"
+        }
         maven {
             name = "spigotmc-repo"
             url = "https://hub.spigotmc.org/nexus/content/repositories/public/"

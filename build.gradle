@@ -9,36 +9,40 @@ version = '0.3-SNAPSHOT'
 repositories {
     mavenCentral()
     maven {
-        name = "spigotmc-repo"
-        url = "https://hub.spigotmc.org/nexus/content/repositories/public/"
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
     maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/public/'
     }
     maven {
-        name = "sonatype-snapshots"
-        url = "https://oss.sonatype.org/content/repositories/snapshots"
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven {
+        name = 'sonatype-snapshots'
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
-    implementation "net.kyori:adventure-api:4.21.0"
-    implementation "net.kyori:adventure-platform-bukkit:4.4.0"
+    compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
+    implementation 'net.kyori:adventure-api:4.21.0'
+    implementation 'net.kyori:adventure-platform-bukkit:4.4.0'
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release.set(17)
+    options.release.set(21)
 }
 
 processResources {
-    def props = [version: version]
+    def props = [version: project.version]
     inputs.properties props
     filteringCharset = 'UTF-8'
     filesMatching('plugin.yml') {
@@ -46,12 +50,12 @@ processResources {
     }
 }
 
-shadowJar {
+tasks.named('shadowJar') {
     archiveClassifier.set('')
     configurations = [project.configurations.runtimeClasspath]
-    relocate 'net.kyori.adventure', 'com.aven0x.shade.adventure'
+    // relocation désactivée pour éviter l'erreur ASM Java 21
 }
 
-build {
-    dependsOn shadowJar
+tasks.named('build') {
+    dependsOn tasks.named('shadowJar')
 }
