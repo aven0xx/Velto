@@ -1,0 +1,111 @@
+package com.aven0x.Velto.utils;
+
+import com.aven0x.Velto.Velto;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.File;
+import java.util.Map;
+
+public class NotificationUtil {
+
+    private static FileConfiguration lang;
+
+    public static void load() {
+        File file = new File(Velto.getInstance().getDataFolder(), "lang.yml");
+        if (!file.exists()) {
+            Velto.getInstance().saveResource("lang.yml", false);
+        }
+        lang = YamlConfiguration.loadConfiguration(file);
+    }
+
+    public static void send(Player player, String key) {
+        send(player, key, null);
+    }
+
+    public static void send(Player player, String key, Map<String, String> placeholders) {
+        if (lang == null) load();
+
+        ConfigurationSection section = lang.getConfigurationSection(key);
+        if (section == null) {
+            player.sendMessage("§cMissing message: " + key);
+            return;
+        }
+
+        String type = section.getString("type", "chat").toLowerCase();
+        String rawMessage = section.getString("message", key);
+        int duration = section.getInt("duration", 40); // 2s default
+
+        // Placeholder replacement
+        if (placeholders != null) {
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                rawMessage = rawMessage.replace(entry.getKey(), entry.getValue());
+            }
+        }
+
+        // Convert & → § for legacy color code support
+        String colored = rawMessage.replace('&', '§');
+        Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
+
+        var audience = Velto.getInstance().adventure().player(player);
+
+        switch (type) {
+            case "chat" -> audience.sendMessage(component);
+
+            case "actionbar" -> sendActionBar(audience, component, duration);
+
+            case "title" -> {
+                String subtitleRaw = section.getString("subtitle", "");
+                if (placeholders != null) {
+                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                        subtitleRaw = subtitleRaw.replace(entry.getKey(), entry.getValue());
+                    }
+                }
+                Component subtitle = LegacyComponentSerializer.legacySection().deserialize(subtitleRaw.replace('&', '§'));
+                audience.showTitle(Title.title(component, subtitle));
+            }
+
+            case "bossbar" -> {
+                String colorName = section.getString("color", "blue").toUpperCase();
+                BossBar.Color color;
+                try {
+                    color = BossBar.Color.valueOf(colorName);
+                } catch (IllegalArgumentException e) {
+                    color = BossBar.Color.BLUE;
+                }
+
+                BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
+                audience.showBossBar(bar);
+                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
+            }
+
+            default -> player.sendMessage("§cInvalid notification type: " + type);
+        }
+    }
+
+    private static void sendActionBar(net.kyori.adventure.audience.Audience audience, Component message, int durationTicks) {
+        int interval = 20;
+        int repetitions = Math.max(1, durationTicks / interval);
+
+        new BukkitRunnable() {
+            int count = 0;
+
+            @Override
+            public void run() {
+                if (count++ >= repetitions) {
+                    cancel();
+                    return;
+                }
+                audience.sendActionBar(message);
+            }
+        }.runTaskTimer(Velto.getInstance(), 0L, interval);
+    }
+}

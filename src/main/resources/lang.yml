@@ -3,7 +3,7 @@ only-player:
   message: "&cOnly players can use this command."
 
 no-permission:
-  type: actionbar
+  type: chat
   message: "&cYou do not have permission."
 
 spawn-not-set:
@@ -13,6 +13,7 @@ spawn-not-set:
 teleporting-spawn:
   type: bossbar
   message: "&aTeleporting to spawn..."
+  color: GREEN
 
 spawn-set:
   type: chat
@@ -21,6 +22,10 @@ spawn-set:
 invalid-usage:
   type: chat
   message: "&cInvalid command usage."
+
+invalid-usage-gamemode:
+  type: chat
+  message: "&cUsage: /gamemode <mode> [player]"
 
 invalid-time:
   type: chat
@@ -74,18 +79,6 @@ healed-other:
   type: chat
   message: "&aYou have healed &e%target%&a."
 
-gamemode-usage:
-  type: chat
-  message: "&cUsage: /gamemode <mode> [player]"
-
-invalid-gamemode:
-  type: chat
-  message: "&cInvalid gamemode."
-
-gamemode-set:
-  type: chat
-  message: "&aGamemode updated."
-
 player-killed:
   type: chat
   message: "&cPlayer has been killed."
@@ -101,3 +94,45 @@ invalid-speed:
 weather-updated:
   type: chat
   message: "&aWeather has been updated."
+
+god-enabled:
+  type: actionbar
+  message: "&aGod mode enabled."
+  duration: 60
+
+god-disabled:
+  type: actionbar
+  message: "&cGod mode disabled."
+  duration: 60
+
+invalid-gamemode:
+  type: chat
+  message: "&cInvalid gamemode. Use 0-3 or survival, creative, adventure, spectator."
+
+gamemode-set-self:
+  type: chat
+  message: "&aYour gamemode has been set to &f%mode%&a."
+
+gamemode-set-other:
+  type: chat
+  message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
+
+automsg1:
+  type: chat
+  message: "&bJoin our Discord to get updates and support!"
+
+automsg2:
+  type: chat
+  message: "&aNeed help? Type &f/help &afor commands."
+
+automsg3:
+  type: chat
+  message: "&dVote for rewards every day!"
+
+automsg4:
+  type: chat
+  message: "&eRemember to claim your daily kit!"
+
+list-command:
+  type: chat
+  message: "&aOnline players: %players%"

@@ -1,6 +1,6 @@
-name: Xcore
-version: 0.2
-main: com.aven0x.xcore.Xcore
+name: Velto
+version: 0.3
+main: com.aven0x.Velto.Velto
 api-version: 1.21
 commands:
   weather: {}
@@ -24,3 +24,6 @@ commands:
   feed: {}
   heal: {}
   broadcast: {}
+  god: {}
+  notiftest: {}
+  list: {}
