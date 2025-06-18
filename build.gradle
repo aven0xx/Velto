@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.aven0x'
-version = '0.3'
+version = '0.4'
 
 repositories {
     mavenCentral()
@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-api:4.21.0'
+    implementation 'net.kyori:adventure-api:4.23.0'
     implementation 'net.kyori:adventure-platform-bukkit:4.4.0'
 }
 
@@ -53,7 +53,8 @@ processResources {
 tasks.named('shadowJar') {
     archiveClassifier.set('')
     configurations = [project.configurations.runtimeClasspath]
-    // relocation désactivée pour éviter l'erreur ASM Java 21
+    // Pas de relocate ici pour éviter les conflits avec Java 21 + ASM
+    // Adventure sera inclus tel quel dans le jar
 }
 
 tasks.named('build') {

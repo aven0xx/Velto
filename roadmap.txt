@@ -1,22 +1,10 @@
-THIS IS VELTO ROADMAP
-
--Recode of the Gamemode Command / Done
--Possibility of adding alias to command / Done
--/list command (Listing online players) / Done
--Automessaging system / Done
--/god command / Done
--Improvement to the notification sytem (Bossbar Color, subtitle) / Done
--Others optimizations / Done
--Namechange to Velto / Done
--Recode of the Anvil command so it works (for real only on PaperMC) / Done
-
-VELTO 0.3 IS READY TO RELEASE
-
 FOR 0.4:
+-Compatibility with 1.21.5 and 1.21.6
 -/alert replacing the Broadcast command
 -NotificationUtil Global Alert System (optimization)
 -Clear command for inventory (using Bukkit)
 -Others optimizations
+-Reload command for configs
 
 FOR 0.5:
 -/itemlore command
