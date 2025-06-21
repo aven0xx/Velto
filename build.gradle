@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.aven0x'
-version = '0.4'
+version = '0.4-SNAPSHOT'
 
 repositories {
     mavenCentral()
