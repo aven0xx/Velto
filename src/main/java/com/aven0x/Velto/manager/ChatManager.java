@@ -31,27 +31,33 @@ public class ChatManager implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         String format = ConfigUtil.getChatFormat();
 
-        // Apply PlaceholderAPI first (if available)
+        // Manual replacements for placeholders
+        format = format.replace("%player_name%", event.getPlayer().getName());
+
+        // Apply PlaceholderAPI if available
         if (papiAvailable) {
             format = PlaceholderAPI.setPlaceholders(event.getPlayer(), format);
         }
 
-        // Escape % in player message to prevent format crash
+        // Escape '%' characters in the message to avoid format issues
         String safeMessage = event.getMessage().replace("%", "%%");
 
-        // Replace %message% with escaped version
+        // Replace %message% placeholder with the safe player message
         format = format.replace("%message%", safeMessage);
 
-        // Apply color codes
+        // Apply color formatting (& -> §, hex)
         format = CC.translate(format);
 
-        // Set formatted chat
+        // Set final formatted chat message
         event.setFormat(format);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         String msg = ConfigUtil.getJoinMessage();
+
+        // Manual fallback if PlaceholderAPI is missing
+        msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
             msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
@@ -63,6 +69,8 @@ public class ChatManager implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         String msg = ConfigUtil.getQuitMessage();
+
+        msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
             msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
