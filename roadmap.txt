@@ -1,5 +1,6 @@
 FOR 0.4:
 -Compatibility with 1.21.5 and 1.21.6 / Done
+-Compatibility with 1.21.7 /
 -/broadcast command upgrade / In progress
 -NotificationUtil Global Alert System (optimization) / In progress
 -Clear command for inventory (using Bukkit)
@@ -10,3 +11,4 @@ FOR 0.5:
 -/itemlore command
 -/rename command (renaming item directly)
 -Others optimizations
+-/killall command (For entities or players)
