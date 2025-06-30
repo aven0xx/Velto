@@ -1,12 +1,12 @@
 FOR 0.4:
--Compatibility with 1.21.5 and 1.21.6
+-Compatibility with 1.21.5 and 1.21.6 / Done
 -/alert replacing the Broadcast command
 -NotificationUtil Global Alert System (optimization)
 -Clear command for inventory (using Bukkit)
--Others optimizations
--Reload command for configs
+-Reload command for configs / In progress
+-Chat System with PlaceholderAPI support / In progress
 
 FOR 0.5:
 -/itemlore command
 -/rename command (renaming item directly)
--Chat System with PlaceholderAPI support
+-Others optimizations
