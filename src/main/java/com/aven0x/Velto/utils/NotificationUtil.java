@@ -44,14 +44,12 @@ public class NotificationUtil {
         String rawMessage = section.getString("message", key);
         int duration = section.getInt("duration", 40); // 2s default
 
-        // Placeholder replacement
         if (placeholders != null) {
             for (Map.Entry<String, String> entry : placeholders.entrySet()) {
                 rawMessage = rawMessage.replace(entry.getKey(), entry.getValue());
             }
         }
 
-        // Convert & → § for legacy color code support
         String colored = rawMessage.replace('&', '§');
         Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
 
@@ -88,6 +86,91 @@ public class NotificationUtil {
             }
 
             default -> player.sendMessage("§cInvalid notification type: " + type);
+        }
+    }
+
+    public static void sendGlobal(String key) {
+        sendGlobal(key, null);
+    }
+
+    public static void sendGlobal(String key, Map<String, String> placeholders) {
+        if (lang == null) load();
+
+        ConfigurationSection section = lang.getConfigurationSection(key);
+        if (section == null) {
+            Bukkit.getLogger().warning("§cMissing global notification: " + key);
+            return;
+        }
+
+        String type = section.getString("type", "chat").toLowerCase();
+        String rawMessage = section.getString("message", key);
+        int duration = section.getInt("duration", 40);
+
+        if (placeholders != null) {
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                rawMessage = rawMessage.replace(entry.getKey(), entry.getValue());
+            }
+        }
+
+        Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
+        var audience = Velto.getInstance().adventure().all();
+
+        switch (type) {
+            case "chat" -> audience.sendMessage(component);
+
+            case "actionbar" -> sendActionBar(audience, component, duration);
+
+            case "title" -> {
+                String subtitleRaw = section.getString("subtitle", "");
+                if (placeholders != null) {
+                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                        subtitleRaw = subtitleRaw.replace(entry.getKey(), entry.getValue());
+                    }
+                }
+                Component subtitle = LegacyComponentSerializer.legacySection().deserialize(subtitleRaw.replace('&', '§'));
+                audience.showTitle(Title.title(component, subtitle));
+            }
+
+            case "bossbar" -> {
+                String colorName = section.getString("color", "blue").toUpperCase();
+                BossBar.Color color;
+                try {
+                    color = BossBar.Color.valueOf(colorName);
+                } catch (IllegalArgumentException e) {
+                    color = BossBar.Color.BLUE;
+                }
+
+                BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
+                audience.showBossBar(bar);
+                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
+            }
+
+            default -> Bukkit.getLogger().warning("§cInvalid global notification type: " + type);
+        }
+    }
+
+    public static void sendGlobalRaw(String rawMessage) {
+        sendGlobalRaw(rawMessage, "chat", 40);
+    }
+
+    public static void sendGlobalRaw(String rawMessage, String type, int durationTicks) {
+        Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
+        var audience = Velto.getInstance().adventure().all();
+
+        switch (type.toLowerCase()) {
+            case "chat" -> audience.sendMessage(component);
+
+            case "actionbar" -> sendActionBar(audience, component, durationTicks);
+
+            case "title" -> audience.showTitle(Title.title(component, Component.empty()));
+
+            case "bossbar" -> {
+                BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
+                audience.showBossBar(bar);
+                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), durationTicks);
+            }
+
+            default -> Bukkit.getLogger().warning("§cInvalid global raw notification type: " + type);
         }
     }
 

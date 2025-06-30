@@ -30,13 +30,23 @@ public class ChatManager implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         String format = ConfigUtil.getChatFormat();
-        format = format.replace("%message%", event.getMessage());
 
+        // Apply PlaceholderAPI first (if available)
         if (papiAvailable) {
             format = PlaceholderAPI.setPlaceholders(event.getPlayer(), format);
         }
 
-        event.setFormat(CC.translate(format));
+        // Escape % in player message to prevent format crash
+        String safeMessage = event.getMessage().replace("%", "%%");
+
+        // Replace %message% with escaped version
+        format = format.replace("%message%", safeMessage);
+
+        // Apply color codes
+        format = CC.translate(format);
+
+        // Set formatted chat
+        event.setFormat(format);
     }
 
     @EventHandler
