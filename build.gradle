@@ -23,17 +23,14 @@ configurations {
     bukkitShadow
 }
 
-// ✅ Shared compileOnly (used in both builds)
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.5'
 
-    // Needed only at runtime for shaded versions
     bukkitShadow "net.kyori:adventure-api:$adventureVersion"
     bukkitShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
 
-    // Always include platform for both builds
     implementation "net.kyori:adventure-platform-bukkit:$platformVersion"
 }
 
@@ -55,6 +52,11 @@ processResources {
     }
 }
 
+// Disable default unnamed JAR
+tasks.named('jar') {
+    enabled = false
+}
+
 // Paper JAR (no Adventure shaded)
 tasks.register('paperJar', Jar) {
     archiveClassifier.set('paper')
@@ -62,14 +64,13 @@ tasks.register('paperJar', Jar) {
     dependsOn classes
 }
 
-// Bukkit JAR (shades full Adventure API + platform)
+// Bukkit JAR (shades Adventure API + platform)
 tasks.named('shadowJar') {
     archiveClassifier.set('bukkit')
     configurations = [project.configurations.runtimeClasspath, project.configurations.bukkitShadow]
-    // ❌ NO relocate, NO minimize
 }
 
-// Build both
+// Build task includes only paper and bukkit jars
 tasks.named('build') {
     dependsOn 'paperJar', 'shadowJar'
 }
