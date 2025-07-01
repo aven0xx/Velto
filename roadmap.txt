@@ -6,6 +6,7 @@ FOR 0.4:
 -Clear command for inventory (using Bukkit)
 -Reload command for configs / In progress
 -Chat System with PlaceholderAPI support / In progress
+-2 compiled version on build (Paper and Spigot) / In progress
 
 FOR 0.5:
 -/itemlore command
