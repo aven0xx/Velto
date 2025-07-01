@@ -6,28 +6,35 @@ plugins {
 group = 'com.aven0x'
 version = '0.4-SNAPSHOT'
 
+def adventureVersion = '4.23.0'
+def platformVersion = '4.4.0'
+
 repositories {
     mavenCentral()
 
     maven { name = 'papermc'; url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { name = 'spigotmc-repo'; url = 'https://hub.spigotmc.org/nexus/content/repositories/public/' }
     maven { name = 'sonatype'; url = 'https://oss.sonatype.org/content/groups/public/' }
-    maven { name = 'sonatype-snapshots'; url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { name = 'placeholderapi'; url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
 }
 
-def adventureVersion = '4.23.0'
-def adventurePlatformVersion = '4.4.0'
+configurations {
+    paperRuntimeOnly
+    bukkitShadow
+}
 
+// ✅ Shared compileOnly (used in both builds)
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.5'
 
-    // Shaded into Bukkit jar
-    implementation "net.kyori:adventure-api:$adventureVersion"
-    implementation "net.kyori:adventure-text-minimessage:$adventureVersion"
-    implementation "net.kyori:adventure-platform-bukkit:$adventurePlatformVersion"
+    // Needed only at runtime for shaded versions
+    bukkitShadow "net.kyori:adventure-api:$adventureVersion"
+    bukkitShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
+
+    // Always include platform for both builds
+    implementation "net.kyori:adventure-platform-bukkit:$platformVersion"
 }
 
 java {
@@ -48,22 +55,21 @@ processResources {
     }
 }
 
-// Paper jar (clean, no Adventure inside)
+// Paper JAR (no Adventure shaded)
 tasks.register('paperJar', Jar) {
     archiveClassifier.set('paper')
     from sourceSets.main.output
     dependsOn classes
 }
 
-// Bukkit jar (shaded, no relocation)
+// Bukkit JAR (shades full Adventure API + platform)
 tasks.named('shadowJar') {
     archiveClassifier.set('bukkit')
-    configurations = [project.configurations.runtimeClasspath]
-
-    // ⚠️ No minimize(), no relocate — safe with Java 21
+    configurations = [project.configurations.runtimeClasspath, project.configurations.bukkitShadow]
+    // ❌ NO relocate, NO minimize
 }
 
-// Final build task
+// Build both
 tasks.named('build') {
-    dependsOn 'shadowJar', 'paperJar'
+    dependsOn 'paperJar', 'shadowJar'
 }
