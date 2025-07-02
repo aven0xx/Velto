@@ -11,27 +11,32 @@ def platformVersion = '4.4.0'
 
 repositories {
     mavenCentral()
-
     maven { name = 'papermc'; url = 'https://repo.papermc.io/repository/maven-public/' }
-    maven { name = 'spigotmc-repo'; url = 'https://hub.spigotmc.org/nexus/content/repositories/public/' }
-    maven { name = 'sonatype'; url = 'https://oss.sonatype.org/content/groups/public/' }
     maven { name = 'placeholderapi'; url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
 }
 
 configurations {
-    paperRuntimeOnly
     bukkitShadow
+    paperShadow
 }
 
 dependencies {
+    // Compilation commune (Paper)
     compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.5'
 
+    // Adventure toujours en compileOnly
+    compileOnly "net.kyori:adventure-api:$adventureVersion"
+    compileOnly "net.kyori:adventure-text-minimessage:$adventureVersion"
+    compileOnly "net.kyori:adventure-platform-bukkit:$platformVersion"
+
+    // Pour shading : tout pour Bukkit, platform + minimessage pour Paper
     bukkitShadow "net.kyori:adventure-api:$adventureVersion"
     bukkitShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
+    bukkitShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
 
-    implementation "net.kyori:adventure-platform-bukkit:$platformVersion"
+    paperShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
+    paperShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
 }
 
 java {
@@ -52,25 +57,26 @@ processResources {
     }
 }
 
-// Disable default unnamed JAR
+// Pas de jar par défaut
 tasks.named('jar') {
     enabled = false
 }
 
-// Paper JAR (no Adventure shaded)
-tasks.register('paperJar', Jar) {
-    archiveClassifier.set('paper')
-    from sourceSets.main.output
-    dependsOn classes
-}
-
-// Bukkit JAR (shades Adventure API + platform)
-tasks.named('shadowJar') {
+// Bukkit JAR : shading complet Adventure
+tasks.register('bukkitJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     archiveClassifier.set('bukkit')
     configurations = [project.configurations.runtimeClasspath, project.configurations.bukkitShadow]
+    from sourceSets.main.output
 }
 
-// Build task includes only paper and bukkit jars
+// Paper JAR : shading minimessage + platform
+tasks.register('paperJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveClassifier.set('paper')
+    configurations = [project.configurations.runtimeClasspath, project.configurations.paperShadow]
+    from sourceSets.main.output
+}
+
+// Build complet
 tasks.named('build') {
-    dependsOn 'paperJar', 'shadowJar'
+    dependsOn 'bukkitJar', 'paperJar'
 }
