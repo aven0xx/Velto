@@ -1,14 +1,11 @@
 FOR 0.4:
--Compatibility with 1.21.5 and 1.21.6 / Done
--Compatibility with 1.21.7 /
--/broadcast command upgrade / In progress
--NotificationUtil Global Alert System (optimization) / In progress
--Clear command for inventory (using Bukkit)
--Reload command for configs / In progress
--Chat System with PlaceholderAPI support / In progress
--2 compiled version on build (Paper and Spigot) / In progress
+-Compatiblity with 1.21.4 / Done
+-/broadcast command upgrade / Done
+-NotificationUtil Global Alert System (optimization) / Done
+-Chat System with PlaceholderAPI support / Done
 
 FOR 0.5:
+-Rewrite to a modular system (Spigot + Paper)
 -/itemlore command
 -/rename command (renaming item directly)
 -Others optimizations

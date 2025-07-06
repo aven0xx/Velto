@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.aven0x'
-version = '0.4-SNAPSHOT'
+version = '0.4'
 
 def adventureVersion = '4.23.0'
 def platformVersion = '4.4.0'
