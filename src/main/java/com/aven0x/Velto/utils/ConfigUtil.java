@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ConfigUtil {
 
-    // Ne pas le mettre statique final !
+    // Do NOT make this final — we want to always get the latest config
     private static FileConfiguration getConfig() {
         return Velto.getInstance().getConfig();
     }
@@ -40,14 +40,30 @@ public class ConfigUtil {
     }
 
     public static List<String> getAutoMessageKeys() {
-        return getConfig().getStringList("auto-messages.messages")
-                .stream()
-                .map(entry -> {
-                    if (entry.startsWith("key: ")) return entry.substring(5);
-                    return entry;
-                })
+        return getConfig().getStringList("auto-messages.messages").stream()
+                .map(entry -> entry.startsWith("key: ") ? entry.substring(5) : entry)
                 .toList();
     }
+
+    // === CHAT CONFIGURATION ===
+
+    public static String getChatFormat() {
+        return getConfig().getString("messages.chat", "<%player_name%> %message%");
+    }
+
+    public static String getJoinMessage() {
+        return getConfig().getString("messages.join", "&e%player_name% joined the game.");
+    }
+
+    public static String getQuitMessage() {
+        return getConfig().getString("messages.quit", "&c%player_name% left the game.");
+    }
+
+    public static String getReloadMessage() {
+        return getConfig().getString("messages.reload", "&aChat configuration reloaded.");
+    }
+
+    // === RAW + UTILITIES ===
 
     public static FileConfiguration getRawConfig() {
         return getConfig();

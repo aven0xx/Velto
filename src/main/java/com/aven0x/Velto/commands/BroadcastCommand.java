@@ -2,8 +2,6 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.Velto;
 import com.aven0x.Velto.utils.NotificationUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -31,16 +29,14 @@ public class BroadcastCommand extends BaseCommand {
             return true;
         }
 
-        String rawMessage = String.join(" ", args).replace('&', '§');
-        Component messageComponent = LegacyComponentSerializer.legacySection().deserialize(rawMessage);
+        // Join args and broadcast using NotificationUtil
+        String rawMessage = String.join(" ", args);
 
-        // Send Adventure message to all players using BukkitAudiences
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Velto.getInstance().adventure().player(player).sendMessage(messageComponent);
-        }
+        // Send as chat-type global message
+        NotificationUtil.sendGlobalRaw(rawMessage, "chat", 80);
 
-        // Log plain text to console (with & codes)
-        Bukkit.getLogger().info(rawMessage.replace('§', '&'));
+        // Log to console with &-formatted color codes
+        Bukkit.getLogger().info(rawMessage);
 
         return true;
     }

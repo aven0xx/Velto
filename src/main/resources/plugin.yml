@@ -1,5 +1,5 @@
 name: Velto
-version: 0.3
+version: 0.4
 main: com.aven0x.Velto.Velto
 api-version: 1.21
 commands:

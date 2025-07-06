@@ -15,3 +15,10 @@ auto-messages:
     - automsg1
     - automsg2
     - automsg3
+
+#This section is for Chat and Reload Messages
+messages:
+  chat: "<&#00ffaa%player_name%&r> &7%message%"
+  join: "&a%player_name% joined the server!"
+  quit: "&c%player_name% left the server!"
+  reload: "&6Chat configuration reloaded successfully."

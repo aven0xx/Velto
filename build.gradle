@@ -4,32 +4,39 @@ plugins {
 }
 
 group = 'com.aven0x'
-version = '0.3'
+version = '0.4'
+
+def adventureVersion = '4.23.0'
+def platformVersion = '4.4.0'
 
 repositories {
     mavenCentral()
-    maven {
-        name = 'papermc'
-        url = 'https://repo.papermc.io/repository/maven-public/'
-    }
-    maven {
-        name = 'spigotmc-repo'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/public/'
-    }
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
-    maven {
-        name = 'sonatype-snapshots'
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+    maven { name = 'papermc'; url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { name = 'placeholderapi'; url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+configurations {
+    bukkitShadow
+    paperShadow
 }
 
 dependencies {
+    // Compilation commune (Paper)
     compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-api:4.21.0'
-    implementation 'net.kyori:adventure-platform-bukkit:4.4.0'
+    compileOnly 'me.clip:placeholderapi:2.11.5'
+
+    // Adventure toujours en compileOnly
+    compileOnly "net.kyori:adventure-api:$adventureVersion"
+    compileOnly "net.kyori:adventure-text-minimessage:$adventureVersion"
+    compileOnly "net.kyori:adventure-platform-bukkit:$platformVersion"
+
+    // Pour shading : tout pour Bukkit, platform + minimessage pour Paper
+    bukkitShadow "net.kyori:adventure-api:$adventureVersion"
+    bukkitShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
+    bukkitShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
+
+    paperShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
+    paperShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
 }
 
 java {
@@ -50,12 +57,26 @@ processResources {
     }
 }
 
-tasks.named('shadowJar') {
-    archiveClassifier.set('')
-    configurations = [project.configurations.runtimeClasspath]
-    // relocation désactivée pour éviter l'erreur ASM Java 21
+// Pas de jar par défaut
+tasks.named('jar') {
+    enabled = false
 }
 
+// Bukkit JAR : shading complet Adventure
+tasks.register('bukkitJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveClassifier.set('bukkit')
+    configurations = [project.configurations.runtimeClasspath, project.configurations.bukkitShadow]
+    from sourceSets.main.output
+}
+
+// Paper JAR : shading minimessage + platform
+tasks.register('paperJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveClassifier.set('paper')
+    configurations = [project.configurations.runtimeClasspath, project.configurations.paperShadow]
+    from sourceSets.main.output
+}
+
+// Build complet
 tasks.named('build') {
-    dependsOn tasks.named('shadowJar')
+    dependsOn 'bukkitJar', 'paperJar'
 }

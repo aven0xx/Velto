@@ -4,7 +4,6 @@ import com.aven0x.Velto.Velto;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -48,10 +47,7 @@ public class AutoMsgManager {
                 }
 
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
-
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    NotificationUtil.send(player, key);
-                }
+                NotificationUtil.sendGlobal(key); // Uses optimized Adventure global dispatch
             }
         }.runTaskTimer(Velto.getInstance(),
                 ConfigUtil.getAutoMessagesIntervalTicks(),

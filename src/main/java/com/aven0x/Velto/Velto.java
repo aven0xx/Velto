@@ -4,6 +4,7 @@ import com.aven0x.Velto.listeners.GodListener;
 import com.aven0x.Velto.manager.AutoMsgManager;
 import com.aven0x.Velto.manager.CommandManager;
 import com.aven0x.Velto.manager.TeleportManager;
+import com.aven0x.Velto.manager.ChatManager;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.NotificationUtil;
 import com.aven0x.Velto.utils.ServerUtil;
@@ -43,6 +44,7 @@ public class Velto extends JavaPlugin {
         this.teleportManager = new TeleportManager();
         this.autoMsgManager = new AutoMsgManager();
         this.autoMsgManager.start();
+        new ChatManager(this);
 
         // Register commands
         CommandManager.registerAllCommands();
