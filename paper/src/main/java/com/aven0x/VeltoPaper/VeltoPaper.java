@@ -8,7 +8,6 @@ import com.aven0x.VeltoPaper.managers.ChatManager;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
 import com.aven0x.VeltoPaper.utils.NotificationUtil;
 import com.aven0x.Velto.utils.ServerUtil;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,7 +15,6 @@ public class VeltoPaper extends JavaPlugin {
 
     private static VeltoPaper instance;
     private TeleportManager teleportManager;
-    private BukkitAudiences adventure;
     private AutoMsgManager autoMsgManager;
 
     @Override
@@ -39,8 +37,7 @@ public class VeltoPaper extends JavaPlugin {
         NotificationUtil.load();
         CommandUtil.load();
 
-        // Setup Adventure + managers
-        this.adventure = BukkitAudiences.create(this);
+        // Setup managers
         this.teleportManager = new TeleportManager();
         this.autoMsgManager = new AutoMsgManager();
         this.autoMsgManager.start();
@@ -55,9 +52,7 @@ public class VeltoPaper extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (this.adventure != null) {
-            this.adventure.close();
-        }
+        // Optional: clean up resources or managers
     }
 
     public static VeltoPaper getInstance() {
@@ -66,9 +61,5 @@ public class VeltoPaper extends JavaPlugin {
 
     public TeleportManager getTeleportManager() {
         return teleportManager;
-    }
-
-    public BukkitAudiences adventure() {
-        return adventure;
     }
 }
