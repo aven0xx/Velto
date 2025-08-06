@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    // Depend on the shadowed output from :common (not the plain jar)
+    // Use the shadow output of :common (fixes multi-project shadow issues)
     implementation(project(path: ':common', configuration: 'shadow'))
 
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
