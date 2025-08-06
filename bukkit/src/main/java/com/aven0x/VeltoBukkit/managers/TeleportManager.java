@@ -1,4 +1,4 @@
-package com.aven0x.VeltoBukkit.manager;
+package com.aven0x.VeltoBukkit.managers;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import org.bukkit.Bukkit;

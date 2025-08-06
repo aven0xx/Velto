@@ -1,10 +1,10 @@
 package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.listeners.GodListener;
-import com.aven0x.VeltoPaper.manager.AutoMsgManager;
-import com.aven0x.VeltoPaper.manager.CommandManager;
-import com.aven0x.VeltoPaper.manager.TeleportManager;
-import com.aven0x.VeltoPaper.manager.ChatManager;
+import com.aven0x.VeltoPaper.managers.AutoMsgManager;
+import com.aven0x.VeltoPaper.managers.CommandManager;
+import com.aven0x.VeltoPaper.managers.TeleportManager;
+import com.aven0x.VeltoPaper.managers.ChatManager;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
 import com.aven0x.VeltoPaper.utils.NotificationUtil;
 import com.aven0x.Velto.utils.ServerUtil;

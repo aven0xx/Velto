@@ -1,10 +1,10 @@
 package com.aven0x.VeltoBukkit;
 
 import com.aven0x.Velto.listeners.GodListener;
-import com.aven0x.VeltoBukkit.manager.AutoMsgManager;
-import com.aven0x.VeltoBukkit.manager.CommandManager;
-import com.aven0x.VeltoBukkit.manager.TeleportManager;
-import com.aven0x.VeltoBukkit.manager.ChatManager;
+import com.aven0x.VeltoBukkit.managers.AutoMsgManager;
+import com.aven0x.VeltoBukkit.managers.CommandManager;
+import com.aven0x.VeltoBukkit.managers.TeleportManager;
+import com.aven0x.VeltoBukkit.managers.ChatManager;
 import com.aven0x.VeltoBukkit.utils.CommandUtil;
 import com.aven0x.VeltoBukkit.utils.NotificationUtil;
 import com.aven0x.Velto.utils.ServerUtil;

@@ -1,10 +1,10 @@
-package com.aven0x.VeltoPaper.manager;
+package com.aven0x.VeltoBukkit.managers;
 
-import com.aven0x.VeltoPaper.commands.*;
-import com.aven0x.VeltoPaper.utils.CommandUtil;
-import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
+import com.aven0x.VeltoBukkit.commands.*;
+import com.aven0x.VeltoBukkit.utils.CommandUtil;
+import com.aven0x.VeltoBukkit.utils.DynamicCommandRegistrar;
 
-import static com.aven0x.VeltoPaper.commands.GamemodeCommands.*;
+import static com.aven0x.VeltoBukkit.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
