@@ -12,7 +12,7 @@ allprojects {
 
 // Custom build task that respects correct module order
 tasks.register("build") {
-    dependsOn(":common:build")
-    dependsOn(":bukkit:build")
-    dependsOn(":paper:build")
+    doFirst {
+        throw new GradleException("Root project 'build' is not allowed. Use ':bukkit:build', ':paper:build' instead.")
+    }
 }
