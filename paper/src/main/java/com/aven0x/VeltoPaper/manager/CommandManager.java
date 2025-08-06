@@ -1,6 +1,7 @@
-package com.aven0x.Velto.manager;
+package com.aven0x.VeltoPaper.manager;
 
 import com.aven0x.Velto.commands.*;
+import com.aven0x.VeltoPaper.commands.*;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.DynamicCommandRegistrar;
 import com.aven0x.Velto.utils.ServerUtil;

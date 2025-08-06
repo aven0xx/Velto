@@ -1,0 +1,10 @@
+plugins { id 'java' }
+
+jar {
+    archiveBaseName.set('Velto')
+    archiveVersion.set('0.5-SNAPSHOT')
+}
+dependencies {
+    implementation project(':common')
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+}

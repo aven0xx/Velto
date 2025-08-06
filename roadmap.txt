@@ -1,11 +1,7 @@
-FOR 0.4:
--Compatiblity with 1.21.4 / Done
--/broadcast command upgrade / Done
--NotificationUtil Global Alert System (optimization) / Done
--Chat System with PlaceholderAPI support / Done
+
 
 FOR 0.5:
--Rewrite to a modular system (Spigot + Paper)
+-Rewrite to a modular system (Spigot + Paper) / In work
 -/itemlore command
 -/rename command (renaming item directly)
 -Others optimizations
