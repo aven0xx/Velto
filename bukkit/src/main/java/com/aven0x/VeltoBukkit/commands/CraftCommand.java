@@ -1,20 +1,19 @@
-package com.aven0x.VeltoPaper.commands;
+package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.Velto.commands.BaseCommand;
-import com.aven0x.Velto.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.NotificationUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class AnvilCommand extends BaseCommand {
-    public AnvilCommand() {
-        super("anvil");
+public class CraftCommand extends BaseCommand {
+    public CraftCommand() {
+        super("craft");
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
-        if (!hasPermission(sender, "velto.anvil")) {
+        if (!hasPermission(sender, "velto.craft")) {
             if (sender instanceof Player player) {
                 NotificationUtil.send(player, "no-permission");
             }
@@ -22,13 +21,14 @@ public class AnvilCommand extends BaseCommand {
         }
 
         if (!(sender instanceof Player player)) {
-            // Command used by console or non-player source
+            if (sender instanceof Player p) {
+                NotificationUtil.send(p, "only-player");
+            }
             return true;
         }
 
-        // Open the Paper anvil UI
-        player.openAnvil(null, true);
-        NotificationUtil.send(player, "opened-anvil");
+        player.openWorkbench(null, true);
+        NotificationUtil.send(player, "opened-craft");
         return true;
     }
 }

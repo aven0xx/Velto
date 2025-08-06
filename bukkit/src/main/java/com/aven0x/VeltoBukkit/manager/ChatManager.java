@@ -1,7 +1,7 @@
 package com.aven0x.VeltoBukkit.manager;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
-import com.aven0x.Velto.utils.ConfigUtil;
+import com.aven0x.VeltoBukkit.utils.ConfigUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

@@ -1,10 +1,8 @@
-package com.aven0x.Velto.commands;
+package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.Velto.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.NotificationUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,18 +11,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-public class HealCommand extends BaseCommand {
+public class FeedCommand extends BaseCommand {
 
-    public HealCommand() {
-        super("heal");
+    public FeedCommand() {
+        super("feed");
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (sender instanceof Player ? (Player) sender : null);
         boolean self = args.length == 0;
+        String perm = self ? "velto.feed" : "velto.feed.others";
 
-        String perm = self ? "velto.heal" : "velto.heal.others";
         if (!hasPermission(sender, perm)) return true;
 
         if (target == null || !target.isOnline()) {
@@ -36,23 +34,18 @@ public class HealCommand extends BaseCommand {
             return true;
         }
 
-        AttributeInstance attr = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (attr != null) {
-            target.setHealth(attr.getValue());
-        }
-
         target.setFoodLevel(20);
         target.setSaturation(20f);
 
         if (self) {
-            NotificationUtil.send(target, "healed-self");
+            NotificationUtil.send(target, "fed-self");
         } else {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "healed-other", Map.of("%target%", target.getName()));
+                NotificationUtil.send(playerSender, "fed-other", Map.of("%target%", target.getName()));
             } else {
-                sender.sendMessage("§aHealed: " + target.getName());
+                sender.sendMessage("§aFed: " + target.getName());
             }
-            NotificationUtil.send(target, "healed-self");
+            NotificationUtil.send(target, "fed-self");
         }
 
         return true;
@@ -60,7 +53,7 @@ public class HealCommand extends BaseCommand {
 
     @Override
     public @NotNull List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1 && sender.hasPermission("velto.heal.others")) {
+        if (args.length == 1 && sender.hasPermission("velto.feed.others")) {
             return Bukkit.getOnlinePlayers().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .map(Player::getName)

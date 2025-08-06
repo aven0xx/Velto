@@ -1,6 +1,6 @@
-package com.aven0x.Velto.utils;
+package com.aven0x.VeltoBukkit.utils;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoBukkit.VeltoBukkit;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -20,9 +20,9 @@ public class NotificationUtil {
     private static FileConfiguration lang;
 
     public static void load() {
-        File file = new File(Velto.getInstance().getDataFolder(), "lang.yml");
+        File file = new File(VeltoBukkit.getInstance().getDataFolder(), "lang.yml");
         if (!file.exists()) {
-            Velto.getInstance().saveResource("lang.yml", false);
+            VeltoBukkit.getInstance().saveResource("lang.yml", false);
         }
         lang = YamlConfiguration.loadConfiguration(file);
     }
@@ -53,7 +53,7 @@ public class NotificationUtil {
         String colored = rawMessage.replace('&', '§');
         Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
 
-        var audience = Velto.getInstance().adventure().player(player);
+        var audience = VeltoBukkit.getInstance().adventure().player(player);
 
         switch (type) {
             case "chat" -> audience.sendMessage(component);
@@ -82,7 +82,7 @@ public class NotificationUtil {
 
                 BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
                 audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), duration);
             }
 
             default -> player.sendMessage("§cInvalid notification type: " + type);
@@ -113,7 +113,7 @@ public class NotificationUtil {
         }
 
         Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
-        var audience = Velto.getInstance().adventure().all();
+        var audience = VeltoBukkit.getInstance().adventure().all();
 
         switch (type) {
             case "chat" -> audience.sendMessage(component);
@@ -142,7 +142,7 @@ public class NotificationUtil {
 
                 BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
                 audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), duration);
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), duration);
             }
 
             default -> Bukkit.getLogger().warning("§cInvalid global notification type: " + type);
@@ -155,7 +155,7 @@ public class NotificationUtil {
 
     public static void sendGlobalRaw(String rawMessage, String type, int durationTicks) {
         Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
-        var audience = Velto.getInstance().adventure().all();
+        var audience = VeltoBukkit.getInstance().adventure().all();
 
         switch (type.toLowerCase()) {
             case "chat" -> audience.sendMessage(component);
@@ -167,7 +167,7 @@ public class NotificationUtil {
             case "bossbar" -> {
                 BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
                 audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(Velto.getInstance(), () -> audience.hideBossBar(bar), durationTicks);
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), durationTicks);
             }
 
             default -> Bukkit.getLogger().warning("§cInvalid global raw notification type: " + type);
@@ -189,6 +189,6 @@ public class NotificationUtil {
                 }
                 audience.sendActionBar(message);
             }
-        }.runTaskTimer(Velto.getInstance(), 0L, interval);
+        }.runTaskTimer(VeltoBukkit.getInstance(), 0L, interval);
     }
 }

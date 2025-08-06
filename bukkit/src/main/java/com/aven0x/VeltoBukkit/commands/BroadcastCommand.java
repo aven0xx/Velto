@@ -1,8 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.VeltoBukkit;
-import com.aven0x.Velto.commands.*;
-import com.aven0x.Velto.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

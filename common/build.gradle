@@ -3,6 +3,11 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
+jar {
+    archiveBaseName.set('Velto')
+    archiveVersion.set('0.5-SNAPSHOT')
+}
+
 repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
@@ -10,8 +15,14 @@ repositories {
 }
 
 dependencies {
+    // Core API for Spigot plugin development
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-platform-bukkit:4.3.2'
+
+    // Example shared dependencies—add yours as needed
+    implementation 'com.google.guava:guava:33.2.0-jre'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+    // If you use PlaceholderAPI in common as well:
     compileOnly 'me.clip:placeholderapi:2.11.5'
 }
 
@@ -19,10 +30,17 @@ tasks {
     shadowJar {
         archiveBaseName.set('Velto')
         archiveVersion.set('0.5-SNAPSHOT')
-        relocate 'net.kyori.adventure', 'com.aven0x.shadowed.adventure'
-        relocate 'net.kyori.examination', 'com.aven0x.shadowed.examination'
+        archiveClassifier.set('') // matches jar name
+        // No relocate
     }
-    build {
-        dependsOn shadowJar
-    }
+}
+
+artifacts {
+    shadowJar
+}
+
+// ---- ADD THIS BLOCK TO FORCE SHADOWJAR AS DEFAULT ----
+configurations {
+    apiElements.outgoing.artifact(tasks.shadowJar)
+    runtimeElements.outgoing.artifact(tasks.shadowJar)
 }

@@ -1,6 +1,6 @@
-package com.aven0x.Velto.utils;
+package com.aven0x.VeltoBukkit.utils;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoBukkit.VeltoBukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -10,14 +10,14 @@ public class ConfigUtil {
 
     // Do NOT make this final — we want to always get the latest config
     private static FileConfiguration getConfig() {
-        return Velto.getInstance().getConfig();
+        return VeltoBukkit.getInstance().getConfig();
     }
 
     // === SPAWN ===
 
     public static void setSpawn(Location location) {
         getConfig().set("spawn", location);
-        Velto.getInstance().saveConfig();
+        VeltoBukkit.getInstance().saveConfig();
     }
 
     public static Location getSpawn() {
@@ -70,10 +70,10 @@ public class ConfigUtil {
     }
 
     public static void reload() {
-        Velto.getInstance().reloadConfig();
+        VeltoBukkit.getInstance().reloadConfig();
     }
 
     public static void save() {
-        Velto.getInstance().saveConfig();
+        VeltoBukkit.getInstance().saveConfig();
     }
 }
