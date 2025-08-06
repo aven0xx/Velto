@@ -1,6 +1,6 @@
-package com.aven0x.Velto.manager;
+package com.aven0x.VeltoBukkit.manager;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoBukkit.VeltoBukkit;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
@@ -49,7 +49,7 @@ public class AutoMsgManager {
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
                 NotificationUtil.sendGlobal(key); // Uses optimized Adventure global dispatch
             }
-        }.runTaskTimer(Velto.getInstance(),
+        }.runTaskTimer(VeltoBukkit.getInstance(),
                 ConfigUtil.getAutoMessagesIntervalTicks(),
                 ConfigUtil.getAutoMessagesIntervalTicks());
     }

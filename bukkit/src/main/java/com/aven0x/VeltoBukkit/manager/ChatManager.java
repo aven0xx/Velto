@@ -1,6 +1,6 @@
-package com.aven0x.Velto.manager;
+package com.aven0x.VeltoBukkit.manager;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoBukkit.VeltoBukkit;
 import com.aven0x.Velto.utils.ConfigUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public class ChatManager implements Listener {
 
-    private final Velto plugin;
+    private final VeltoBukkit plugin;
     private final boolean papiAvailable;
 
-    public ChatManager(Velto plugin) {
+    public ChatManager(VeltoBukkit plugin) {
         this.plugin = plugin;
         this.papiAvailable = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);

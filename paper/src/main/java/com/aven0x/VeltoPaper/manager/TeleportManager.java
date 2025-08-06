@@ -1,6 +1,6 @@
-package com.aven0x.Velto.manager;
+package com.aven0x.VeltoPaper.manager;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoPaper.VeltoPaper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 public class TeleportManager {
     public void teleportAsync(Player player, Location location) {
         Bukkit.getScheduler().runTaskAsynchronously(
-                Velto.getInstance(),
+                VeltoPaper.getInstance(),
                 () -> Bukkit.getScheduler().runTask(
-                        Velto.getInstance(),
+                        VeltoPaper.getInstance(),
                         () -> player.teleport(location)
                 )
         );

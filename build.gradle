@@ -5,5 +5,6 @@ allprojects {
         mavenCentral()
         maven { url = 'https://repo.papermc.io/repository/maven-public/' } // For Paper
         maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' } // For Spigot
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' } // For Adventure Platform
     }
 }

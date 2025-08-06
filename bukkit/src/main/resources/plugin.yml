@@ -1,6 +1,6 @@
 name: Velto
-version: 0.4
-main: com.aven0x.Velto.Velto
+version: 0.5
+main: com.aven0x.Velto.VeltoBukkit
 api-version: 1.21
 commands:
   weather: {}

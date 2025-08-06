@@ -1,6 +1,7 @@
-package com.aven0x.Velto.commands;
+package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoPaper.VeltoPaper;
+import com.aven0x.Velto.commands.*;
 import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

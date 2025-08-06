@@ -1,11 +1,9 @@
-package com.aven0x.VeltoPaper.manager;
+package com.aven0x.VeltoBukkit.manager;
 
 import com.aven0x.Velto.commands.*;
-import com.aven0x.VeltoPaper.commands.SpawnCommand;
-import com.aven0x.VeltoPaper.commands.*;
+import com.aven0x.VeltoBukkit.commands.*;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.DynamicCommandRegistrar;
-import com.aven0x.Velto.utils.ServerUtil;
 
 import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
@@ -20,11 +18,6 @@ public class CommandManager {
         register("craft", new CraftCommand());
         register("list", new ListCommand());
         register("notiftest", new NotifTestCommand());
-
-        // Paper-only command
-        if (ServerUtil.isPaper()) {
-            register("anvil", new AnvilCommand());
-        }
 
         register("feed", new FeedCommand());
         register("heal", new HealCommand());

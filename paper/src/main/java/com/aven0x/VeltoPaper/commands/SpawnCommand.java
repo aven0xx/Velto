@@ -1,6 +1,7 @@
-package com.aven0x.Velto.commands;
+package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.Velto.Velto;
+import com.aven0x.VeltoPaper.VeltoPaper;
+import com.aven0x.Velto.commands.BaseCommand;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.NotificationUtil;
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ public class SpawnCommand extends BaseCommand {
             return true;
         }
 
-        Velto.getInstance().getTeleportManager().teleportAsync(player, spawn);
+        VeltoPaper.getInstance().getTeleportManager().teleportAsync(player, spawn);
         NotificationUtil.send(player, "teleporting-spawn");
         return true;
     }
