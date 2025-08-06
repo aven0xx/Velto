@@ -5,7 +5,7 @@ plugins {
 
 jar {
     archiveBaseName.set('Velto')
-    archiveVersion.set('0.5-SNAPSHOT') // disables version in jar name
+    archiveVersion.set('0.5-SNAPSHOT')
 }
 
 repositories {
@@ -15,21 +15,18 @@ repositories {
 }
 
 dependencies {
-    // Use the shadow output of :common (fixes multi-project shadow issues)
     implementation(project(path: ':common', configuration: 'shadow'))
 
-    compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-platform-bukkit:4.3.2'
+    compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.5'
-    // Other bukkit/spigot-only dependencies
+    // Other paper/bukkit-only dependencies
 }
 
 tasks {
     shadowJar {
         archiveBaseName.set('Velto')
         archiveVersion.set('0.5-SNAPSHOT')
-        archiveClassifier.set('') // removes -all classifier, matches jar task
-        // No relocation
+        archiveClassifier.set('')
     }
     build {
         dependsOn shadowJar
