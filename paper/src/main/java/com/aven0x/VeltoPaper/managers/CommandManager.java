@@ -31,6 +31,8 @@ public class CommandManager {
         register("gms", new GmsCommand());
         register("gma", new GmaCommand());
         register("gmsp", new GmspCommand());
+
+        register("anvil", new AnvilCommand()); // Paper only command
     }
 
     private static void register(String name, BaseCommand command) {
