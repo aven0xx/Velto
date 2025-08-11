@@ -1,0 +1,138 @@
+only-player:
+  type: chat
+  message: "&cOnly players can use this command."
+
+no-permission:
+  type: chat
+  message: "&cYou do not have permission."
+
+spawn-not-set:
+  type: chat
+  message: "&cSpawn point not set."
+
+teleporting-spawn:
+  type: bossbar
+  message: "&aTeleporting to spawn..."
+  color: GREEN
+
+spawn-set:
+  type: chat
+  message: "&aSpawn point set!"
+
+invalid-usage:
+  type: chat
+  message: "&cInvalid command usage."
+
+invalid-usage-gamemode:
+  type: chat
+  message: "&cUsage: /gamemode <mode> [player]"
+
+invalid-time:
+  type: chat
+  message: "&cInvalid time specified."
+
+invalid-world:
+  type: chat
+  message: "&cWorld not found."
+
+time-set:
+  type: chat
+  message: "&aTime set!"
+
+time-set-day:
+  type: chat
+  message: "&aDaytime set!"
+
+time-set-night:
+  type: chat
+  message: "&aNighttime set!"
+
+opened-craft:
+  type: actionbar
+  message: "&aOpened crafting table."
+
+opened-anvil:
+  type: actionbar
+  message: "&aOpened anvil."
+
+broadcast-usage:
+  type: chat
+  message: "&cYou must specify a message."
+
+invalid-player:
+  type: chat
+  message: "&cPlayer not found."
+
+fed-self:
+  type: chat
+  message: "&aYou have been fed."
+
+fed-other:
+  type: chat
+  message: "&aYou have fed &e%target%&a."
+
+healed-self:
+  type: chat
+  message: "&aYou have been healed."
+
+healed-other:
+  type: chat
+  message: "&aYou have healed &e%target%&a."
+
+player-killed:
+  type: chat
+  message: "&cPlayer has been killed."
+
+speed-updated:
+  type: actionbar
+  message: "&aYour speed has been updated."
+
+invalid-speed:
+  type: chat
+  message: "&cInvalid speed. Use a number between 1 and 10."
+
+weather-updated:
+  type: chat
+  message: "&aWeather has been updated."
+
+god-enabled:
+  type: actionbar
+  message: "&aGod mode enabled."
+  duration: 60
+
+god-disabled:
+  type: actionbar
+  message: "&cGod mode disabled."
+  duration: 60
+
+invalid-gamemode:
+  type: chat
+  message: "&cInvalid gamemode. Use 0-3 or survival, creative, adventure, spectator."
+
+gamemode-set-self:
+  type: chat
+  message: "&aYour gamemode has been set to &f%mode%&a."
+
+gamemode-set-other:
+  type: chat
+  message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
+
+automsg1:
+  type: chat
+  message: "&bJoin our Discord to get updates and support!"
+
+automsg2:
+  type: chat
+  message: "&aNeed help? Type &f/help &afor commands."
+
+automsg3:
+  type: chat
+  message: "&dVote for rewards every day!"
+
+automsg4:
+  type: chat
+  message: "&eRemember to claim your daily kit!"
+
+list-command:
+  type: chat
+  message: "&aOnline players: %players%"

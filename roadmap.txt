@@ -1,7 +1,7 @@
 
 
 FOR 0.5:
--Restructured to a modular system (Spigot + Paper) / 65%
+-Restructured to a modular system (Spigot + Paper) / 100%
 -Compatibility with 1.21.8
 -/itemlore command
 -/rename command (renaming item directly)
