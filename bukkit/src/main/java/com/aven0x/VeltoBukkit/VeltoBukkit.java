@@ -25,10 +25,10 @@ public class VeltoBukkit extends JavaPlugin {
 
         // Detect server type (Spigot vs Paper)
         if (ServerUtil.isPaper()) {
-            Bukkit.getLogger().info("[Velto] Plugin version 0.3 has been enabled");
+            Bukkit.getLogger().info("[Velto] has been enabled");
             Bukkit.getLogger().info("[Velto] Paper detected. All features enabled.");
         } else {
-            Bukkit.getLogger().info("[Velto] Plugin version 0.3 has been enabled");
+            Bukkit.getLogger().info("[Velto] has been enabled");
             Bukkit.getLogger().warning("[Velto] Spigot detected. Some features (like /anvil) are disabled.");
         }
 
