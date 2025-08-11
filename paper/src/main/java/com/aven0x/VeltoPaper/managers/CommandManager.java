@@ -25,7 +25,7 @@ public class CommandManager {
         register("kill", new KillCommand());
         register("speed", new SpeedCommand());
         register("god", new GodCommand());
-
+        register("killall", new KillAllCommand());
         register("gamemode", new GamemodeCommand());
         register("gmc", new GmcCommand());
         register("gms", new GmsCommand());

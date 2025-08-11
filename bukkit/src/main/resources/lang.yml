@@ -136,3 +136,7 @@ automsg4:
 list-command:
   type: chat
   message: "&aOnline players: %players%"
+
+  killall-done:
+    type: chat
+    message: "&aKillAll command executed successfully."
