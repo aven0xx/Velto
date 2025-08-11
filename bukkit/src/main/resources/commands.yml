@@ -61,6 +61,6 @@ list:
 notiftest:
   enabled: true
   aliases: []
-  killall:
-    enabled: true
-    aliases: [ ]
+killall:
+  enabled: true
+  aliases: [ ]
