@@ -1,0 +1,66 @@
+spawn:
+  enabled: true
+  aliases: []
+setspawn:
+  enabled: true
+  aliases: []
+time:
+  enabled: true
+  aliases: []
+day:
+  enabled: true
+  aliases: ["setday"]
+night:
+  enabled: true
+  aliases: ["setnight"]
+craft:
+  enabled: true
+  aliases: ["workbench"]
+anvil:
+  enabled: true
+  aliases: ["repair"]
+feed:
+  enabled: true
+  aliases: []
+heal:
+  enabled: true
+  aliases: []
+broadcast:
+  enabled: true
+  aliases: ["bc"]
+weather:
+  enabled: true
+  aliases: []
+speed:
+  enabled: true
+  aliases: []
+kill:
+  enabled: true
+  aliases: ["suicide"]
+god:
+  enabled: true
+  aliases: ["invincible"]
+gamemode:
+  enabled: true
+  aliases: ["gm"]
+gmc:
+  enabled: true
+  aliases: ["gm1", "creative"]
+gms:
+  enabled: true
+  aliases: ["gm0", "survival"]
+gma:
+  enabled: true
+  aliases: ["gm2", "adventure"]
+gmsp:
+  enabled: true
+  aliases: ["gm3", "spectator"]
+list:
+  enabled: true
+  aliases: []
+notiftest:
+  enabled: true
+  aliases: []
+  killall:
+    enabled: true
+    aliases: [ ]
