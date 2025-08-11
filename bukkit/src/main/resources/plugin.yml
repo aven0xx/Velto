@@ -27,3 +27,4 @@ commands:
   god: {}
   notiftest: {}
   list: {}
+  killall: {}
