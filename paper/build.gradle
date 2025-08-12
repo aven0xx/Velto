@@ -5,7 +5,7 @@ plugins {
 
 jar {
     archiveBaseName.set('Velto-paper')
-    archiveVersion.set('0.5')
+    archiveVersion.set('0.6-SNAPSHOT')
 }
 
 repositories {
