@@ -3,6 +3,6 @@
 FOR 0.5:
 -Restructured to a modular system (Spigot + Paper) / Done
 -/itemlore command
--/rename command (renaming item directly) / In progress
+-/rename command (renaming item directly) / Done
 -Others optimizations
 -/killall command (For entities) / Done

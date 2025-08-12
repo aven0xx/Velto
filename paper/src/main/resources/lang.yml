@@ -153,3 +153,75 @@ rename-cleared:
 rename-success:
   type: chat
   message: "&aItem renamed."
+
+  no-permission:
+    type: chat
+    message: "&cYou don't have permission to do that."
+
+  only-player:
+    type: chat
+    message: "&cThis command can only be used by a player."
+
+  opened-anvil:
+    type: chat
+    message: "&aAnvil opened."
+
+  opened-craft:
+    type: chat
+    message: "&aCrafting table opened."
+
+  rename-no-item:
+    type: chat
+    message: "&cYou must hold an item to rename."
+
+  rename-usage:
+    type: chat
+    message: "&eUsage:&f /rename <name...> &7or&f /rename reset"
+
+  rename-cleared:
+    type: chat
+    message: "&aCustom name removed."
+
+  rename-success:
+    type: chat
+    message: "&aItem renamed."
+
+  killall-done:
+    type: chat
+    message: "&aKillAll completed."
+
+  lore-no-item:
+    type: chat
+    message: "&cYou must hold an item to edit lore."
+
+  lore-usage:
+    type: chat
+    message: "&eUsage:&f /itemlore <show|clear|add|insert|set|remove> ..."
+
+  lore-empty:
+    type: chat
+    message: "&7This item has no lore."
+
+  lore-cleared:
+    type: chat
+    message: "&aLore cleared."
+
+  lore-add-success:
+    type: chat
+    message: "&aLore line added."
+
+  lore-insert-success:
+    type: chat
+    message: "&aLore line inserted."
+
+  lore-set-success:
+    type: chat
+    message: "&aLore line updated."
+
+  lore-remove-success:
+    type: chat
+    message: "&aLore line removed."
+
+  lore-out-of-range:
+    type: chat
+    message: "&cLine number out of range."

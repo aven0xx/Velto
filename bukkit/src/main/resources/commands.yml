@@ -67,3 +67,6 @@ killall:
 rename:
   enabled: true
   aliases: [ ]
+itemlore:
+  enabled: true
+  aliases: []
