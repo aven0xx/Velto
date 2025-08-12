@@ -1,7 +1,6 @@
+#Velto Roadmap
+
+FOR 0.6:
 
 
-FOR 0.5:
--Restructured to a modular system (Spigot + Paper) / Done
--/itemlore command / Done
--/rename command (renaming item directly) / Done
--/killall command (For entities) / Done
+
