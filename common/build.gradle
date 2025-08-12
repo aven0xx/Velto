@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+jar {
+    archiveBaseName.set('Velto-common')
+    archiveVersion.set('0.5')
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+    // Core API for Spigot plugin development
+    compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
+
+    // Example shared dependencies—add yours as needed
+    implementation 'com.google.guava:guava:33.2.0-jre'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+    // If you use PlaceholderAPI in common as well:
+    compileOnly 'me.clip:placeholderapi:2.11.5'
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set('Velto-common')
+        archiveVersion.set('0.5')
+        archiveClassifier.set('') // matches jar name
+        // No relocate
+    }
+}
+
+artifacts {
+    shadowJar
+}
+
+// ---- ADD THIS BLOCK TO FORCE SHADOWJAR AS DEFAULT ----
+configurations {
+    apiElements.outgoing.artifact(tasks.shadowJar)
+    runtimeElements.outgoing.artifact(tasks.shadowJar)
+}

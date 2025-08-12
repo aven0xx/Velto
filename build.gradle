@@ -1,82 +1,18 @@
-plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
-}
+allprojects {
+    group = 'Velto'
+    version = '0.5'
 
-group = 'com.aven0x'
-version = '0.4'
-
-def adventureVersion = '4.23.0'
-def platformVersion = '4.4.0'
-
-repositories {
-    mavenCentral()
-    maven { name = 'papermc'; url = 'https://repo.papermc.io/repository/maven-public/' }
-    maven { name = 'placeholderapi'; url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
-}
-
-configurations {
-    bukkitShadow
-    paperShadow
-}
-
-dependencies {
-    // Compilation commune (Paper)
-    compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
-    compileOnly 'me.clip:placeholderapi:2.11.5'
-
-    // Adventure toujours en compileOnly
-    compileOnly "net.kyori:adventure-api:$adventureVersion"
-    compileOnly "net.kyori:adventure-text-minimessage:$adventureVersion"
-    compileOnly "net.kyori:adventure-platform-bukkit:$platformVersion"
-
-    // Pour shading : tout pour Bukkit, platform + minimessage pour Paper
-    bukkitShadow "net.kyori:adventure-api:$adventureVersion"
-    bukkitShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
-    bukkitShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
-
-    paperShadow "net.kyori:adventure-text-minimessage:$adventureVersion"
-    paperShadow "net.kyori:adventure-platform-bukkit:$platformVersion"
-}
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.release.set(21)
-}
-
-processResources {
-    def props = [version: project.version]
-    inputs.properties props
-    filteringCharset = 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
+    repositories {
+        mavenCentral()
+        maven { url = 'https://repo.papermc.io/repository/maven-public/' } // For Paper
+        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' } // For Spigot
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' } // For Adventure Platform
     }
 }
 
-// Pas de jar par défaut
-tasks.named('jar') {
-    enabled = false
-}
-
-// Bukkit JAR : shading complet Adventure
-tasks.register('bukkitJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    archiveClassifier.set('bukkit')
-    configurations = [project.configurations.runtimeClasspath, project.configurations.bukkitShadow]
-    from sourceSets.main.output
-}
-
-// Paper JAR : shading minimessage + platform
-tasks.register('paperJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    archiveClassifier.set('paper')
-    configurations = [project.configurations.runtimeClasspath, project.configurations.paperShadow]
-    from sourceSets.main.output
-}
-
-// Build complet
-tasks.named('build') {
-    dependsOn 'bukkitJar', 'paperJar'
+// Custom build task that respects correct module order
+tasks.register("build") {
+    doFirst {
+        throw new GradleException("Root project 'build' is not allowed. Use ':bukkit:build', ':paper:build' instead.")
+    }
 }

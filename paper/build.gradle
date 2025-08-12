@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+jar {
+    archiveBaseName.set('Velto-paper')
+    archiveVersion.set('0.5')
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+    implementation(project(path: ':common', configuration: 'shadow'))
+
+    compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.11.5'
+    // Other paper/bukkit-only dependencies
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set('Velto-paper')
+        archiveVersion.set('0.5')
+        archiveClassifier.set('')
+    }
+    build {
+        dependsOn shadowJar
+    }
+}
