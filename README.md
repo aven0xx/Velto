@@ -7,7 +7,12 @@ Designed for **Spigot** and **Paper** servers, it provides a clean, extendable c
 
 ---
 
-## ✨ Features
+##  Wiki
+Detailed setup guidance, documentation, and development info are available on the **[Velto Wiki](https://github.com/aven0xx/Velto/wiki)**.
+
+---
+
+## ​ Features
 
 - 🚀 **Spigot & Paper compatibility** (with some Paper-exclusive features)  
 - ✅ **Modern permission checks** (`velto.command` / `velto.command.others`)  
@@ -23,7 +28,7 @@ Designed for **Spigot** and **Paper** servers, it provides a clean, extendable c
 
 ---
 
-## 📂 File Structure
+## ​ File Structure
 
 ```plaintext
 config.yml         # Stores spawn point and other persistent data
