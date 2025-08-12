@@ -1,8 +1,8 @@
 
 
 FOR 0.5:
--Restructured to a modular system (Spigot + Paper) / 100%
+-Restructured to a modular system (Spigot + Paper) / Done
 -/itemlore command
--/rename command (renaming item directly)
+-/rename command (renaming item directly) / In progress
 -Others optimizations
--/killall command (For entities or players) / 100%
+-/killall command (For entities) / Done
