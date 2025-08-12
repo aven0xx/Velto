@@ -4,8 +4,8 @@ plugins {
 }
 
 jar {
-    archiveBaseName.set('Velto')
-    archiveVersion.set('0.5-SNAPSHOT') // disables version in jar name
+    archiveBaseName.set('Velto-bukkit')
+    archiveVersion.set('0.5') // disables version in jar name
 }
 
 repositories {
@@ -26,8 +26,8 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveBaseName.set('Velto')
-        archiveVersion.set('0.5-SNAPSHOT')
+        archiveBaseName.set('Velto-bukkit')
+        archiveVersion.set('0.5')
         archiveClassifier.set('') // removes -all classifier, matches jar task
         // No relocation
     }

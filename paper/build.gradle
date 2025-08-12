@@ -4,8 +4,8 @@ plugins {
 }
 
 jar {
-    archiveBaseName.set('Velto')
-    archiveVersion.set('0.5-SNAPSHOT')
+    archiveBaseName.set('Velto-paper')
+    archiveVersion.set('0.5')
 }
 
 repositories {
@@ -24,8 +24,8 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveBaseName.set('Velto')
-        archiveVersion.set('0.5-SNAPSHOT')
+        archiveBaseName.set('Velto-paper')
+        archiveVersion.set('0.5')
         archiveClassifier.set('')
     }
     build {
