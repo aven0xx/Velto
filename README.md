@@ -1,4 +1,5 @@
-# Velto *(Alpha)*
+# Velto *(Alpha)*  
+![License](https://img.shields.io/github/license/aven0xx/Velto) [![Latest Release](https://img.shields.io/github/v/release/aven0xx/Velto)](https://github.com/aven0xx/Velto/releases/latest)
 
 > **⚠ Alpha Notice:** Velto is a **small core plugin** coded with the help of AI and improved over time for production use. While functional, some features are still missing or under development. Expect updates and refinements as the plugin evolves.
 
