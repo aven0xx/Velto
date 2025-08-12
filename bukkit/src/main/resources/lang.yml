@@ -138,8 +138,8 @@ list-command:
   message: "&aOnline players: %players%"
 
 killall-done:
- type: chat
- message: "&aKillAll command executed successfully."
+  type: chat
+  message: "&aKillAll command executed successfully."
 
 rename-no-item:
   type: chat
@@ -153,14 +153,6 @@ rename-cleared:
 rename-success:
   type: chat
   message: "&aItem renamed."
-
-no-permission:
-  type: chat
-  message: "&cYou don't have permission to do that."
-
-only-player:
-  type: chat
-  message: "&cThis command can only be used by a player."
 
 opened-anvil:
   type: chat

@@ -154,74 +154,66 @@ rename-success:
   type: chat
   message: "&aItem renamed."
 
-  no-permission:
-    type: chat
-    message: "&cYou don't have permission to do that."
+opened-anvil:
+  type: chat
+  message: "&aAnvil opened."
 
-  only-player:
-    type: chat
-    message: "&cThis command can only be used by a player."
+opened-craft:
+  type: chat
+  message: "&aCrafting table opened."
 
-  opened-anvil:
-    type: chat
-    message: "&aAnvil opened."
+rename-no-item:
+  type: chat
+  message: "&cYou must hold an item to rename."
 
-  opened-craft:
-    type: chat
-    message: "&aCrafting table opened."
+rename-usage:
+  type: chat
+  message: "&eUsage:&f /rename <name...> &7or&f /rename reset"
 
-  rename-no-item:
-    type: chat
-    message: "&cYou must hold an item to rename."
+rename-cleared:
+  type: chat
+  message: "&aCustom name removed."
 
-  rename-usage:
-    type: chat
-    message: "&eUsage:&f /rename <name...> &7or&f /rename reset"
+rename-success:
+  type: chat
+  message: "&aItem renamed."
 
-  rename-cleared:
-    type: chat
-    message: "&aCustom name removed."
+killall-done:
+  type: chat
+  message: "&aKillAll completed."
 
-  rename-success:
-    type: chat
-    message: "&aItem renamed."
+lore-no-item:
+  type: chat
+  message: "&cYou must hold an item to edit lore."
 
-  killall-done:
-    type: chat
-    message: "&aKillAll completed."
+lore-usage:
+  type: chat
+  message: "&eUsage:&f /itemlore <show|clear|add|insert|set|remove> ..."
 
-  lore-no-item:
-    type: chat
-    message: "&cYou must hold an item to edit lore."
+lore-empty:
+  type: chat
+  message: "&7This item has no lore."
 
-  lore-usage:
-    type: chat
-    message: "&eUsage:&f /itemlore <show|clear|add|insert|set|remove> ..."
+lore-cleared:
+  type: chat
+  message: "&aLore cleared."
 
-  lore-empty:
-    type: chat
-    message: "&7This item has no lore."
+lore-add-success:
+  type: chat
+  message: "&aLore line added."
 
-  lore-cleared:
-    type: chat
-    message: "&aLore cleared."
+lore-insert-success:
+  type: chat
+  message: "&aLore line inserted."
 
-  lore-add-success:
-    type: chat
-    message: "&aLore line added."
+lore-set-success:
+  type: chat
+  message: "&aLore line updated."
 
-  lore-insert-success:
-    type: chat
-    message: "&aLore line inserted."
+lore-remove-success:
+  type: chat
+  message: "&aLore line removed."
 
-  lore-set-success:
-    type: chat
-    message: "&aLore line updated."
-
-  lore-remove-success:
-    type: chat
-    message: "&aLore line removed."
-
-  lore-out-of-range:
-    type: chat
-    message: "&cLine number out of range."
+lore-out-of-range:
+  type: chat
+  message: "&cLine number out of range."
