@@ -7,12 +7,22 @@ Designed for **Spigot** and **Paper** servers, it provides a clean, extendable c
 
 ---
 
-##  Wiki
+## 📚 Wiki
 Detailed setup guidance, documentation, and development info are available on the **[Velto Wiki](https://github.com/aven0xx/Velto/wiki)**.
 
 ---
 
-## ​ Features
+## 📥 Download
+You can download the latest builds from the **[Releases section](../../releases)**.  
+Two builds are available:
+- **`-paper`** → Recommended for Paper servers (includes exclusive features).  
+- **`-bukkit`** → For Spigot/Bukkit servers (compatible with Bukkit API limitations).  
+
+The Bukkit build should work on Paper but remains untested. Paper build is recommended.
+
+---
+
+## ✨ Features
 
 - 🚀 **Spigot & Paper compatibility** (with some Paper-exclusive features)  
 - ✅ **Modern permission checks** (`velto.command` / `velto.command.others`)  
@@ -28,7 +38,7 @@ Detailed setup guidance, documentation, and development info are available on th
 
 ---
 
-## ​ File Structure
+## 📂 File Structure
 
 ```plaintext
 config.yml         # Stores spawn point and other persistent data
