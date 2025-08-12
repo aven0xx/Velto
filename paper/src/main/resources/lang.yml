@@ -140,3 +140,16 @@ list-command:
 killall-done:
   type: chat
   message: "&aKillAll command executed successfully."
+
+rename-no-item:
+  type: chat
+  message: "&cYou must hold an item to rename."
+rename-usage:
+  type: chat
+  message: "&cUsage: /rename <name...> or /rename reset"
+rename-cleared:
+  type: chat
+  message: "&aCustom name removed."
+rename-success:
+  type: chat
+  message: "&aItem renamed."

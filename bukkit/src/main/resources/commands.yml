@@ -64,3 +64,6 @@ notiftest:
 killall:
   enabled: true
   aliases: [ ]
+rename:
+  enabled: true
+  aliases: [ ]

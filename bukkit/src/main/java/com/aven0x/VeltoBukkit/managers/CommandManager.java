@@ -17,7 +17,7 @@ public class CommandManager {
         register("craft", new CraftCommand());
         register("list", new ListCommand());
         register("notiftest", new NotifTestCommand());
-
+        register("rename", new RenameCommand());
         register("feed", new FeedCommand());
         register("heal", new HealCommand());
         register("broadcast", new BroadcastCommand());

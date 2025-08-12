@@ -5,4 +5,4 @@ FOR 0.5:
 -/itemlore command
 -/rename command (renaming item directly)
 -Others optimizations
--/killall command (For entities or players)
+-/killall command (For entities or players) / 100%
