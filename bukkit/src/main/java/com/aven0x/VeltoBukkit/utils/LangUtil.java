@@ -1,11 +1,14 @@
 package com.aven0x.VeltoBukkit.utils;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.title.Title;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +19,6 @@ import java.io.File;
 import java.util.Map;
 
 public class LangUtil {
-
     private static FileConfiguration lang;
 
     public static void load() {
@@ -36,56 +38,51 @@ public class LangUtil {
 
         ConfigurationSection section = lang.getConfigurationSection(key);
         if (section == null) {
-            player.sendMessage("§cMissing message: " + key);
+            player.sendMessage(ChatColor.RED + "Missing message: " + key);
             return;
         }
 
         String type = section.getString("type", "chat").toLowerCase();
         String rawMessage = section.getString("message", key);
-        int duration = section.getInt("duration", 40); // 2s default
+        int duration = section.getInt("duration", 40); // ticks
 
         if (placeholders != null) {
-            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                rawMessage = rawMessage.replace(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, String> e : placeholders.entrySet()) {
+                rawMessage = rawMessage.replace(e.getKey(), e.getValue());
             }
         }
 
-        String colored = rawMessage.replace('&', '§');
-        Component component = LegacyComponentSerializer.legacySection().deserialize(colored);
-
-        var audience = VeltoBukkit.getInstance().adventure().player(player);
+        String colored = ChatColor.translateAlternateColorCodes('&', rawMessage);
 
         switch (type) {
-            case "chat" -> audience.sendMessage(component);
+            case "chat" -> player.sendMessage(colored);
 
-            case "actionbar" -> sendActionBar(audience, component, duration);
+            case "actionbar" -> sendActionBar(player, colored, duration);
 
             case "title" -> {
-                String subtitleRaw = section.getString("subtitle", "");
+                String subtitleRaw = ChatColor.translateAlternateColorCodes(
+                        '&', section.getString("subtitle", ""));
                 if (placeholders != null) {
-                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                        subtitleRaw = subtitleRaw.replace(entry.getKey(), entry.getValue());
+                    for (Map.Entry<String, String> e : placeholders.entrySet()) {
+                        subtitleRaw = subtitleRaw.replace(e.getKey(), e.getValue());
                     }
                 }
-                Component subtitle = LegacyComponentSerializer.legacySection().deserialize(subtitleRaw.replace('&', '§'));
-                audience.showTitle(Title.title(component, subtitle));
+                // simple timing: 10t fade in/out, stay = duration
+                player.sendTitle(colored, subtitleRaw, 10, Math.max(1, duration), 10);
             }
 
             case "bossbar" -> {
-                String colorName = section.getString("color", "blue").toUpperCase();
-                BossBar.Color color;
+                String colorName = section.getString("color", "BLUE").toUpperCase();
+                BarColor color;
                 try {
-                    color = BossBar.Color.valueOf(colorName);
-                } catch (IllegalArgumentException e) {
-                    color = BossBar.Color.BLUE;
+                    color = BarColor.valueOf(colorName);
+                } catch (IllegalArgumentException ex) {
+                    color = BarColor.BLUE;
                 }
-
-                BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
-                audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), duration);
+                sendBossBar(player, colored, color, duration);
             }
 
-            default -> player.sendMessage("§cInvalid notification type: " + type);
+            default -> player.sendMessage(ChatColor.RED + "Invalid notification type: " + type);
         }
     }
 
@@ -98,7 +95,7 @@ public class LangUtil {
 
         ConfigurationSection section = lang.getConfigurationSection(key);
         if (section == null) {
-            Bukkit.getLogger().warning("§cMissing global notification: " + key);
+            Bukkit.getLogger().warning("Missing global notification: " + key);
             return;
         }
 
@@ -107,45 +104,57 @@ public class LangUtil {
         int duration = section.getInt("duration", 40);
 
         if (placeholders != null) {
-            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                rawMessage = rawMessage.replace(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, String> e : placeholders.entrySet()) {
+                rawMessage = rawMessage.replace(e.getKey(), e.getValue());
             }
         }
 
-        Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
-        var audience = VeltoBukkit.getInstance().adventure().all();
+        String colored = ChatColor.translateAlternateColorCodes('&', rawMessage);
 
         switch (type) {
-            case "chat" -> audience.sendMessage(component);
+            case "chat" -> Bukkit.broadcastMessage(colored);
 
-            case "actionbar" -> sendActionBar(audience, component, duration);
+            case "actionbar" -> {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    sendActionBar(p, colored, duration);
+                }
+            }
 
             case "title" -> {
-                String subtitleRaw = section.getString("subtitle", "");
+                String subtitleRaw = ChatColor.translateAlternateColorCodes(
+                        '&', section.getString("subtitle", ""));
                 if (placeholders != null) {
-                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                        subtitleRaw = subtitleRaw.replace(entry.getKey(), entry.getValue());
+                    for (Map.Entry<String, String> e : placeholders.entrySet()) {
+                        subtitleRaw = subtitleRaw.replace(e.getKey(), e.getValue());
                     }
                 }
-                Component subtitle = LegacyComponentSerializer.legacySection().deserialize(subtitleRaw.replace('&', '§'));
-                audience.showTitle(Title.title(component, subtitle));
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendTitle(colored, subtitleRaw, 10, Math.max(1, duration), 10);
+                }
             }
 
             case "bossbar" -> {
-                String colorName = section.getString("color", "blue").toUpperCase();
-                BossBar.Color color;
+                String colorName = section.getString("color", "BLUE").toUpperCase();
+                BarColor color;
                 try {
-                    color = BossBar.Color.valueOf(colorName);
-                } catch (IllegalArgumentException e) {
-                    color = BossBar.Color.BLUE;
+                    color = BarColor.valueOf(colorName);
+                } catch (IllegalArgumentException ex) {
+                    color = BarColor.BLUE;
                 }
+                // one bar for all players
+                BossBar bar = Bukkit.createBossBar(colored, color, BarStyle.SOLID);
+                bar.setProgress(1.0);
+                bar.setVisible(true);
+                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
 
-                BossBar bar = BossBar.bossBar(component, 1f, color, BossBar.Overlay.PROGRESS);
-                audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), duration);
+                int finalDuration = duration;
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                    bar.removeAll();
+                    bar.setVisible(false);
+                }, Math.max(1L, finalDuration));
             }
 
-            default -> Bukkit.getLogger().warning("§cInvalid global notification type: " + type);
+            default -> Bukkit.getLogger().warning("Invalid global notification type: " + type);
         }
     }
 
@@ -154,41 +163,69 @@ public class LangUtil {
     }
 
     public static void sendGlobalRaw(String rawMessage, String type, int durationTicks) {
-        Component component = LegacyComponentSerializer.legacySection().deserialize(rawMessage.replace('&', '§'));
-        var audience = VeltoBukkit.getInstance().adventure().all();
+        String colored = ChatColor.translateAlternateColorCodes('&', rawMessage);
 
         switch (type.toLowerCase()) {
-            case "chat" -> audience.sendMessage(component);
+            case "chat" -> Bukkit.broadcastMessage(colored);
 
-            case "actionbar" -> sendActionBar(audience, component, durationTicks);
-
-            case "title" -> audience.showTitle(Title.title(component, Component.empty()));
-
-            case "bossbar" -> {
-                BossBar bar = BossBar.bossBar(component, 1f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
-                audience.showBossBar(bar);
-                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> audience.hideBossBar(bar), durationTicks);
+            case "actionbar" -> {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    sendActionBar(p, colored, durationTicks);
+                }
             }
 
-            default -> Bukkit.getLogger().warning("§cInvalid global raw notification type: " + type);
+            case "title" -> {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendTitle(colored, "", 10, Math.max(1, durationTicks), 10);
+                }
+            }
+
+            case "bossbar" -> {
+                BossBar bar = Bukkit.createBossBar(colored, BarColor.BLUE, BarStyle.SOLID);
+                bar.setProgress(1.0);
+                bar.setVisible(true);
+                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
+
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                    bar.removeAll();
+                    bar.setVisible(false);
+                }, Math.max(1L, durationTicks));
+            }
+
+            default -> Bukkit.getLogger().warning("Invalid global raw notification type: " + type);
         }
     }
 
-    private static void sendActionBar(net.kyori.adventure.audience.Audience audience, Component message, int durationTicks) {
-        int interval = 20;
+    // ===== Helpers =====
+
+    private static void sendActionBar(Player player, String message, int durationTicks) {
+        // Convert legacy string to BaseComponents and send to ACTION_BAR
+        BaseComponent[] components = TextComponent.fromLegacyText(message);
+        int interval = 20; // re-send every second to keep it visible
         int repetitions = Math.max(1, durationTicks / interval);
 
         new BukkitRunnable() {
             int count = 0;
-
             @Override
             public void run() {
-                if (count++ >= repetitions) {
+                if (count++ >= repetitions || !player.isOnline()) {
                     cancel();
                     return;
                 }
-                audience.sendActionBar(message);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
             }
         }.runTaskTimer(VeltoBukkit.getInstance(), 0L, interval);
+    }
+
+    private static void sendBossBar(Player player, String title, BarColor color, int durationTicks) {
+        BossBar bar = Bukkit.createBossBar(title, color, BarStyle.SOLID);
+        bar.setProgress(1.0);
+        bar.addPlayer(player);
+        bar.setVisible(true);
+
+        Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+            bar.removePlayer(player);
+            bar.setVisible(false);
+        }, Math.max(1L, durationTicks));
     }
 }
