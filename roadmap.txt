@@ -1,6 +1,7 @@
 #Velto Roadmap
 
 FOR 0.6:
+-Kick messages and Join Messages are sent only if isVanished false / Done
 
 
 
