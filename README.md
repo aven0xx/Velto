@@ -1,18 +1,20 @@
-# Velto *(Alpha)*
+# Velto *(Alpha)*  
 ![License](https://img.shields.io/github/license/aven0xx/Velto) [![Latest Release](https://img.shields.io/github/v/release/aven0xx/Velto)](https://github.com/aven0xx/Velto/releases/latest)
 
-> **⚠ Alpha Notice:** Velto is a **small, minimal core plugin** built with the help of AI and refined over time. It is designed to slot into **multi-server / proxy setups** (Bungee/Waterfall/Velocity) without stepping on other plugins’ toes. Some features are still missing or under development.
+> **⚠ Alpha Notice:** Velto is a **small, lightweight core plugin** built with the help of AI and refined over time. It was imagined as a **simple, plug-and-play core** that doesn’t need frequent updates, is easy to extend, and works well alongside other major plugins.
 
-**Velto** provides a clean foundation of server utilities and a flexible message system—**without** bundling gameplay systems you already run network-wide (economy, homes, tpa, etc.). Use Velto as the glue around your existing stack.
+**Velto** is not meant to replace big all-in-one solutions like Essentials, CMI, or EternalCore. Instead, it focuses on providing a minimal set of utilities and a configurable message system. It can be used as:
+- A **simple core** for standalone servers.
+- A **foundation plugin** in a cross-server setup, leaving things like economy, homes, and teleports to dedicated plugins.
 
 ---
 
 ## 🚦 Philosophy
 
-- **Cross-server friendly:** Plays nicely with network/proxy topologies.
-- **Do one thing well:** Core utilities & messaging; **no economy**, **no home/tpa**, **no kits**.
-- **Composable:** Expect you already run dedicated cross-server plugins (e.g., economy, homes/tpa, permissions).
-- **Predictable:** Minimal defaults, clear permissions, everything user-configurable via `lang.yml`.
+- **Keep it light:** Minimal features, no unnecessary systems.
+- **Play well with others:** Designed to work with existing plugins without overlap.
+- **Easy to set up:** Drop it in, start the server, and it works.
+- **Extendable:** Clean architecture so you can add your own features.
 
 ---
 
@@ -20,66 +22,46 @@
 
 Grab builds in **[Releases](../../releases)**:
 
-- **`-paper`** – Recommended for Paper servers (enables Paper-only enhancements).
-- **`-bukkit`** – For Spigot/Bukkit; runs on Paper as well.
-
-> The Bukkit build should work on Paper, but the Paper build is preferred.
+- **`-paper`** – For Paper servers (includes Paper-only commands).  
+- **`-bukkit`** – For Spigot/Bukkit; also works on Paper.
 
 ---
 
-## ✅ What Velto Includes (and Excludes)
+## ✅ Included Commands
 
-### Included
-- 🔧 **Utility commands** (small, essential set):
-  - `/heal`, `/feed`, `/speed`, `/gamemode`, `/kill`
-  - `/time`, `/day`, `/night`, `/weather`
-  - `/craft`, `/broadcast`
-  - `/setspawn`, **`/spawn`** *(the only teleportation command)*
-  - `/anvil` *(Paper-only)*
-- 🧠 **Configurable messages** via `lang.yml` (chat, actionbar, title, bossbar).
-- 🧩 **Extensible architecture** (clean command base; easy to add features).
-- 🧵 **Async-friendly** internals where it matters.
-
-### Explicitly Not Included
-- ❌ **Economy** — use a dedicated cross-server economy (Vault-compatible) plugin.
-- ❌ **Homes/TPA/Warps** — by design, **only `/spawn`** is provided. Expect a network-wide homes/tpa plugin.
-- ❌ **Kits/Claims/Towns/Minigames** — out of scope for a minimal core.
-
-> Velto is the **“no overlap”** core: it won’t fight your network standards.
+- `/heal`, `/feed`, `/speed`, `/gamemode`, `/kill`  
+- `/time`, `/day`, `/night`, `/weather`  
+- `/craft`, `/broadcast`  
+- `/setspawn`, `/spawn` *(only teleport command)*  
+- `/anvil` *(Paper-only)*
 
 ---
 
-## 🔌 Cross-Server Use
+## 🧠 Configurable Messages
 
-Velto is tested with:
-- **Paper** on proxied networks (Velocity/Waterfall)
-- **Spigot/Bukkit** in single-server or proxied setups
+Velto’s `lang.yml` lets you choose how messages are displayed:
+- **chat**  
+- **actionbar**  
+- **title**  
+- **bossbar**  
 
-Because Velto avoids economy and player-state systems, it **doesn’t require** database replication or proxy messaging to “stay consistent” with other servers—making multi-server maintenance simpler.
-
----
-
-## ✨ Feature Highlights
-
-- 🚀 **Spigot & Paper compatibility** (with selective Paper-only commands like `/anvil`)
-- 🛡️ **Simple permission model:**
-  - Base: `velto.<command>`
-  - Others/sudo variants (when applicable): `velto.<command>.others`
-- 🎨 **Message pipeline** via `lang.yml`:
-  - `type: chat | actionbar | title | bossbar`
-  - Placeholder passthrough for your own variables
+Placeholders are supported for dynamic values.
 
 ---
 
-## 📚 Wiki
+## ❌ What Velto Does Not Include
 
-Docs, setup, and development notes live on the **[Velto Wiki](https://github.com/aven0xx/Velto/wiki)**.
+- Economy  
+- Homes/TPA/Warps (only `/spawn` is provided)  
+- Kits, claims, towns, minigames
+
+These are intentionally left out so you can use the best existing plugins for your needs.
 
 ---
 
-## ⚙️ Configuration Files
+## 📂 Configuration Files
 
 ```text
 config.yml   # spawn location & base settings
-lang.yml     # fully configurable messages (type + content)
+lang.yml     # fully configurable messages
 commands.yml # enable/disable Velto commands
