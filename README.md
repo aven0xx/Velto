@@ -7,6 +7,8 @@
 - A **simple core** for standalone servers.
 - A **foundation plugin** in a cross-server setup, leaving things like economy, homes, and teleports to dedicated plugins.
 
+📚 **[Read the Velto Wiki →](https://github.com/aven0xx/Velto/wiki)** for installation, configuration, and development guides.
+
 ---
 
 ## 🚦 Philosophy
@@ -30,10 +32,10 @@ Grab builds in **[Releases](../../releases)**:
 ## ✅ Included Commands
 
 - `/heal`, `/feed`, `/speed`, `/gamemode`, `/kill`  
-- `/time`, `/day`, `/night`, `/weather`  
-- `/craft`, `/broadcast`  
-- `/setspawn`, `/spawn` *(only teleport command)*  
-- `/anvil` *(Paper-only)*
+- `/time`, `/day`, `/night`, `/weather` `/itemlore`
+- `/craft`, `/broadcast`  `/killall` `/rename`
+- `/setspawn`, `/spawn` *(Set and teleport to a spawn point)*  
+- `/anvil` *(Paper-only because of limitations of Spigot API)*
 
 ---
 
