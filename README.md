@@ -4,7 +4,7 @@
 > **⚠ Alpha Notice:** Velto is a **small core plugin** coded with the help of AI and improved over time for production use. While functional, some features are still missing or under development. Expect updates and refinements as the plugin evolves.
 
 **Velto** is a lightweight, modern core plugin for Minecraft servers, offering essential utility commands with fully configurable messages.  
-Designed for **Spigot** and **Paper** servers, it provides a clean, extendable command structure, making it easy to add more features as your server grows.
+Designed for **Spigot (Velto 0.6 and later)** and **Paper** servers, it provides a clean, extendable command structure, making it easy to add more features as your server grows.
 
 ---
 
