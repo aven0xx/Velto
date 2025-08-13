@@ -3,11 +3,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-jar {
-    archiveBaseName.set('Velto-bukkit')
-    archiveVersion.set('0.5') // disables version in jar name
-}
-
 repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
@@ -15,22 +10,28 @@ repositories {
 }
 
 dependencies {
-    // Use the shadow output of :common (fixes multi-project shadow issues)
-    implementation(project(path: ':common', configuration: 'shadow'))
+    // Merge :common classes into the final jar
+    implementation project(':common')
 
+    // Spigot/PAPI as provided by server
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-platform-bukkit:4.3.2'
     compileOnly 'me.clip:placeholderapi:2.11.5'
-    // Other bukkit/spigot-only dependencies
 }
 
 tasks {
+    jar {
+        archiveBaseName.set('Velto-bukkit')
+        archiveVersion.set('0.6')
+    }
+
     shadowJar {
         archiveBaseName.set('Velto-bukkit')
-        archiveVersion.set('0.5')
-        archiveClassifier.set('') // removes -all classifier, matches jar task
-        // No relocation
+        archiveVersion.set('0.6')
+        archiveClassifier.set('') // no "-all"
+
+        mergeServiceFiles() // helpful for kyori service loaders
     }
+
     build {
         dependsOn shadowJar
     }

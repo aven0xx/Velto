@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class DayCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.timeset")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
@@ -29,7 +29,7 @@ public class DayCommand extends BaseCommand {
 
         if (world == null) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-world");
+                LangUtil.send(player, "invalid-world");
             }
             return true;
         }
@@ -37,7 +37,7 @@ public class DayCommand extends BaseCommand {
         world.setTime(1000);
 
         if (sender instanceof Player player) {
-            NotificationUtil.send(player, "time-set-day");
+            LangUtil.send(player, "time-set-day");
         }
 
         return true;

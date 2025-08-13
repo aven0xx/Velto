@@ -6,7 +6,7 @@ import com.aven0x.VeltoPaper.managers.CommandManager;
 import com.aven0x.VeltoPaper.managers.TeleportManager;
 import com.aven0x.VeltoPaper.managers.ChatManager;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,7 +34,7 @@ public class VeltoPaper extends JavaPlugin {
         saveDefaultConfig();
 
         // Load custom configs
-        NotificationUtil.load();
+        LangUtil.load();
         CommandUtil.load();
 
         // Setup managers

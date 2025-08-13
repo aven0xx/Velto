@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,7 +25,7 @@ public class ListCommand extends BaseCommand {
 
         // Permission check
         if (!hasPermission(player, "velto.list")) {
-            NotificationUtil.send(player, "no-permission");
+            LangUtil.send(player, "no-permission");
             return true;
         }
 
@@ -37,7 +37,7 @@ public class ListCommand extends BaseCommand {
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%players%", players);
 
-        NotificationUtil.send(player, "list-command", placeholders);
+        LangUtil.send(player, "list-command", placeholders);
         return true;
     }
 }

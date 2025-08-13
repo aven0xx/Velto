@@ -1,7 +1,7 @@
 package com.aven0x.VeltoBukkit.commands;
 
 import com.aven0x.Velto.manager.GodManager;
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -26,7 +26,7 @@ public class GodCommand extends BaseCommand {
 
         if (target == null || !target.isOnline()) {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "invalid-player");
+                LangUtil.send(playerSender, "invalid-player");
             }
             return true;
         }
@@ -37,11 +37,11 @@ public class GodCommand extends BaseCommand {
         placeholders.put("%target%", target.getName());
 
         if (self) {
-            NotificationUtil.send(target, enabled ? "god-enabled" : "god-disabled");
+            LangUtil.send(target, enabled ? "god-enabled" : "god-disabled");
         } else {
-            NotificationUtil.send(target, enabled ? "god-enabled" : "god-disabled");
+            LangUtil.send(target, enabled ? "god-enabled" : "god-disabled");
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, enabled ? "god-enabled-other" : "god-disabled-other", placeholders);
+                LangUtil.send(playerSender, enabled ? "god-enabled-other" : "god-disabled-other", placeholders);
             }
         }
 

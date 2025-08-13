@@ -1,5 +1,5 @@
 name: Velto
-version: 0.5
+version: 0.6-SNAPSHOT
 main: com.aven0x.VeltoBukkit.VeltoBukkit
 api-version: 1.21
 commands:
@@ -30,3 +30,4 @@ commands:
   killall: {}
   rename: {}
   itemlore: {}
+  veltoreload: {}

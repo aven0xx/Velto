@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,20 +15,20 @@ public class CraftCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.craft")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
 
         if (!(sender instanceof Player player)) {
             if (sender instanceof Player p) {
-                NotificationUtil.send(p, "only-player");
+                LangUtil.send(p, "only-player");
             }
             return true;
         }
 
         player.openWorkbench(null, true);
-        NotificationUtil.send(player, "opened-craft");
+        LangUtil.send(player, "opened-craft");
         return true;
     }
 }

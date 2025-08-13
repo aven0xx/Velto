@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,7 +27,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
         // Permission
         if (!hasPermission(sender, "velto.lore")) {
             if (sender instanceof Player p) {
-                NotificationUtil.send(p, "no-permission");
+                LangUtil.send(p, "no-permission");
             }
             return true;
         }
@@ -39,7 +39,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
 
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item == null || item.getType().isAir()) {
-            NotificationUtil.send(player, "lore-no-item");
+            LangUtil.send(player, "lore-no-item");
             return true;
         }
 
@@ -60,7 +60,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
         switch (sub) {
             case "show": {
                 if (lore.isEmpty()) {
-                    NotificationUtil.send(player, "lore-empty");
+                    LangUtil.send(player, "lore-empty");
                     return true;
                 }
                 player.sendMessage(ChatColor.YELLOW + "Lore (" + lore.size() + " lines):");
@@ -78,7 +78,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 ItemMeta m2 = item.getItemMeta();
                 m2.setLore(finalLore);
                 item.setItemMeta(m2);
-                NotificationUtil.send(player, "lore-cleared");
+                LangUtil.send(player, "lore-cleared");
                 return true;
             }
             case "add": {
@@ -92,7 +92,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 ItemMeta m2 = item.getItemMeta();
                 m2.setLore(lore);
                 item.setItemMeta(m2);
-                NotificationUtil.send(player, "lore-add-success");
+                LangUtil.send(player, "lore-add-success");
                 player.sendMessage(ChatColor.GREEN + "Added line " + lore.size() + ".");
                 return true;
             }
@@ -103,13 +103,13 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 }
                 Integer idx1 = parsePositiveInt(args[1]);
                 if (idx1 == null) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 int index0 = idx1 - 1; // 1-based -> 0-based
                 // Insert allows index = size + 1 (append)
                 if (index0 < 0 || index0 > lore.size()) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 String text = colorize(joinFrom(args, 2));
@@ -118,7 +118,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 ItemMeta m2 = item.getItemMeta();
                 m2.setLore(lore);
                 item.setItemMeta(m2);
-                NotificationUtil.send(player, "lore-insert-success");
+                LangUtil.send(player, "lore-insert-success");
                 player.sendMessage(ChatColor.GREEN + "Inserted at line " + idx1 + ".");
                 return true;
             }
@@ -128,17 +128,17 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                     return true;
                 }
                 if (lore.isEmpty()) {
-                    NotificationUtil.send(player, "lore-empty");
+                    LangUtil.send(player, "lore-empty");
                     return true;
                 }
                 Integer idx1 = parsePositiveInt(args[1]);
                 if (idx1 == null) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 int index0 = idx1 - 1;
                 if (index0 < 0 || index0 >= lore.size()) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 String text = colorize(joinFrom(args, 2));
@@ -147,7 +147,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 ItemMeta m2 = item.getItemMeta();
                 m2.setLore(lore);
                 item.setItemMeta(m2);
-                NotificationUtil.send(player, "lore-set-success");
+                LangUtil.send(player, "lore-set-success");
                 player.sendMessage(ChatColor.GREEN + "Updated line " + idx1 + ".");
                 return true;
             }
@@ -157,17 +157,17 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                     return true;
                 }
                 if (lore.isEmpty()) {
-                    NotificationUtil.send(player, "lore-empty");
+                    LangUtil.send(player, "lore-empty");
                     return true;
                 }
                 Integer idx1 = parsePositiveInt(args[1]);
                 if (idx1 == null) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 int index0 = idx1 - 1;
                 if (index0 < 0 || index0 >= lore.size()) {
-                    NotificationUtil.send(player, "lore-out-of-range");
+                    LangUtil.send(player, "lore-out-of-range");
                     return true;
                 }
                 lore.remove(index0);
@@ -178,7 +178,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
                 List<String> finalLore = lore.isEmpty() ? null : lore;
                 m2.setLore(finalLore);
                 item.setItemMeta(m2);
-                NotificationUtil.send(player, "lore-remove-success");
+                LangUtil.send(player, "lore-remove-success");
                 player.sendMessage(ChatColor.GREEN + "Removed line " + idx1 + ".");
                 return true;
             }
@@ -189,7 +189,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
     }
 
     private void sendUsage(@NotNull Player player, @NotNull String label) {
-        NotificationUtil.send(player, "lore-usage");
+        LangUtil.send(player, "lore-usage");
         player.sendMessage(ChatColor.YELLOW + "Usage:");
         player.sendMessage(ChatColor.GRAY + "/" + label + " show");
         player.sendMessage(ChatColor.GRAY + "/" + label + " clear");

@@ -3,11 +3,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-jar {
-    archiveBaseName.set('Velto-paper')
-    archiveVersion.set('0.5')
-}
-
 repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
@@ -15,19 +10,30 @@ repositories {
 }
 
 dependencies {
-    implementation(project(path: ':common', configuration: 'shadow'))
+    // Depend on the normal jar from :common
+    implementation project(':common')
 
     compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.5'
-    // Other paper/bukkit-only dependencies
 }
 
 tasks {
+    jar {
+        archiveBaseName.set('Velto-paper')
+        archiveVersion.set('0.6')
+    }
+
     shadowJar {
         archiveBaseName.set('Velto-paper')
-        archiveVersion.set('0.5')
-        archiveClassifier.set('')
+        archiveVersion.set('0.6')
+        archiveClassifier.set('') // no "-all"
+
+        // Merge :common classes into the final jar
+        dependencies {
+            include(project(':common'))
+        }
     }
+
     build {
         dependsOn shadowJar
     }

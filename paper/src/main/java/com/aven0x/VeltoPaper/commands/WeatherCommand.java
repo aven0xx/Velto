@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -20,14 +20,14 @@ public class WeatherCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.weather")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
 
         if (args.length < 1) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-usage");
+                LangUtil.send(player, "invalid-usage");
             }
             return true;
         }
@@ -52,14 +52,14 @@ public class WeatherCommand extends BaseCommand {
             }
             default -> {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "invalid-usage");
+                    LangUtil.send(player, "invalid-usage");
                 }
                 return true;
             }
         }
 
         if (sender instanceof Player player) {
-            NotificationUtil.send(player, "weather-updated");
+            LangUtil.send(player, "weather-updated");
         }
 
         return true;

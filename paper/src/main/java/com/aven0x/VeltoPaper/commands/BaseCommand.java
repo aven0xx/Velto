@@ -1,7 +1,7 @@
 package com.aven0x.VeltoPaper.commands;
 
 import com.aven0x.VeltoPaper.utils.CommandUtil;
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -41,7 +41,7 @@ public abstract class BaseCommand implements CommandExecutor, TabCompleter {
     protected boolean hasPermission(CommandSender sender, String perm) {
         if (!sender.hasPermission(perm)) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             } else {
                 sender.sendMessage("§cYou do not have permission.");
             }

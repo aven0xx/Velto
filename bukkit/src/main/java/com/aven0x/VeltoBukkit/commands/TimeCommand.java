@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -17,14 +17,14 @@ public class TimeCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.timeset")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
 
         if (args.length < 2) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-usage");
+                LangUtil.send(player, "invalid-usage");
             }
             return true;
         }
@@ -40,7 +40,7 @@ public class TimeCommand extends BaseCommand {
             };
         } catch (NumberFormatException e) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-time");
+                LangUtil.send(player, "invalid-time");
             }
             return true;
         }
@@ -51,7 +51,7 @@ public class TimeCommand extends BaseCommand {
 
         if (world == null) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-world");
+                LangUtil.send(player, "invalid-world");
             }
             return true;
         }
@@ -59,7 +59,7 @@ public class TimeCommand extends BaseCommand {
         world.setTime(time);
 
         if (sender instanceof Player player) {
-            NotificationUtil.send(player, "time-set");
+            LangUtil.send(player, "time-set");
         }
 
         return true;

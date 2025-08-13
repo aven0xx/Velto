@@ -6,9 +6,8 @@ import com.aven0x.VeltoBukkit.managers.CommandManager;
 import com.aven0x.VeltoBukkit.managers.TeleportManager;
 import com.aven0x.VeltoBukkit.managers.ChatManager;
 import com.aven0x.VeltoBukkit.utils.CommandUtil;
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,7 +15,6 @@ public class VeltoBukkit extends JavaPlugin {
 
     private static VeltoBukkit instance;
     private TeleportManager teleportManager;
-    private BukkitAudiences adventure;
     private AutoMsgManager autoMsgManager;
 
     @Override
@@ -36,11 +34,10 @@ public class VeltoBukkit extends JavaPlugin {
         saveDefaultConfig();
 
         // Load custom configs
-        NotificationUtil.load();
+        LangUtil.load();
         CommandUtil.load();
 
-        // Setup Adventure + managers
-        this.adventure = BukkitAudiences.create(this);
+        // Setup managers
         this.teleportManager = new TeleportManager();
         this.autoMsgManager = new AutoMsgManager();
         this.autoMsgManager.start();
@@ -55,9 +52,7 @@ public class VeltoBukkit extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (this.adventure != null) {
-            this.adventure.close();
-        }
+        // nothing special to close now that Adventure is removed
     }
 
     public static VeltoBukkit getInstance() {
@@ -66,9 +61,5 @@ public class VeltoBukkit extends JavaPlugin {
 
     public TeleportManager getTeleportManager() {
         return teleportManager;
-    }
-
-    public BukkitAudiences adventure() {
-        return adventure;
     }
 }
