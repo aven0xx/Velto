@@ -1,5 +1,5 @@
 name: Velto
-version: 0.6-SNAPSHOT
+version: 0.6
 main: com.aven0x.VeltoBukkit.VeltoBukkit
 api-version: 1.21
 commands:
