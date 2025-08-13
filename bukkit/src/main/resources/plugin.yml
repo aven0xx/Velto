@@ -30,3 +30,4 @@ commands:
   killall: {}
   rename: {}
   itemlore: {}
+  veltoreload: {}

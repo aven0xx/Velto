@@ -70,3 +70,6 @@ rename:
 itemlore:
   enabled: true
   aliases: []
+  veltoreload:
+    enabled: true
+    aliases: [ ]

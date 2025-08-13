@@ -32,7 +32,7 @@ public class CommandManager {
         register("gma", new GmaCommand());
         register("gmsp", new GmspCommand());
         register("itemlore", new ItemLoreCommand());
-
+        register("veltoreload", new ReloadCommand());
         register("anvil", new AnvilCommand()); // Paper only command
     }
 

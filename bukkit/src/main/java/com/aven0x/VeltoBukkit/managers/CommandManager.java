@@ -32,6 +32,7 @@ public class CommandManager {
         register("gma", new GmaCommand());
         register("gmsp", new GmspCommand());
         register("itemlore", new ItemLoreCommand());
+        register("veltoreload", new ReloadCommand());
     }
 
     private static void register(String name, BaseCommand command) {
