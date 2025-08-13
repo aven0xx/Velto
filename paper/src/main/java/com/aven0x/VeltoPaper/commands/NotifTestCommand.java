@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,12 +23,12 @@ public class NotifTestCommand extends BaseCommand {
         }
 
         if (args.length != 1) {
-            NotificationUtil.send(player, "invalid-usage");
+            LangUtil.send(player, "invalid-usage");
             return true;
         }
 
         String key = args[0];
-        NotificationUtil.send(player, key);
+        LangUtil.send(player, key);
         return true;
     }
 }

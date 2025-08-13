@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class SpeedCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-usage");
+                LangUtil.send(player, "invalid-usage");
             }
             return true;
         }
@@ -26,14 +26,14 @@ public class SpeedCommand extends BaseCommand {
             speedLevel = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-speed");
+                LangUtil.send(player, "invalid-speed");
             }
             return true;
         }
 
         if (speedLevel < 1 || speedLevel > 10) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-speed");
+                LangUtil.send(player, "invalid-speed");
             }
             return true;
         }
@@ -47,14 +47,14 @@ public class SpeedCommand extends BaseCommand {
 
         if (!hasPermission(sender, perm)) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
 
         if (target == null || !target.isOnline()) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-player");
+                LangUtil.send(player, "invalid-player");
             }
             return true;
         }
@@ -70,7 +70,7 @@ public class SpeedCommand extends BaseCommand {
         }
 
         if (sender instanceof Player player) {
-            NotificationUtil.send(player, "speed-updated");
+            LangUtil.send(player, "speed-updated");
         }
 
         return true;

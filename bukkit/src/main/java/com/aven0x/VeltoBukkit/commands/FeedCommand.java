@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -27,7 +27,7 @@ public class FeedCommand extends BaseCommand {
 
         if (target == null || !target.isOnline()) {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "invalid-player");
+                LangUtil.send(playerSender, "invalid-player");
             } else {
                 sender.sendMessage("§cInvalid player.");
             }
@@ -38,14 +38,14 @@ public class FeedCommand extends BaseCommand {
         target.setSaturation(20f);
 
         if (self) {
-            NotificationUtil.send(target, "fed-self");
+            LangUtil.send(target, "fed-self");
         } else {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "fed-other", Map.of("%target%", target.getName()));
+                LangUtil.send(playerSender, "fed-other", Map.of("%target%", target.getName()));
             } else {
                 sender.sendMessage("§aFed: " + target.getName());
             }
-            NotificationUtil.send(target, "fed-self");
+            LangUtil.send(target, "fed-self");
         }
 
         return true;

@@ -6,7 +6,7 @@ import com.aven0x.VeltoBukkit.managers.CommandManager;
 import com.aven0x.VeltoBukkit.managers.TeleportManager;
 import com.aven0x.VeltoBukkit.managers.ChatManager;
 import com.aven0x.VeltoBukkit.utils.CommandUtil;
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
@@ -36,7 +36,7 @@ public class VeltoBukkit extends JavaPlugin {
         saveDefaultConfig();
 
         // Load custom configs
-        NotificationUtil.load();
+        LangUtil.load();
         CommandUtil.load();
 
         // Setup Adventure + managers

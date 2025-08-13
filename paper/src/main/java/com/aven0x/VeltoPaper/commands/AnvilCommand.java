@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ public class AnvilCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.anvil")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
@@ -27,7 +27,7 @@ public class AnvilCommand extends BaseCommand {
 
         // Open the Paper anvil UI
         player.openAnvil(null, true);
-        NotificationUtil.send(player, "opened-anvil");
+        LangUtil.send(player, "opened-anvil");
         return true;
     }
 }

@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -20,7 +20,7 @@ public class KillCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.kill")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             } else {
                 sender.sendMessage("§cYou don't have permission.");
             }
@@ -33,7 +33,7 @@ public class KillCommand extends BaseCommand {
 
         if (target == null || !target.isOnline()) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "invalid-player");
+                LangUtil.send(player, "invalid-player");
             } else {
                 sender.sendMessage("§cInvalid player.");
             }
@@ -43,7 +43,7 @@ public class KillCommand extends BaseCommand {
         target.setHealth(0);
 
         if (sender instanceof Player playerSender) {
-            NotificationUtil.send(playerSender, "player-killed");
+            LangUtil.send(playerSender, "player-killed");
         } else {
             sender.sendMessage("§aKilled: " + target.getName());
         }

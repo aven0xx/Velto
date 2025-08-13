@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -22,7 +22,7 @@ public class KillAllCommand extends BaseCommand {
         // Permission check (same pattern as AnvilCommand)
         if (!hasPermission(sender, "velto.killall")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
@@ -77,7 +77,7 @@ public class KillAllCommand extends BaseCommand {
         }
 
         // Keep your NotificationUtil flow
-        NotificationUtil.send(player, "killall-done");
+        LangUtil.send(player, "killall-done");
         player.sendMessage("§aRemoved §f" + removed + " §aentities of type §f" +
                 (killAll ? "ALL" : targetType) + " §ain world §f" + targetWorld.getName() + "§a.");
 

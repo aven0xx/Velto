@@ -2,7 +2,7 @@ package com.aven0x.VeltoPaper.managers;
 
 import com.aven0x.VeltoPaper.VeltoPaper;
 import com.aven0x.VeltoPaper.utils.ConfigUtil;
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -47,7 +47,7 @@ public class AutoMsgManager {
                 }
 
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
-                NotificationUtil.sendGlobal(key); // Uses optimized Adventure global dispatch
+                LangUtil.sendGlobal(key); // Uses optimized Adventure global dispatch
             }
         }.runTaskTimer(VeltoPaper.getInstance(),
                 ConfigUtil.getAutoMessagesIntervalTicks(),

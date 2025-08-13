@@ -1,6 +1,6 @@
 package com.aven0x.VeltoPaper.commands;
 
-import com.aven0x.VeltoPaper.utils.NotificationUtil;
+import com.aven0x.VeltoPaper.utils.LangUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,7 @@ public class RenameCommand extends BaseCommand {
         // Permission
         if (!hasPermission(sender, "velto.rename")) {
             if (sender instanceof Player player) {
-                NotificationUtil.send(player, "no-permission");
+                LangUtil.send(player, "no-permission");
             }
             return true;
         }
@@ -35,20 +35,20 @@ public class RenameCommand extends BaseCommand {
         // Must hold something
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item == null || item.getType().isAir()) {
-            NotificationUtil.send(player, "rename-no-item");
+            LangUtil.send(player, "rename-no-item");
             return true;
         }
 
         // Usage / reset
         if (args.length == 0) {
-            NotificationUtil.send(player, "rename-usage"); // e.g., "&e/rename <name...> or /rename reset"
+            LangUtil.send(player, "rename-usage"); // e.g., "&e/rename <name...> or /rename reset"
             return true;
         }
         if (args.length == 1 && (args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("clear"))) {
             ItemMeta meta = item.getItemMeta();
             meta.setDisplayName(null); // remove custom name
             item.setItemMeta(meta);
-            NotificationUtil.send(player, "rename-cleared");
+            LangUtil.send(player, "rename-cleared");
             return true;
         }
 
@@ -60,7 +60,7 @@ public class RenameCommand extends BaseCommand {
         meta.setDisplayName(colored);
         item.setItemMeta(meta);
 
-        NotificationUtil.send(player, "rename-success");
+        LangUtil.send(player, "rename-success");
         return true;
     }
 }

@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -22,7 +22,7 @@ public class GamemodeCommands {
         public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
             if (args.length < 1) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "invalid-usage-gamemode");
+                    LangUtil.send(player, "invalid-usage-gamemode");
                 } else {
                     sender.sendMessage("§cUsage: /gamemode <mode> [player]");
                 }
@@ -39,7 +39,7 @@ public class GamemodeCommands {
 
             if (mode == null) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "invalid-gamemode");
+                    LangUtil.send(player, "invalid-gamemode");
                 } else {
                     sender.sendMessage("§cInvalid gamemode.");
                 }
@@ -58,7 +58,7 @@ public class GamemodeCommands {
 
             if (target == null || !target.isOnline()) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "invalid-player");
+                    LangUtil.send(player, "invalid-player");
                 } else {
                     sender.sendMessage("§cInvalid player.");
                 }
@@ -68,11 +68,11 @@ public class GamemodeCommands {
             target.setGameMode(mode);
 
             Map<String, String> placeholders = Map.of("%mode%", mode.name());
-            NotificationUtil.send(target, "gamemode-set-self", placeholders);
+            LangUtil.send(target, "gamemode-set-self", placeholders);
 
             if (!self) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "gamemode-set-other", Map.of(
+                    LangUtil.send(player, "gamemode-set-other", Map.of(
                             "%target%", target.getName(),
                             "%mode%", mode.name()
                     ));
@@ -136,7 +136,7 @@ public class GamemodeCommands {
 
             if (target == null || !target.isOnline()) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "invalid-player");
+                    LangUtil.send(player, "invalid-player");
                 } else {
                     sender.sendMessage("§cInvalid player.");
                 }
@@ -146,11 +146,11 @@ public class GamemodeCommands {
             target.setGameMode(mode);
 
             Map<String, String> placeholders = Map.of("%mode%", mode.name());
-            NotificationUtil.send(target, "gamemode-set-self", placeholders);
+            LangUtil.send(target, "gamemode-set-self", placeholders);
 
             if (!self) {
                 if (sender instanceof Player player) {
-                    NotificationUtil.send(player, "gamemode-set-other", Map.of(
+                    LangUtil.send(player, "gamemode-set-other", Map.of(
                             "%target%", target.getName(),
                             "%mode%", mode.name()
                     ));

@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -29,7 +29,7 @@ public class HealCommand extends BaseCommand {
 
         if (target == null || !target.isOnline()) {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "invalid-player");
+                LangUtil.send(playerSender, "invalid-player");
             } else {
                 sender.sendMessage("§cInvalid player.");
             }
@@ -45,14 +45,14 @@ public class HealCommand extends BaseCommand {
         target.setSaturation(20f);
 
         if (self) {
-            NotificationUtil.send(target, "healed-self");
+            LangUtil.send(target, "healed-self");
         } else {
             if (sender instanceof Player playerSender) {
-                NotificationUtil.send(playerSender, "healed-other", Map.of("%target%", target.getName()));
+                LangUtil.send(playerSender, "healed-other", Map.of("%target%", target.getName()));
             } else {
                 sender.sendMessage("§aHealed: " + target.getName());
             }
-            NotificationUtil.send(target, "healed-self");
+            LangUtil.send(target, "healed-self");
         }
 
         return true;

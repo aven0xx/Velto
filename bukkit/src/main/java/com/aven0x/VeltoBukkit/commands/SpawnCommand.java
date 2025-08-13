@@ -2,7 +2,7 @@ package com.aven0x.VeltoBukkit.commands;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import com.aven0x.VeltoBukkit.utils.ConfigUtil;
-import com.aven0x.VeltoBukkit.utils.NotificationUtil;
+import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,18 +18,18 @@ public class SpawnCommand extends BaseCommand {
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.spawn")) return true;
         if (!(sender instanceof Player player)) {
-            NotificationUtil.send((Player) sender, "only-player");
+            LangUtil.send((Player) sender, "only-player");
             return true;
         }
 
         Location spawn = ConfigUtil.getSpawn();
         if (spawn == null) {
-            NotificationUtil.send(player, "spawn-not-set");
+            LangUtil.send(player, "spawn-not-set");
             return true;
         }
 
         VeltoBukkit.getInstance().getTeleportManager().teleportAsync(player, spawn);
-        NotificationUtil.send(player, "teleporting-spawn");
+        LangUtil.send(player, "teleporting-spawn");
         return true;
     }
 }
