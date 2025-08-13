@@ -32,8 +32,8 @@ Grab builds in **[Releases](../../releases)**:
 ## ✅ Included Commands
 
 - `/heal`, `/feed`, `/speed`, `/gamemode`, `/kill`  
-- `/time`, `/day`, `/night`, `/weather` `/itemlore`
-- `/craft`, `/broadcast`  `/killall` `/rename`
+- `/time`, `/day`, `/night`, `/weather`, `/itemlore`
+- `/craft`, `/broadcast`,  `/killall`, `/rename`
 - `/setspawn`, `/spawn` *(Set and teleport to a spawn point)*  
 - `/anvil` *(Paper-only because of limitations of Spigot API)*
 
