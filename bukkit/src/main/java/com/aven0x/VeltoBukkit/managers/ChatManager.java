@@ -2,6 +2,7 @@ package com.aven0x.VeltoBukkit.managers;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import com.aven0x.VeltoBukkit.utils.ConfigUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -54,6 +55,12 @@ public class ChatManager implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        // Hide join message if the player is vanished
+        if (PlayerUtil.isVanished(event.getPlayer())) {
+            event.setJoinMessage(null);
+            return;
+        }
+
         String msg = ConfigUtil.getJoinMessage();
 
         // Manual fallback if PlaceholderAPI is missing
@@ -68,6 +75,12 @@ public class ChatManager implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        // Hide quit message if the player is vanished
+        if (PlayerUtil.isVanished(event.getPlayer())) {
+            event.setQuitMessage(null);
+            return;
+        }
+
         String msg = ConfigUtil.getQuitMessage();
 
         msg = msg.replace("%player_name%", event.getPlayer().getName());
