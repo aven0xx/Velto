@@ -1,6 +1,6 @@
 package com.aven0x.Velto.listeners;
 
-import com.aven0x.Velto.manager.GodManager;
+import com.aven0x.Velto.managers.GodManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

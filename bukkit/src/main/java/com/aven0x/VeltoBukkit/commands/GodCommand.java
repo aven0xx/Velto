@@ -1,6 +1,6 @@
 package com.aven0x.VeltoBukkit.commands;
 
-import com.aven0x.Velto.manager.GodManager;
+import com.aven0x.Velto.managers.GodManager;
 import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

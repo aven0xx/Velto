@@ -1,9 +1,7 @@
 #Velto Roadmap
 
-FOR 0.6:
--Kick messages and Join Messages are sent only if isVanished false / Done
--Refactor NotificationUtil to LangUtil since it manages lang.yml / Done
--Reload command / Done
--Now compatible with Bukkit/Spigot / Done
--Now tested up to 1.21.8 / Done
+FOR 0.7:
+-Alert System replacing the Broadcast command (AlertCommand)
+-Basic AFK System (AFKManager)
+-Chat Format according to permission (Rewrite of ChatManager)
 
