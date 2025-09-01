@@ -226,7 +226,7 @@ public class AfkManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        // Nettoyer les données du joueur à sa déconnexion
+        // Clean data on player disconnect
         cleanup(event.getPlayer());
     }
 }
