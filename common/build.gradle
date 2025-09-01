@@ -5,7 +5,7 @@ plugins {
 
 jar {
     archiveBaseName.set('Velto-common')
-    archiveVersion.set('0.6')
+    archiveVersion.set('0.7-SNAPSHOT')
 }
 
 repositories {
@@ -29,7 +29,7 @@ dependencies {
 tasks {
     shadowJar {
         archiveBaseName.set('Velto-common')
-        archiveVersion.set('0.6')
+        archiveVersion.set('0.7-SNAPSHOT')
         archiveClassifier.set('') // matches jar name
         // No relocate
     }
