@@ -3,5 +3,6 @@
 FOR 0.7:
 -Alert System replacing the Broadcast command (AlertCommand)
 -Basic AFK System (AFKManager)
+-AFK Zone
 -Chat Format according to permission (Rewrite of ChatManager)
 

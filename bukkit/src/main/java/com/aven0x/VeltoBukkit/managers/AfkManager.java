@@ -2,8 +2,10 @@ package com.aven0x.VeltoBukkit.managers;
 
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoBukkit.VeltoBukkit;
+import com.aven0x.VeltoBukkit.utils.ConfigUtil;
 import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -101,6 +103,14 @@ public class AfkManager implements Listener {
         if (afk && !wasAfk) {
             // Devient AFK
             afkPlayers.add(uuid);
+
+            // Teleport player to AFK zone if enabled in config
+            if (ConfigUtil.isAfkzoneOn()) {
+                Location afkZone = ConfigUtil.getAfkzone();
+                if (afkZone != null && afkZone.getWorld() != null) {
+                    player.teleport(afkZone);
+                }
+            }
 
 // Notification to the player
             Map<String, String> placeholders = Map.of("%player%", player.getName());

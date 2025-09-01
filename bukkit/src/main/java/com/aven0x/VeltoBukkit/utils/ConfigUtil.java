@@ -24,6 +24,14 @@ public class ConfigUtil {
         return getConfig().contains("spawn") ? getConfig().getLocation("spawn") : null;
     }
 
+    public static boolean isAfkzoneOn() {
+        return getConfig().getBoolean("afkzone.enabled", true);
+    }
+
+    public static Location getAfkzone() {
+        return getConfig().contains("afkzone.location") ? getConfig().getLocation("afkzone.location") : null;
+    }
+
     // === AUTO MESSAGES ===
 
     public static boolean isAutoMessagesEnabled() {
