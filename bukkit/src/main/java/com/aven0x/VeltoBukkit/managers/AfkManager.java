@@ -1,5 +1,6 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
@@ -25,7 +26,7 @@ public class AfkManager implements Listener {
     private static BukkitRunnable afkChecker;
 
     /**
-     * Démarre le système AFK
+     * Start AFK system
      */
     public static void start() {
         if (afkChecker != null) {
@@ -52,12 +53,12 @@ public class AfkManager implements Listener {
             }
         };
 
-        // Vérifie toutes les 30 secondes
+        // Check every 30 seconds
         afkChecker.runTaskTimer(VeltoBukkit.getInstance(), 600L, 600L);
     }
 
     /**
-     * Arrête le système AFK
+     * Stop AFK system
      */
     public static void stop() {
         if (afkChecker != null) {
@@ -101,29 +102,34 @@ public class AfkManager implements Listener {
             // Devient AFK
             afkPlayers.add(uuid);
 
-            // Notification au joueur
+// Notification to the player
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-enabled", placeholders);
 
-            // Notification globale
-            LangUtil.sendGlobal("afk-player", placeholders);
+// Global Notification (if not vanished)
+            if (!PlayerUtil.isVanished(player)) {
+                LangUtil.sendGlobal("afk-player", placeholders);
+            }
 
         } else if (!afk && wasAfk) {
             // N'est plus AFK
             afkPlayers.remove(uuid);
             lastActivity.put(uuid, System.currentTimeMillis());
 
-            // Notification au joueur
+// Notification to the player
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-disabled", placeholders);
 
-            // Notification globale
-            LangUtil.sendGlobal("afk-player-back", placeholders);
+// Global Notification (if not vanished)
+            if (!PlayerUtil.isVanished(player)) {
+                LangUtil.sendGlobal("afk-player-back", placeholders);
+            }
+
         }
     }
 
     /**
-     * Toggle le statut AFK d'un joueur (pour commande)
+     * Toggle AFK status (for AFK command)
      */
     public static boolean toggleAfk(Player player) {
         boolean newState = !isAfk(player);
@@ -132,7 +138,7 @@ public class AfkManager implements Listener {
     }
 
     /**
-     * Récupère tous les joueurs AFK
+     * Get all AFK players
      */
     public static Set<Player> getAfkPlayers() {
         Set<Player> players = new HashSet<>();
@@ -146,7 +152,7 @@ public class AfkManager implements Listener {
     }
 
     /**
-     * Récupère le temps depuis la dernière activité d'un joueur (en millisecondes)
+     * Get Time since a player last activity
      */
     public static long getTimeSinceLastActivity(Player player) {
         UUID uuid = player.getUniqueId();
@@ -155,7 +161,7 @@ public class AfkManager implements Listener {
     }
 
     /**
-     * Nettoie les données d'un joueur qui se déconnecte
+     * Clean up data when a player disconnect
      */
     public static void cleanup(Player player) {
         UUID uuid = player.getUniqueId();
@@ -164,7 +170,7 @@ public class AfkManager implements Listener {
     }
 
     /**
-     * Récupère le timeout AFK en secondes (pour affichage)
+     * Get AFK Timeout
      */
     public static int getAfkTimeoutSeconds() {
         return (int) (AFK_TIMEOUT / 1000);
@@ -182,7 +188,6 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        // Ne pas compter si l'événement est annulé
         if (!event.isCancelled()) {
             updateActivity(event.getPlayer());
         }
@@ -190,7 +195,6 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        // Ne pas compter si l'événement est annulé
         if (!event.isCancelled()) {
             String command = event.getMessage().toLowerCase();
 
@@ -203,7 +207,6 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Toute interaction avec le monde
         if (!event.isCancelled()) {
             updateActivity(event.getPlayer());
         }
@@ -211,7 +214,6 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClick(InventoryClickEvent event) {
-        // Clicks dans les inventaires
         if (!event.isCancelled() && event.getWhoClicked() instanceof Player player) {
             updateActivity(player);
         }
@@ -219,7 +221,6 @@ public class AfkManager implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        // Initialiser l'activité du joueur à sa connexion
         updateActivity(event.getPlayer());
     }
 
