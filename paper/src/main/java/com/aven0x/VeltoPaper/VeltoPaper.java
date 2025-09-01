@@ -1,8 +1,6 @@
 package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.listeners.GodListener;
-import com.aven0x.Velto.listeners.PlayerActiveListener;
-import com.aven0x.Velto.managers.AFKManager;
 import com.aven0x.VeltoPaper.managers.AutoMsgManager;
 import com.aven0x.VeltoPaper.managers.CommandManager;
 import com.aven0x.VeltoPaper.managers.TeleportManager;
@@ -43,6 +41,7 @@ public class VeltoPaper extends JavaPlugin {
         this.teleportManager = new TeleportManager();
         this.autoMsgManager = new AutoMsgManager();
         this.autoMsgManager.start();
+        new ChatManager(this);
 
         // Register commands
         CommandManager.registerAllCommands();
