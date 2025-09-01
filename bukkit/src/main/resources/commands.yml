@@ -73,3 +73,6 @@ itemlore:
   veltoreload:
     enabled: true
     aliases: [ ]
+  afk:
+    enabled: true
+    aliases: [ "away" ]

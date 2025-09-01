@@ -1,6 +1,7 @@
 package com.aven0x.VeltoBukkit;
 
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.VeltoBukkit.managers.AfkManager;
 import com.aven0x.VeltoBukkit.managers.AutoMsgManager;
 import com.aven0x.VeltoBukkit.managers.CommandManager;
 import com.aven0x.VeltoBukkit.managers.TeleportManager;
@@ -48,11 +49,18 @@ public class VeltoBukkit extends JavaPlugin {
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
+
+        AfkManager afkManager = new AfkManager();
+        getServer().getPluginManager().registerEvents(afkManager, this);
+        AfkManager.start();
     }
 
     @Override
     public void onDisable() {
         // nothing special to close now that Adventure is removed
+
+        // Arrêter le système AFK
+        AfkManager.stop();
     }
 
     public static VeltoBukkit getInstance() {

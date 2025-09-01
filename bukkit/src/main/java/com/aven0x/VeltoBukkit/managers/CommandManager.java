@@ -33,6 +33,7 @@ public class CommandManager {
         register("gmsp", new GmspCommand());
         register("itemlore", new ItemLoreCommand());
         register("veltoreload", new ReloadCommand());
+        register("afk", new AfkCommand());
     }
 
     private static void register(String name, BaseCommand command) {
