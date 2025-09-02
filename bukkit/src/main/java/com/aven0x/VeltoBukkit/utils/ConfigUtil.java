@@ -29,7 +29,7 @@ public class ConfigUtil {
     }
 
     public static Location getAfkzone() {
-        return getConfig().contains("afkzone.location") ? getConfig().getLocation("afkzone.location") : null;
+        return getConfig().contains("afkzone") ? getConfig().getLocation("afkzone") : null;
     }
 
     // === AUTO MESSAGES ===

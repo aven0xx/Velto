@@ -27,6 +27,9 @@ public class AfkManager implements Listener {
     private static final long AFK_TIMEOUT = 300000; // 5 minutes en millisecondes
     private static BukkitRunnable afkChecker;
 
+    // NEW: store the player's location right before teleporting to AFK zone
+    private static final Map<UUID, Location> preAfkLocations = new HashMap<>();
+
     /**
      * Start AFK system
      */
@@ -69,6 +72,7 @@ public class AfkManager implements Listener {
         }
         lastActivity.clear();
         afkPlayers.clear();
+        preAfkLocations.clear(); // NEW: also clear stored pre-AFK locations
     }
 
     /**
@@ -104,19 +108,68 @@ public class AfkManager implements Listener {
             // Devient AFK
             afkPlayers.add(uuid);
 
+            System.out.println("=== DEBUG: Player " + player.getName() + " becoming AFK ===");
+
             // Teleport player to AFK zone if enabled in config
-            if (ConfigUtil.isAfkzoneOn()) {
-                Location afkZone = ConfigUtil.getAfkzone();
-                if (afkZone != null && afkZone.getWorld() != null) {
-                    player.teleport(afkZone);
+            boolean afkzoneEnabled = ConfigUtil.isAfkzoneOn();
+            System.out.println("DEBUG: AFK Zone enabled: " + afkzoneEnabled);
+
+            if (afkzoneEnabled) {
+                // Save current location BEFORE teleporting (clone to avoid mutation)
+                try {
+                    preAfkLocations.put(uuid, player.getLocation().clone());
+                    System.out.println("DEBUG: Saved pre-AFK location for " + player.getName() + ": " + preAfkLocations.get(uuid));
+                } catch (Exception e) {
+                    System.out.println("DEBUG: Failed to save pre-AFK location for " + player.getName() + ": " + e.getMessage());
                 }
+
+                Location afkZone = ConfigUtil.getAfkzone();
+                System.out.println("DEBUG: AFK Zone location from config: " + afkZone);
+
+                if (afkZone != null) {
+                    System.out.println("DEBUG: AFK Zone world: " + afkZone.getWorld());
+                    System.out.println("DEBUG: AFK Zone coordinates: x=" + afkZone.getX() + ", y=" + afkZone.getY() + ", z=" + afkZone.getZ());
+
+                    if (afkZone.getWorld() != null) {
+                        System.out.println("DEBUG: Player current location: " + player.getLocation());
+                        System.out.println("DEBUG: Attempting teleportation...");
+
+                        try {
+                            boolean success = player.teleport(afkZone);
+                            System.out.println("DEBUG: Teleport result: " + success);
+
+                            if (!success) {
+                                System.out.println("DEBUG: Teleport failed - trying with delay...");
+
+                                // Try with a small delay in case of timing issues
+                                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                                    boolean delayedSuccess = player.teleport(afkZone);
+                                    System.out.println("DEBUG: Delayed teleport result: " + delayedSuccess);
+                                }, 1L);
+                            }
+                        } catch (Exception e) {
+                            System.out.println("DEBUG: Exception during teleport: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("DEBUG: ERROR - AFK Zone world is null!");
+                    }
+                } else {
+                    System.out.println("DEBUG: ERROR - AFK Zone location is null!");
+                }
+            } else {
+                System.out.println("DEBUG: AFK Zone is disabled in config");
             }
 
-// Notification to the player
+            System.out.println("=== DEBUG END ===");
+
+            //Keep indent
+
+            // Notification to the player
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-enabled", placeholders);
 
-// Global Notification (if not vanished)
+            // Global Notification (if not vanished)
             if (!PlayerUtil.isVanished(player)) {
                 LangUtil.sendGlobal("afk-player", placeholders);
             }
@@ -126,15 +179,41 @@ public class AfkManager implements Listener {
             afkPlayers.remove(uuid);
             lastActivity.put(uuid, System.currentTimeMillis());
 
-// Notification to the player
+            // If AFK zone is on and we have a saved location, try to send them back
+            if (ConfigUtil.isAfkzoneOn()) {
+                Location back = preAfkLocations.remove(uuid);
+                if (back != null) {
+                    System.out.println("DEBUG: Restoring " + player.getName() + " to pre-AFK location: " + back);
+                    try {
+                        boolean success = player.teleport(back);
+                        System.out.println("DEBUG: Return teleport result: " + success);
+                        if (!success) {
+                            Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                                boolean delayed = player.teleport(back);
+                                System.out.println("DEBUG: Delayed return teleport result: " + delayed);
+                            }, 1L);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("DEBUG: Exception while returning from AFK: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("DEBUG: No pre-AFK location stored for " + player.getName() + " (maybe AFK zone was disabled or save failed).");
+                }
+            } else {
+                // If AFK zone is OFF now, we don't force a return teleport.
+                // Clean any leftover entry
+                preAfkLocations.remove(uuid);
+            }
+
+            // Notification to the player
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-disabled", placeholders);
 
-// Global Notification (if not vanished)
+            // Global Notification (if not vanished)
             if (!PlayerUtil.isVanished(player)) {
                 LangUtil.sendGlobal("afk-player-back", placeholders);
             }
-
         }
     }
 
@@ -177,6 +256,7 @@ public class AfkManager implements Listener {
         UUID uuid = player.getUniqueId();
         lastActivity.remove(uuid);
         afkPlayers.remove(uuid);
+        preAfkLocations.remove(uuid); // NEW: avoid stale stored locations
     }
 
     /**
