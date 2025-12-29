@@ -18,24 +18,41 @@ public class WeatherCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+        // hasPermission() already sends "no-permission"
         if (!hasPermission(sender, "velto.weather")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 
+        // Usage: /weather <clear|sun|rain|thunder> [world]
         if (args.length < 1) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-usage");
+            } else {
+                sender.sendMessage("§cUsage: /weather <clear|sun|rain|thunder> <world>");
             }
             return true;
         }
 
         String mode = args[0].toLowerCase();
-        World world = (sender instanceof Player player)
-                ? player.getWorld()
-                : Bukkit.getWorlds().get(0);
+
+        World world = null;
+        // If world provided: /weather <mode> <world>
+        if (args.length >= 2) {
+            world = Bukkit.getWorld(args[1]);
+        } else if (sender instanceof Player player) {
+            // Player default: current world
+            world = player.getWorld();
+        }
+
+        // Console must specify a world for /weather
+        if (world == null) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "invalid-world");
+            } else {
+                sender.sendMessage("§cWorld not found. Usage: /weather <clear|sun|rain|thunder> <world>");
+            }
+            return true;
+        }
 
         switch (mode) {
             case "clear", "sun" -> {
@@ -53,6 +70,8 @@ public class WeatherCommand extends BaseCommand {
             default -> {
                 if (sender instanceof Player player) {
                     LangUtil.send(player, "invalid-usage");
+                } else {
+                    sender.sendMessage("§cUsage: /weather <clear|sun|rain|thunder> <world>");
                 }
                 return true;
             }
@@ -60,9 +79,33 @@ public class WeatherCommand extends BaseCommand {
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "weather-updated");
+        } else {
+            sender.sendMessage("§aWeather updated in world §f" + world.getName() + "§a.");
         }
 
         return true;
+    }
+
+    // ===== Wrapper helper =====
+    static boolean dispatchWeather(CommandSender sender, String mode, String[] args) {
+        // Player: keep old behavior (/sun affects current world)
+        if (sender instanceof Player) {
+            return Bukkit.dispatchCommand(sender, "weather " + mode);
+        }
+
+        // Console: allow /sun [world] and preserve old behavior (default first world)
+        String worldName;
+        if (args.length >= 1) {
+            worldName = args[0];
+        } else {
+            if (Bukkit.getWorlds().isEmpty()) {
+                sender.sendMessage("§cNo worlds are loaded.");
+                return true;
+            }
+            worldName = Bukkit.getWorlds().get(0).getName();
+        }
+
+        return Bukkit.dispatchCommand(sender, "weather " + mode + " " + worldName);
     }
 }
 
@@ -73,7 +116,7 @@ class SunCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
-        return Bukkit.dispatchCommand(sender, "weather sun");
+        return WeatherCommand.dispatchWeather(sender, "sun", args);
     }
 }
 
@@ -84,7 +127,7 @@ class RainCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
-        return Bukkit.dispatchCommand(sender, "weather rain");
+        return WeatherCommand.dispatchWeather(sender, "rain", args);
     }
 }
 
@@ -95,6 +138,6 @@ class ThunderCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
-        return Bukkit.dispatchCommand(sender, "weather thunder");
+        return WeatherCommand.dispatchWeather(sender, "thunder", args);
     }
 }
