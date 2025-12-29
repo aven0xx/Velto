@@ -1,10 +1,12 @@
 package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.VeltoPaper.managers.AfkManager;
 import com.aven0x.VeltoPaper.managers.AutoMsgManager;
 import com.aven0x.VeltoPaper.managers.CommandManager;
 import com.aven0x.VeltoPaper.managers.TeleportManager;
 import com.aven0x.VeltoPaper.managers.ChatManager;
+import com.aven0x.VeltoPaper.utils.AfkPositionStorage;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
 import com.aven0x.VeltoPaper.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
@@ -48,11 +50,19 @@ public class VeltoPaper extends JavaPlugin {
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
+
+        AfkManager afkManager = new AfkManager();
+        getServer().getPluginManager().registerEvents(afkManager, this);
+        AfkManager.start();
+        AfkPositionStorage.init(getDataFolder());
     }
 
     @Override
     public void onDisable() {
-        // Optional: clean up resources or managers
+        // nothing special to close now that Adventure is removed
+
+        // Arrêter le système AFK
+        AfkManager.stop();
     }
 
     public static VeltoPaper getInstance() {
