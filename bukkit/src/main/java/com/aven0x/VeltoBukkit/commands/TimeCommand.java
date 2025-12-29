@@ -16,20 +16,20 @@ public class TimeCommand extends BaseCommand {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (!hasPermission(sender, "velto.timeset")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 
-        if (args.length < 2) {
+        // Usage: /time <day|night|ticks> [world]
+        if (args.length < 1) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-usage");
+            } else {
+                sender.sendMessage("§cUsage: /time <day|night|ticks> <world>");
             }
             return true;
         }
 
-        String timeArg = args[1].toLowerCase();
+        String timeArg = args[0].toLowerCase();
         long time;
 
         try {
@@ -41,17 +41,28 @@ public class TimeCommand extends BaseCommand {
         } catch (NumberFormatException e) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-time");
+            } else {
+                sender.sendMessage("§cInvalid time specified.");
             }
             return true;
         }
 
-        World world = args.length > 2
-                ? Bukkit.getWorld(args[2])
-                : sender instanceof Player ? ((Player) sender).getWorld() : null;
+        World world = null;
 
+        // If world was provided
+        if (args.length >= 2) {
+            world = Bukkit.getWorld(args[1]);
+        } else if (sender instanceof Player player) {
+            // Player default: current world
+            world = player.getWorld();
+        }
+
+        // Console must specify a world
         if (world == null) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-world");
+            } else {
+                sender.sendMessage("§cWorld not found. Usage: /time <day|night|ticks> <world>");
             }
             return true;
         }
@@ -60,6 +71,8 @@ public class TimeCommand extends BaseCommand {
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "time-set");
+        } else {
+            sender.sendMessage("§aTime set in world §f" + world.getName() + " §ato §f" + time + "§a.");
         }
 
         return true;
