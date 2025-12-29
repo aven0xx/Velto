@@ -2,7 +2,7 @@
 
 FOR 0.7:
 -Alert System replacing the Broadcast command (AlertCommand)
--Basic AFK System (AFKManager)
--AFK Zone
+-Basic AFK System (AFKManager) / DONE
+-AFK Zone / DONE
 -Chat Format according to permission (Rewrite of ChatManager)
-
+-Fix of /time and /weather command / Done
