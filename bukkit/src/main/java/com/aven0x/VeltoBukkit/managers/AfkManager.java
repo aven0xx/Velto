@@ -2,6 +2,7 @@ package com.aven0x.VeltoBukkit.managers;
 
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoBukkit.VeltoBukkit;
+import com.aven0x.VeltoBukkit.utils.AfkPositionStorage;
 import com.aven0x.VeltoBukkit.utils.ConfigUtil;
 import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
@@ -14,21 +15,34 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class AfkManager implements Listener {
 
-    private static final Map<UUID, Long> lastActivity = new HashMap<>();
-    private static final Set<UUID> afkPlayers = new HashSet<>();
-    private static final long AFK_TIMEOUT = 300000; // 5 minutes en millisecondes
+    // Thread-safe collections (recommended)
+    private static final Map<UUID, Long> lastActivity = new ConcurrentHashMap<>();
+    private static final Set<UUID> afkPlayers = ConcurrentHashMap.newKeySet();
+
+    // store the player's location right before teleporting to AFK zone
+    private static final Map<UUID, Location> preAfkLocations = new ConcurrentHashMap<>();
+
+    private static final long AFK_TIMEOUT = 300000; // 5 minutes
     private static BukkitRunnable afkChecker;
 
-    // NEW: store the player's location right before teleporting to AFK zone
-    private static final Map<UUID, Location> preAfkLocations = new HashMap<>();
+    // Simple debug toggle (optional): plug into your config if you want
+    private static boolean DEBUG = false;
+
+    private static Logger log() {
+        return VeltoBukkit.getInstance().getLogger();
+    }
+
+    private static void debug(String msg) {
+        if (DEBUG) log().info("[AFK-DEBUG] " + msg);
+    }
 
     /**
      * Start AFK system
@@ -51,7 +65,6 @@ public class AfkManager implements Listener {
                     boolean shouldBeAfk = (currentTime - lastActivityTime) >= AFK_TIMEOUT;
 
                     if (!wasAfk && shouldBeAfk) {
-                        // Joueur devient AFK
                         setAfk(player, true);
                     }
                 }
@@ -72,7 +85,7 @@ public class AfkManager implements Listener {
         }
         lastActivity.clear();
         afkPlayers.clear();
-        preAfkLocations.clear(); // NEW: also clear stored pre-AFK locations
+        preAfkLocations.clear();
     }
 
     /**
@@ -84,15 +97,12 @@ public class AfkManager implements Listener {
         UUID uuid = player.getUniqueId();
         lastActivity.put(uuid, System.currentTimeMillis());
 
-        // Si le joueur était AFK, le marquer comme actif
+        // If the player was AFK, mark active (main-thread safe thanks to setAfk airbag)
         if (afkPlayers.contains(uuid)) {
             setAfk(player, false);
         }
     }
 
-    /**
-     * Check AFK status
-     */
     public static boolean isAfk(Player player) {
         return afkPlayers.contains(player.getUniqueId());
     }
@@ -101,136 +111,114 @@ public class AfkManager implements Listener {
      * Toggle AFK
      */
     public static void setAfk(Player player, boolean afk) {
+        // Airbag: ensure main thread
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(VeltoBukkit.getInstance(), () -> setAfk(player, afk));
+            return;
+        }
+
+        if (player == null || !player.isOnline()) return;
+
         UUID uuid = player.getUniqueId();
         boolean wasAfk = afkPlayers.contains(uuid);
 
         if (afk && !wasAfk) {
-            // Devient AFK
+            // Becoming AFK
             afkPlayers.add(uuid);
 
-            System.out.println("=== DEBUG: Player " + player.getName() + " becoming AFK ===");
-
-            // Teleport player to AFK zone if enabled in config
             boolean afkzoneEnabled = ConfigUtil.isAfkzoneOn();
-            System.out.println("DEBUG: AFK Zone enabled: " + afkzoneEnabled);
+            debug("Player " + player.getName() + " becoming AFK. afkzoneEnabled=" + afkzoneEnabled);
 
             if (afkzoneEnabled) {
-                // Save current location BEFORE teleporting (clone to avoid mutation)
+                // Save current location BEFORE teleporting
                 try {
                     preAfkLocations.put(uuid, player.getLocation().clone());
-                    System.out.println("DEBUG: Saved pre-AFK location for " + player.getName() + ": " + preAfkLocations.get(uuid));
+                    debug("Saved pre-AFK location: " + preAfkLocations.get(uuid));
                 } catch (Exception e) {
-                    System.out.println("DEBUG: Failed to save pre-AFK location for " + player.getName() + ": " + e.getMessage());
+                    log().warning("Failed to save pre-AFK location for " + player.getName() + ": " + e.getMessage());
                 }
 
                 Location afkZone = ConfigUtil.getAfkzone();
-                System.out.println("DEBUG: AFK Zone location from config: " + afkZone);
-
-                if (afkZone != null) {
-                    System.out.println("DEBUG: AFK Zone world: " + afkZone.getWorld());
-                    System.out.println("DEBUG: AFK Zone coordinates: x=" + afkZone.getX() + ", y=" + afkZone.getY() + ", z=" + afkZone.getZ());
-
-                    if (afkZone.getWorld() != null) {
-                        System.out.println("DEBUG: Player current location: " + player.getLocation());
-                        System.out.println("DEBUG: Attempting teleportation...");
-
-                        try {
-                            boolean success = player.teleport(afkZone);
-                            System.out.println("DEBUG: Teleport result: " + success);
-
-                            if (!success) {
-                                System.out.println("DEBUG: Teleport failed - trying with delay...");
-
-                                // Try with a small delay in case of timing issues
-                                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
-                                    boolean delayedSuccess = player.teleport(afkZone);
-                                    System.out.println("DEBUG: Delayed teleport result: " + delayedSuccess);
-                                }, 1L);
-                            }
-                        } catch (Exception e) {
-                            System.out.println("DEBUG: Exception during teleport: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.out.println("DEBUG: ERROR - AFK Zone world is null!");
-                    }
+                if (afkZone != null && afkZone.getWorld() != null) {
+                    tryTeleportWithRetry(player, afkZone, "AFK teleport");
                 } else {
-                    System.out.println("DEBUG: ERROR - AFK Zone location is null!");
+                    log().warning("AFK zone is null or world is null (check config).");
                 }
-            } else {
-                System.out.println("DEBUG: AFK Zone is disabled in config");
             }
 
-            System.out.println("=== DEBUG END ===");
-
-            //Keep indent
-
-            // Notification to the player
+            // Notify
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-enabled", placeholders);
 
-            // Global Notification (if not vanished)
             if (!PlayerUtil.isVanished(player)) {
                 LangUtil.sendGlobal("afk-player", placeholders);
             }
 
         } else if (!afk && wasAfk) {
-            // N'est plus AFK
+            // Leaving AFK
             afkPlayers.remove(uuid);
             lastActivity.put(uuid, System.currentTimeMillis());
 
-            // If AFK zone is on and we have a saved location, try to send them back
             if (ConfigUtil.isAfkzoneOn()) {
                 Location back = preAfkLocations.remove(uuid);
+
                 if (back != null) {
-                    System.out.println("DEBUG: Restoring " + player.getName() + " to pre-AFK location: " + back);
-                    try {
-                        boolean success = player.teleport(back);
-                        System.out.println("DEBUG: Return teleport result: " + success);
-                        if (!success) {
-                            Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
-                                boolean delayed = player.teleport(back);
-                                System.out.println("DEBUG: Delayed return teleport result: " + delayed);
-                            }, 1L);
-                        }
-                    } catch (Exception e) {
-                        System.out.println("DEBUG: Exception while returning from AFK: " + e.getMessage());
-                        e.printStackTrace();
+                    // Validate return location
+                    if (back.getWorld() == null) {
+                        log().warning("Return location world is null for " + player.getName() + ". Not teleporting.");
+                    } else {
+                        // optional: ensure chunk is loaded
+                        try {
+                            back.getChunk().load();
+                        } catch (Exception ignored) {}
+
+                        tryTeleportWithRetry(player, back, "Return from AFK");
                     }
                 } else {
-                    System.out.println("DEBUG: No pre-AFK location stored for " + player.getName() + " (maybe AFK zone was disabled or save failed).");
+                    debug("No pre-AFK location stored for " + player.getName() + ".");
                 }
             } else {
-                // If AFK zone is OFF now, we don't force a return teleport.
-                // Clean any leftover entry
                 preAfkLocations.remove(uuid);
             }
 
-            // Notification to the player
+            // Notify
             Map<String, String> placeholders = Map.of("%player%", player.getName());
             LangUtil.send(player, "afk-disabled", placeholders);
 
-            // Global Notification (if not vanished)
             if (!PlayerUtil.isVanished(player)) {
                 LangUtil.sendGlobal("afk-player-back", placeholders);
             }
         }
     }
 
-    /**
-     * Toggle AFK status (for AFK command)
-     */
+    private static void tryTeleportWithRetry(Player player, Location target, String label) {
+        try {
+            boolean success = player.teleport(target);
+            debug(label + " result: " + success);
+
+            if (!success) {
+                Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                    try {
+                        boolean delayed = player.teleport(target);
+                        debug(label + " delayed result: " + delayed);
+                    } catch (Exception e) {
+                        log().warning(label + " delayed exception for " + player.getName() + ": " + e.getMessage());
+                    }
+                }, 1L);
+            }
+        } catch (Exception e) {
+            log().warning(label + " exception for " + player.getName() + ": " + e.getMessage());
+        }
+    }
+
     public static boolean toggleAfk(Player player) {
         boolean newState = !isAfk(player);
         setAfk(player, newState);
         return newState;
     }
 
-    /**
-     * Get all AFK players
-     */
     public static Set<Player> getAfkPlayers() {
-        Set<Player> players = new HashSet<>();
+        Set<Player> players = ConcurrentHashMap.newKeySet();
         for (UUID uuid : afkPlayers) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isOnline()) {
@@ -240,28 +228,19 @@ public class AfkManager implements Listener {
         return players;
     }
 
-    /**
-     * Get Time since a player last activity
-     */
     public static long getTimeSinceLastActivity(Player player) {
         UUID uuid = player.getUniqueId();
         long lastTime = lastActivity.getOrDefault(uuid, System.currentTimeMillis());
         return System.currentTimeMillis() - lastTime;
     }
 
-    /**
-     * Clean up data when a player disconnect
-     */
     public static void cleanup(Player player) {
         UUID uuid = player.getUniqueId();
         lastActivity.remove(uuid);
         afkPlayers.remove(uuid);
-        preAfkLocations.remove(uuid); // NEW: avoid stale stored locations
+        preAfkLocations.remove(uuid);
     }
 
-    /**
-     * Get AFK Timeout
-     */
     public static int getAfkTimeoutSeconds() {
         return (int) (AFK_TIMEOUT / 1000);
     }
@@ -270,28 +249,34 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
-        // Seulement si le joueur a bougé significativement (pas juste rotation)
-        if (event.getFrom().distanceSquared(event.getTo()) > 0.01) {
+        Location to = event.getTo();
+        if (to == null) return;
+
+        Location from = event.getFrom();
+
+        // Ignore rotation-only changes
+        if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
             updateActivity(event.getPlayer());
         }
     }
 
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (!event.isCancelled()) {
-            updateActivity(event.getPlayer());
-        }
+        if (event.isCancelled()) return;
+
+        // Async event -> schedule on main thread
+        Player p = event.getPlayer();
+        Bukkit.getScheduler().runTask(VeltoBukkit.getInstance(), () -> updateActivity(p));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        if (!event.isCancelled()) {
-            String command = event.getMessage().toLowerCase();
+        if (event.isCancelled()) return;
 
-            // Ignorer la commande /afk pour éviter les boucles infinies
-            if (!command.startsWith("/afk")) {
-                updateActivity(event.getPlayer());
-            }
+        String command = event.getMessage().toLowerCase();
+        if (!command.startsWith("/afk")) {
+            updateActivity(event.getPlayer());
         }
     }
 
@@ -311,12 +296,47 @@ public class AfkManager implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        updateActivity(event.getPlayer());
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        updateActivity(player);
+
+        // Pending return from persistent storage (quit while AFK)
+        if (AfkPositionStorage.isInitialized() && AfkPositionStorage.has(uuid)) {
+            Location back = AfkPositionStorage.get(uuid);
+
+            Bukkit.getScheduler().runTaskLater(VeltoBukkit.getInstance(), () -> {
+                if (player.isOnline() && back != null && back.getWorld() != null) {
+                    try {
+                        back.getChunk().load();
+                    } catch (Exception ignored) {}
+
+                    tryTeleportWithRetry(player, back, "Pending return teleport");
+                } else {
+                    log().warning("Pending return invalid for " + player.getName() + " (location/world missing).");
+                }
+
+                AfkPositionStorage.remove(uuid);
+                AfkPositionStorage.save();
+            }, 1L);
+        }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        // Clean data on player disconnect
-        cleanup(event.getPlayer());
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        // If player quits while AFK, persist pre-AFK location for next join
+        if (AfkPositionStorage.isInitialized() && isAfk(player)) {
+            Location back = preAfkLocations.get(uuid);
+            if (back != null) {
+                AfkPositionStorage.put(uuid, back);
+                AfkPositionStorage.save();
+                debug("Saved pending return for " + player.getName());
+            }
+        }
+
+        cleanup(player);
     }
 }

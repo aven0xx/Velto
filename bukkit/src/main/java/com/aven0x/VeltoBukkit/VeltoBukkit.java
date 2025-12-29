@@ -6,6 +6,7 @@ import com.aven0x.VeltoBukkit.managers.AutoMsgManager;
 import com.aven0x.VeltoBukkit.managers.CommandManager;
 import com.aven0x.VeltoBukkit.managers.TeleportManager;
 import com.aven0x.VeltoBukkit.managers.ChatManager;
+import com.aven0x.VeltoBukkit.utils.AfkPositionStorage;
 import com.aven0x.VeltoBukkit.utils.CommandUtil;
 import com.aven0x.VeltoBukkit.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
@@ -53,6 +54,7 @@ public class VeltoBukkit extends JavaPlugin {
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);
         AfkManager.start();
+        AfkPositionStorage.init(getDataFolder());
     }
 
     @Override
