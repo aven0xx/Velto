@@ -1,8 +1,8 @@
 #Velto Roadmap
 
 FOR 0.7:
--Alert System replacing the Broadcast command (AlertCommand)
+-Alert System replacing the Broadcast command (AlertCommand) / DONE
 -Basic AFK System (AFKManager) / DONE
 -AFK Zone / DONE
--Chat Format according to permission (Rewrite of ChatManager)
--Fix of /time and /weather command / Done
+-Chat Format according to permission (Rewrite of ChatManager) / DONE
+-Fix of /time and /weather command / DONE

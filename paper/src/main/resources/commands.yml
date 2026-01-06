@@ -25,9 +25,9 @@ feed:
 heal:
   enabled: true
   aliases: []
-broadcast:
+alert:
   enabled: true
-  aliases: ["bc"]
+  aliases: ["broadcast", "bc"]
 weather:
   enabled: true
   aliases: []

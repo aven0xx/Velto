@@ -20,7 +20,7 @@ public class CommandManager {
         register("rename", new RenameCommand());
         register("feed", new FeedCommand());
         register("heal", new HealCommand());
-        register("broadcast", new BroadcastCommand());
+        register("alert", new AlertCommand());
         register("weather", new WeatherCommand());
         register("kill", new KillCommand());
         register("speed", new SpeedCommand());

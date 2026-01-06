@@ -55,10 +55,6 @@ opened-anvil:
   type: actionbar
   message: "&aOpened anvil."
 
-broadcast-usage:
-  type: chat
-  message: "&cYou must specify a message."
-
 invalid-player:
   type: chat
   message: "&cPlayer not found."
@@ -226,3 +222,15 @@ afk-list-empty:
 afk-list:
   type: chat
   message: "&7AFK Players (%count%): &f%players%"
+
+  alert-usage:
+    type: chat
+    message: "&cUsage: /alert <chat|actionbar|bossbar|title> <ticks> <message...>"
+
+  alert-invalid-type:
+    type: chat
+    message: "&cInvalid type. Allowed: chat, actionbar, bossbar, title."
+
+  alert-invalid-duration:
+    type: chat
+    message: "&cInvalid duration. Must be a number of ticks (>= 1)."
