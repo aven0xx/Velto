@@ -5,7 +5,7 @@ plugins {
 
 jar {
     archiveBaseName.set('Velto-common')
-    archiveVersion.set('0.7.0)
+    archiveVersion.set('0.7.0')
 }
 
 repositories {
