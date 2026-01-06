@@ -2,33 +2,4 @@ name: Velto
 version: 0.7
 main: com.aven0x.VeltoPaper.VeltoPaper
 api-version: 1.21
-commands:
-  weather: {}
-  sun: {}
-  rain: {}
-  thunder: {}
-  spawn: {}
-  setspawn: {}
-  speed: {}
-  kill: {}
-  time: {}
-  day: {}
-  night: {}
-  craft: {}
-  anvil: {}
-  gamemode: {}
-  gms: {}
-  gmc: {}
-  gma: {}
-  gmsp: {}
-  feed: {}
-  heal: {}
-  alert: {}
-  god: {}
-  notiftest: {}
-  list: {}
-  killall: {}
-  rename: {}
-  itemlore: {}
-  veltoreload: {}
-  afk: {}
+

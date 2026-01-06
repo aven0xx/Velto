@@ -30,6 +30,9 @@ public class AfkManager implements Listener {
     // store the player's location right before teleporting to AFK zone
     private static final Map<UUID, Location> preAfkLocations = new ConcurrentHashMap<>();
 
+    // ✅ NEW: ignore movement for 1s after teleport to avoid "moved too quickly" spam / teleport loop
+    private static final Map<UUID, Long> ignoreMoveUntil = new ConcurrentHashMap<>();
+
     private static final long AFK_TIMEOUT = 300000; // 5 minutes
     private static BukkitRunnable afkChecker;
 
@@ -86,6 +89,7 @@ public class AfkManager implements Listener {
         lastActivity.clear();
         afkPlayers.clear();
         preAfkLocations.clear();
+        ignoreMoveUntil.clear(); // ✅ NEW
     }
 
     /**
@@ -193,12 +197,18 @@ public class AfkManager implements Listener {
 
     private static void tryTeleportWithRetry(Player player, Location target, String label) {
         try {
+            // ✅ NEW: prevent move event from instantly un-AFK'ing due to teleport
+            ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
+
             boolean success = player.teleport(target);
             debug(label + " result: " + success);
 
             if (!success) {
                 Bukkit.getScheduler().runTaskLater(VeltoPaper.getInstance(), () -> {
                     try {
+                        // ✅ NEW: also ignore move for the retry teleport
+                        ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
+
                         boolean delayed = player.teleport(target);
                         debug(label + " delayed result: " + delayed);
                     } catch (Exception e) {
@@ -239,6 +249,7 @@ public class AfkManager implements Listener {
         lastActivity.remove(uuid);
         afkPlayers.remove(uuid);
         preAfkLocations.remove(uuid);
+        ignoreMoveUntil.remove(uuid); // ✅ NEW
     }
 
     public static int getAfkTimeoutSeconds() {
@@ -249,6 +260,12 @@ public class AfkManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+
+        // ✅ NEW: ignore movement events caused by our recent teleport
+        if (System.currentTimeMillis() < ignoreMoveUntil.getOrDefault(uuid, 0L)) return;
+
         Location to = event.getTo();
         if (to == null) return;
 
@@ -256,10 +273,9 @@ public class AfkManager implements Listener {
 
         // Ignore rotation-only changes
         if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
-            updateActivity(event.getPlayer());
+            updateActivity(player);
         }
     }
-
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {

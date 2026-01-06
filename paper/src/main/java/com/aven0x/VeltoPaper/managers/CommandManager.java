@@ -4,44 +4,52 @@ import com.aven0x.VeltoPaper.commands.*;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
 import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
 
+import java.util.function.Supplier;
+
 import static com.aven0x.VeltoPaper.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
     public static void registerAllCommands() {
-        register("spawn", new SpawnCommand());
-        register("setspawn", new SetSpawnCommand());
-        register("time", new TimeCommand());
-        register("day", new DayCommand());
-        register("night", new NightCommand());
-        register("craft", new CraftCommand());
-        register("list", new ListCommand());
-        register("notiftest", new NotifTestCommand());
-        register("rename", new RenameCommand());
-        register("feed", new FeedCommand());
-        register("heal", new HealCommand());
-        register("alert", new AlertCommand());
-        register("weather", new WeatherCommand());
-        register("kill", new KillCommand());
-        register("speed", new SpeedCommand());
-        register("god", new GodCommand());
-        register("killall", new KillAllCommand());
-        register("gamemode", new GamemodeCommand());
-        register("gmc", new GmcCommand());
-        register("gms", new GmsCommand());
-        register("gma", new GmaCommand());
-        register("gmsp", new GmspCommand());
-        register("itemlore", new ItemLoreCommand());
-        register("veltoreload", new ReloadCommand());
-        register("afk", new AfkCommand());
-        register("anvil", new AnvilCommand()); // Paper only command
+        register("spawn", SpawnCommand::new);
+        register("setspawn", SetSpawnCommand::new);
+        register("time", TimeCommand::new);
+        register("day", DayCommand::new);
+        register("night", NightCommand::new);
+        register("craft", CraftCommand::new);
+        register("list", ListCommand::new);
+        register("notiftest", NotifTestCommand::new);
+        register("rename", RenameCommand::new);
+        register("feed", FeedCommand::new);
+        register("heal", HealCommand::new);
+        register("alert", AlertCommand::new);
+        register("weather", WeatherCommand::new);
+        register("kill", KillCommand::new);
+        register("speed", SpeedCommand::new);
+        register("god", GodCommand::new);
+        register("killall", KillAllCommand::new);
+        register("gamemode", GamemodeCommand::new);
+        register("gmc", GmcCommand::new);
+        register("gms", GmsCommand::new);
+        register("gma", GmaCommand::new);
+        register("gmsp", GmspCommand::new);
+        register("itemlore", ItemLoreCommand::new);
+        register("veltoreload", ReloadCommand::new);
+        register("afk", AfkCommand::new);
+        register("anvil", AnvilCommand::new);
     }
 
-    private static void register(String name, BaseCommand command) {
+    private static void register(String name, Supplier<? extends BaseCommand> factory) {
         if (!CommandUtil.isEnabled(name)) return;
 
+        BaseCommand command = factory.get(); // only constructed if enabled
+
+        // Register the MAIN command name dynamically
+        DynamicCommandRegistrar.registerCommand(name, command);
+
+        // Register aliases dynamically
         for (String alias : CommandUtil.getAliases(name)) {
-            DynamicCommandRegistrar.registerAlias(alias, command);
+            DynamicCommandRegistrar.registerCommand(alias, command);
         }
     }
 }
