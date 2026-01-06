@@ -25,7 +25,7 @@ tasks {
 
     shadowJar {
         archiveBaseName.set('Velto-paper')
-        archiveVersion.set('0.7-SNAPSHOT')
+        archiveVersion.set('0.7.0')
         archiveClassifier.set('') // no "-all"
 
         // Merge :common classes into the final jar
