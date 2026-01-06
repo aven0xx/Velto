@@ -23,15 +23,26 @@ public class ConfigUtil {
     }
 
     public static Location getSpawn() {
-        return getConfig().contains("spawn") ? getConfig().getLocation("spawn") : null;
+        return getConfig().isLocation("spawn") ? getConfig().getLocation("spawn") : null;
     }
+
+    // === AFK ZONE ===
 
     public static boolean isAfkzoneOn() {
         return getConfig().getBoolean("afkzone.enabled", true);
     }
 
+    /** Reads afkzone.location from config.yml */
     public static Location getAfkzone() {
-        return getConfig().contains("afkzone") ? getConfig().getLocation("afkzone") : null;
+        return getConfig().isLocation("afkzone.location")
+                ? getConfig().getLocation("afkzone.location")
+                : null;
+    }
+
+    /** Convenience setter if you ever add a /setafkzone command */
+    public static void setAfkzone(Location location) {
+        getConfig().set("afkzone.location", location);
+        VeltoBukkit.getInstance().saveConfig();
     }
 
     // === AUTO MESSAGES ===
@@ -50,8 +61,12 @@ public class ConfigUtil {
     }
 
     public static List<String> getAutoMessageKeys() {
-        return getConfig().getStringList("auto-messages.messages").stream()
-                .map(entry -> entry.startsWith("key: ") ? entry.substring(5) : entry)
+        List<String> raw = getConfig().getStringList("auto-messages.messages");
+        if (raw == null) return Collections.emptyList();
+
+        return raw.stream()
+                .map(entry -> entry != null && entry.startsWith("key: ") ? entry.substring(5) : entry)
+                .filter(s -> s != null && !s.isBlank())
                 .toList();
     }
 

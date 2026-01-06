@@ -23,7 +23,7 @@ commands:
   gmsp: {}
   feed: {}
   heal: {}
-  broadcast: {}
+  alert: {}
   god: {}
   notiftest: {}
   list: {}

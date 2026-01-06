@@ -23,7 +23,7 @@ commands:
   gmsp: {}
   feed: {}
   heal: {}
-  broadcast: {}
+  alert: {}
   god: {}
   notiftest: {}
   list: {}
@@ -31,3 +31,4 @@ commands:
   rename: {}
   itemlore: {}
   veltoreload: {}
+  afk: {}
