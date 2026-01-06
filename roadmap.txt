@@ -6,4 +6,3 @@ FOR 0.7:
 -AFK Zone / DONE
 -Chat Format according to permission (Rewrite of ChatManager)
 -Fix of /time and /weather command / Done
--Config Version System

@@ -2,8 +2,10 @@ package com.aven0x.VeltoBukkit.utils;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigUtil {
@@ -55,8 +57,21 @@ public class ConfigUtil {
 
     // === CHAT CONFIGURATION ===
 
+    /** REQUIRED fallback chat format */
     public static String getChatFormat() {
         return getConfig().getString("messages.chat", "<%player_name%> %message%");
+    }
+
+    /** Optional: defines group order (first match wins) */
+    public static List<String> getChatPriority() {
+        List<String> list = getConfig().getStringList("messages.chat-priority");
+        return (list == null) ? Collections.emptyList() : list;
+    }
+
+    /** Optional: returns the section for a given group name */
+    public static ConfigurationSection getChatGroupSection(String group) {
+        if (group == null || group.isBlank()) return null;
+        return getConfig().getConfigurationSection("messages.chat-groups." + group);
     }
 
     public static String getJoinMessage() {
