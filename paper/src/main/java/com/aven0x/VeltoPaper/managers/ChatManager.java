@@ -6,7 +6,10 @@ import com.aven0x.Velto.utils.PlayerUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -28,42 +31,68 @@ public class ChatManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
-        String format = ConfigUtil.getChatFormat();
+        Player player = event.getPlayer();
 
-        // Manual replacements for placeholders
-        format = format.replace("%player_name%", event.getPlayer().getName());
+        String format = resolveChatFormat(player);
 
-        // Apply PlaceholderAPI if available
+        // Manual placeholder
+        format = format.replace("%player_name%", player.getName());
+
+        // PAPI placeholders
         if (papiAvailable) {
-            format = PlaceholderAPI.setPlaceholders(event.getPlayer(), format);
+            format = PlaceholderAPI.setPlaceholders(player, format);
         }
 
-        // Escape '%' characters in the message to avoid format issues
+        // Escape % to avoid String.format issues in Bukkit chat format
         String safeMessage = event.getMessage().replace("%", "%%");
-
-        // Replace %message% placeholder with the safe player message
         format = format.replace("%message%", safeMessage);
 
-        // Apply color formatting (& -> §, hex)
+        // Colors
         format = CC.translate(format);
 
-        // Set final formatted chat message
         event.setFormat(format);
+    }
+
+    /**
+     * Dynamic groups:
+     * - Default: messages.chat (required)
+     * - Optional priority list: messages.chat-priority
+     * - Optional groups: messages.chat-groups.<group>.format + .permission(optional)
+     */
+    private String resolveChatFormat(Player player) {
+        String fallback = ConfigUtil.getChatFormat();
+
+        List<String> priority = ConfigUtil.getChatPriority();
+        if (priority == null || priority.isEmpty()) {
+            return fallback;
+        }
+
+        for (String group : priority) {
+            ConfigurationSection sec = ConfigUtil.getChatGroupSection(group);
+            if (sec == null) continue;
+
+            String groupFormat = sec.getString("format", "");
+            if (groupFormat == null || groupFormat.isBlank()) continue;
+
+            String perm = sec.getString("permission", "");
+            if (perm == null || perm.isBlank() || player.hasPermission(perm)) {
+                return groupFormat;
+            }
+        }
+
+        return fallback;
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        // Hide join message if the player is vanished
         if (PlayerUtil.isVanished(event.getPlayer())) {
             event.setJoinMessage(null);
             return;
         }
 
         String msg = ConfigUtil.getJoinMessage();
-
-        // Manual fallback if PlaceholderAPI is missing
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
@@ -75,14 +104,12 @@ public class ChatManager implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        // Hide quit message if the player is vanished
         if (PlayerUtil.isVanished(event.getPlayer())) {
             event.setQuitMessage(null);
             return;
         }
 
         String msg = ConfigUtil.getQuitMessage();
-
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
@@ -96,10 +123,12 @@ public class ChatManager implements Listener {
         private static final Pattern HEX_PATTERN = Pattern.compile("&#[a-fA-F0-9]{6}");
 
         public static String translate(String input) {
+            if (input == null) return "";
             Matcher matcher = HEX_PATTERN.matcher(input);
             while (matcher.find()) {
-                String color = matcher.group().substring(1); // Remove '&'
-                input = input.replace("&" + color, ChatColor.of("#" + color.substring(1)).toString());
+                String token = matcher.group();  // "&#RRGGBB"
+                String hex = token.substring(1); // "#RRGGBB"
+                input = input.replace(token, ChatColor.of(hex).toString());
             }
             return input.replace("&", "§");
         }

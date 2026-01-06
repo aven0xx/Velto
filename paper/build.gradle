@@ -20,12 +20,12 @@ dependencies {
 tasks {
     jar {
         archiveBaseName.set('Velto-paper')
-        archiveVersion.set('0.6')
+        archiveVersion.set('0.7-SNAPSHOT')
     }
 
     shadowJar {
         archiveBaseName.set('Velto-paper')
-        archiveVersion.set('0.6')
+        archiveVersion.set('0.7.0')
         archiveClassifier.set('') // no "-all"
 
         // Merge :common classes into the final jar

@@ -1,33 +1,4 @@
 name: Velto
-version: 0.6
+version: 0.7.0
 main: com.aven0x.VeltoBukkit.VeltoBukkit
 api-version: 1.21
-commands:
-  weather: {}
-  sun: {}
-  rain: {}
-  thunder: {}
-  spawn: {}
-  setspawn: {}
-  speed: {}
-  kill: {}
-  time: {}
-  day: {}
-  night: {}
-  craft: {}
-  anvil: {}
-  gamemode: {}
-  gms: {}
-  gmc: {}
-  gma: {}
-  gmsp: {}
-  feed: {}
-  heal: {}
-  broadcast: {}
-  god: {}
-  notiftest: {}
-  list: {}
-  killall: {}
-  rename: {}
-  itemlore: {}
-  veltoreload: {}

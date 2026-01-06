@@ -21,12 +21,12 @@ dependencies {
 tasks {
     jar {
         archiveBaseName.set('Velto-bukkit')
-        archiveVersion.set('0.6')
+        archiveVersion.set('0.7-SNAPSHOT')
     }
 
     shadowJar {
         archiveBaseName.set('Velto-bukkit')
-        archiveVersion.set('0.6')
+        archiveVersion.set('0.7.0')
         archiveClassifier.set('') // no "-all"
 
         mergeServiceFiles() // helpful for kyori service loaders

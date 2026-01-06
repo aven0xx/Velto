@@ -2,8 +2,10 @@ package com.aven0x.VeltoBukkit.utils;
 
 import com.aven0x.VeltoBukkit.VeltoBukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigUtil {
@@ -21,7 +23,26 @@ public class ConfigUtil {
     }
 
     public static Location getSpawn() {
-        return getConfig().contains("spawn") ? getConfig().getLocation("spawn") : null;
+        return getConfig().isLocation("spawn") ? getConfig().getLocation("spawn") : null;
+    }
+
+    // === AFK ZONE ===
+
+    public static boolean isAfkzoneOn() {
+        return getConfig().getBoolean("afkzone.enabled", true);
+    }
+
+    /** Reads afkzone.location from config.yml */
+    public static Location getAfkzone() {
+        return getConfig().isLocation("afkzone.location")
+                ? getConfig().getLocation("afkzone.location")
+                : null;
+    }
+
+    /** Convenience setter if you ever add a /setafkzone command */
+    public static void setAfkzone(Location location) {
+        getConfig().set("afkzone.location", location);
+        VeltoBukkit.getInstance().saveConfig();
     }
 
     // === AUTO MESSAGES ===
@@ -40,15 +61,32 @@ public class ConfigUtil {
     }
 
     public static List<String> getAutoMessageKeys() {
-        return getConfig().getStringList("auto-messages.messages").stream()
-                .map(entry -> entry.startsWith("key: ") ? entry.substring(5) : entry)
+        List<String> raw = getConfig().getStringList("auto-messages.messages");
+        if (raw == null) return Collections.emptyList();
+
+        return raw.stream()
+                .map(entry -> entry != null && entry.startsWith("key: ") ? entry.substring(5) : entry)
+                .filter(s -> s != null && !s.isBlank())
                 .toList();
     }
 
     // === CHAT CONFIGURATION ===
 
+    /** REQUIRED fallback chat format */
     public static String getChatFormat() {
         return getConfig().getString("messages.chat", "<%player_name%> %message%");
+    }
+
+    /** Optional: defines group order (first match wins) */
+    public static List<String> getChatPriority() {
+        List<String> list = getConfig().getStringList("messages.chat-priority");
+        return (list == null) ? Collections.emptyList() : list;
+    }
+
+    /** Optional: returns the section for a given group name */
+    public static ConfigurationSection getChatGroupSection(String group) {
+        if (group == null || group.isBlank()) return null;
+        return getConfig().getConfigurationSection("messages.chat-groups." + group);
     }
 
     public static String getJoinMessage() {

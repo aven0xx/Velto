@@ -25,9 +25,9 @@ feed:
 heal:
   enabled: true
   aliases: []
-broadcast:
+alert:
   enabled: true
-  aliases: ["bc"]
+  aliases: ["broadcast", "bc"]
 weather:
   enabled: true
   aliases: []
@@ -73,3 +73,6 @@ itemlore:
   veltoreload:
     enabled: true
     aliases: [ ]
+  afk:
+    enabled: true
+    aliases: [ "away" ]

@@ -25,7 +25,7 @@ public class DynamicCommandRegistrar {
         }
     }
 
-    public static void registerAlias(String alias, BaseCommand command) {
+    public static void registerCommand(String alias, BaseCommand command) {
         if (commandMap == null) return;
 
         Command cmd = new BukkitCommand(alias) {

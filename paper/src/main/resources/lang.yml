@@ -55,10 +55,6 @@ opened-anvil:
   type: actionbar
   message: "&aOpened anvil."
 
-broadcast-usage:
-  type: chat
-  message: "&cYou must specify a message."
-
 invalid-player:
   type: chat
   message: "&cPlayer not found."
@@ -117,50 +113,13 @@ gamemode-set-other:
   type: chat
   message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
 
-automsg1:
-  type: chat
-  message: "&bJoin our Discord to get updates and support!"
-
-automsg2:
-  type: chat
-  message: "&aNeed help? Type &f/help &afor commands."
-
-automsg3:
-  type: chat
-  message: "&dVote for rewards every day!"
-
-automsg4:
-  type: chat
-  message: "&eRemember to claim your daily kit!"
-
 list-command:
   type: chat
   message: "&aOnline players: %players%"
 
 killall-done:
   type: chat
-  message: "&aKillAll command executed successfully."
-
-rename-no-item:
-  type: chat
-  message: "&cYou must hold an item to rename."
-rename-usage:
-  type: chat
-  message: "&cUsage: /rename <name...> or /rename reset"
-rename-cleared:
-  type: chat
-  message: "&aCustom name removed."
-rename-success:
-  type: chat
-  message: "&aItem renamed."
-
-opened-anvil:
-  type: chat
-  message: "&aAnvil opened."
-
-opened-craft:
-  type: chat
-  message: "&aCrafting table opened."
+  message: "&aKillAll completed."
 
 rename-no-item:
   type: chat
@@ -177,10 +136,6 @@ rename-cleared:
 rename-success:
   type: chat
   message: "&aItem renamed."
-
-killall-done:
-  type: chat
-  message: "&aKillAll completed."
 
 lore-no-item:
   type: chat
@@ -217,3 +172,65 @@ lore-remove-success:
 lore-out-of-range:
   type: chat
   message: "&cLine number out of range."
+
+automsg1:
+  type: chat
+  message: "&bJoin our Discord to get updates and support!"
+
+automsg2:
+  type: chat
+  message: "&aNeed help? Type &f/help &afor commands."
+
+automsg3:
+  type: chat
+  message: "&dVote for rewards every day!"
+
+automsg4:
+  type: chat
+  message: "&eRemember to claim your daily kit!"
+
+afk-enabled:
+  type: actionbar
+  message: "&7You are now AFK."
+  duration: 60
+
+afk-disabled:
+  type: actionbar
+  message: "&aYou are no longer AFK."
+  duration: 60
+
+afk-player:
+  type: chat
+  message: "&7%player% is now AFK."
+
+afk-player-back:
+  type: chat
+  message: "&a%player% is no longer AFK."
+
+afk-usage:
+  type: chat
+  message: "&eUsage: &f/afk [player] &7or &f/afk list"
+
+afk-set-other:
+  type: chat
+  message: "&aSet %target% to %status%."
+
+afk-list-empty:
+  type: chat
+  message: "&7No players are currently AFK."
+
+afk-list:
+  type: chat
+  message: "&7AFK Players (%count%): &f%players%"
+
+  alert-usage:
+    type: chat
+    message: "&cUsage: /alert <chat|actionbar|bossbar|title> <ticks> <message...>"
+
+  alert-invalid-type:
+    type: chat
+    message: "&cInvalid type. Allowed: chat, actionbar, bossbar, title."
+
+  alert-invalid-duration:
+    type: chat
+    message: "&cInvalid duration. Must be a number of ticks (>= 1)."
