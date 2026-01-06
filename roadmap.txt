@@ -6,4 +6,4 @@ FOR 0.7.0:
 -AFK Zone / DONE
 -Chat Format Groups (Rewrite of ChatManager) / DONE
 -Fix of /time and /weather command / DONE
--All command handled by DynamicCommand
+-All command handled by DynamicCommand / Done
