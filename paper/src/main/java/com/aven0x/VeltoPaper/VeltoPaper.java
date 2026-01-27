@@ -1,11 +1,7 @@
 package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.listeners.GodListener;
-import com.aven0x.VeltoPaper.managers.AfkManager;
-import com.aven0x.VeltoPaper.managers.AutoMsgManager;
-import com.aven0x.VeltoPaper.managers.CommandManager;
-import com.aven0x.VeltoPaper.managers.TeleportManager;
-import com.aven0x.VeltoPaper.managers.ChatManager;
+import com.aven0x.VeltoPaper.managers.*;
 import com.aven0x.VeltoPaper.utils.AfkPositionStorage;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
 import com.aven0x.VeltoPaper.utils.LangUtil;
@@ -53,6 +49,7 @@ public class VeltoPaper extends JavaPlugin {
 
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);
+        PlaceholderManager.init();
         AfkManager.start();
         AfkPositionStorage.init(getDataFolder());
     }
