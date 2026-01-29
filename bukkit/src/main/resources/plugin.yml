@@ -2,3 +2,6 @@ name: Velto
 version: 0.7.1-SNAPSHOT
 main: com.aven0x.VeltoBukkit.VeltoBukkit
 api-version: 1.21
+
+softdepend: ["PlaceholderAPI"]
+

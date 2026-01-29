@@ -3,9 +3,7 @@ package com.aven0x.VeltoPaper.utils;
 import com.aven0x.VeltoPaper.VeltoPaper;
 import com.aven0x.VeltoPaper.commands.BaseCommand;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.command.defaults.BukkitCommand;
 
 import java.lang.reflect.Field;

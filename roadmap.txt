@@ -1,9 +1,7 @@
 #Velto Roadmap
 
-FOR 0.7.0:
--Alert System replacing the Broadcast command (AlertCommand) / DONE
--Basic AFK System (AFKManager) / DONE
--AFK Zone / DONE
--Chat Format Groups (Rewrite of ChatManager) / DONE
--Fix of /time and /weather command / DONE
--All command handled by DynamicCommand / Done
+FOR 0.7.1:
+
+-Adding PlaceholderManager (Hook with PlaceholderAPI) / Done
+-Registering %velto_afk% placeholder that return true or false status for AFK / Done
+-Fix of Build not working in 0.7.0 on Gradle
