@@ -21,18 +21,30 @@ dependencies {
 tasks {
     jar {
         archiveBaseName.set('Velto-bukkitmodule')
-        archiveVersion.set('0.7.1')
+        archiveVersion.set(project.version.toString())
     }
 
     shadowJar {
+        dependsOn tasks.processResources
         archiveBaseName.set('Velto-bukkit')
-        archiveVersion.set('0.7.1-SNAPSHOT')
+        archiveVersion.set(project.version.toString())
         archiveClassifier.set('') // no "-all"
-
-        mergeServiceFiles() // helpful for kyori service loaders
+        mergeServiceFiles()
     }
 
     build {
         dependsOn shadowJar
     }
+
+    tasks.processResources {
+        filteringCharset = 'UTF-8'
+        inputs.property("version", project.version)
+
+        filesMatching(["plugin.yml", "paper-plugin.yml"]) {
+            expand(
+                    version: project.version.toString()
+            )
+        }
+    }
+
 }
