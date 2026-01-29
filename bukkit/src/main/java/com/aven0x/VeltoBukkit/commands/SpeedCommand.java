@@ -31,7 +31,7 @@ public class SpeedCommand extends BaseCommand {
             return true;
         }
 
-        if (speedLevel < 1 || speedLevel > 10) {
+        if (speedLevel < 0 || speedLevel > 10) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-speed");
             }
@@ -40,9 +40,16 @@ public class SpeedCommand extends BaseCommand {
 
         Player target = args.length > 1
                 ? Bukkit.getPlayer(args[1])
-                : sender instanceof Player ? (Player) sender : null;
+                : (sender instanceof Player ? (Player) sender : null);
 
-        boolean self = args.length == 1;
+        if (target == null || !target.isOnline()) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "invalid-player");
+            }
+            return true;
+        }
+
+        boolean self = (target == sender);
         String perm = self ? "velto.speed" : "velto.speed.others";
 
         if (!hasPermission(sender, perm)) {
@@ -52,25 +59,28 @@ public class SpeedCommand extends BaseCommand {
             return true;
         }
 
-        if (target == null || !target.isOnline()) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "invalid-player");
-            }
-            return true;
-        }
+        // Logique de vitesse corrigée pour correspondre à Vanilla au niveau 1
+        float finalWalkSpeed;
+        float finalFlySpeed;
 
-        // ✅ Adjusted speed logic
-        float baseSpeed = target.isFlying() ? 0.1f : 0.2f;
-        float speed = baseSpeed * speedLevel;
-
-        if (target.isFlying()) {
-            target.setFlySpeed(Math.min(speed, 1.0f));
+        if (speedLevel <= 1) {
+            // Niveau 0 ou 1 = Vitesse Vanilla exacte
+            finalWalkSpeed = 0.2f;
+            finalFlySpeed = 0.1f;
         } else {
-            target.setWalkSpeed(Math.min(speed, 1.0f));
+            // Progression : Niveau 2 = 2x plus vite, etc.
+            finalWalkSpeed = 0.2f * speedLevel;
+            finalFlySpeed = 0.1f * speedLevel;
         }
 
+        // On applique aux deux pour éviter les déséquilibres marche/vol
+        target.setWalkSpeed(Math.min(finalWalkSpeed, 1.0f));
+        target.setFlySpeed(Math.min(finalFlySpeed, 1.0f));
+
+        // Message de confirmation
         if (sender instanceof Player player) {
-            LangUtil.send(player, "speed-updated");
+            String messageKey = (speedLevel <= 1) ? "speed-reset" : "speed-updated";
+            LangUtil.send(player, messageKey);
         }
 
         return true;

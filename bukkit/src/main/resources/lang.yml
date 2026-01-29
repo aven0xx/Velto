@@ -83,6 +83,10 @@ speed-updated:
   type: actionbar
   message: "&aYour speed has been updated."
 
+speed-reset:
+  type: actionbar
+  message: "&aYour speed has been set to default."
+
 invalid-speed:
   type: chat
   message: "&cInvalid speed. Use a number between 1 and 10."
