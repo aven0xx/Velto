@@ -5,3 +5,4 @@ FOR 0.7.1:
 -Adding PlaceholderManager (Hook with PlaceholderAPI) / Done
 -Registering %velto_afk% placeholder that return true or false status for AFK / Done
 -Fix of Build not working in 0.7.0 on Gradle / Done
+-Native Paper-plugin.yml / Done
