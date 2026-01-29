@@ -1,7 +1,7 @@
 # Velto *(Alpha)*  
 [![License](https://img.shields.io/github/license/aven0xx/Velto)](https://github.com/aven0xx/Velto/blob/main/LICENSE) [![Latest Release](https://img.shields.io/github/v/release/aven0xx/Velto)](https://github.com/aven0xx/Velto/releases/latest)
 
-> **⚠ Alpha Notice:** Velto is a **small, lightweight core plugin** built with the help of AI and refined over time. It was imagined as a **simple, plug-and-play core** that doesn’t need frequent updates, is easy to extend, and works well alongside other major plugins.
+> **⚠ Alpha Notice:** Velto is a **small, lightweight core plugin** built with the help of AI and refined over time. It was imagined as a **simple, plug-and-play core** that doesn’t need frequent updates, is easy to extend, and works well alongside other major plugins. Please also note that since I developped this plugin mainly for my server running on 1.21.4, update to 1.21.8 and more is not a priority and the plugin might not function correctly on these more recent versions.
 
 **Velto** is not meant to replace big all-in-one solutions like Essentials, CMI, or EternalCore. Instead, it focuses on providing a minimal set of utilities and a configurable message system. It can be used as:
 - A **simple core** for standalone servers.
