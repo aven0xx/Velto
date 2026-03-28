@@ -1,7 +1,7 @@
 name: Velto
 version: ${version}
 main: com.aven0x.VeltoBukkit.VeltoBukkit
-api-version: 1.21
+api-version: 1.21.4
 
 softdepend: ["PlaceholderAPI"]
 

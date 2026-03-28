@@ -11,7 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -32,7 +33,7 @@ public class ChatManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
         String format = resolveChatFormat(player);
@@ -45,14 +46,16 @@ public class ChatManager implements Listener {
             format = PlaceholderAPI.setPlaceholders(player, format);
         }
 
-        // Escape % to avoid String.format issues in Bukkit chat format
-        String safeMessage = event.getMessage().replace("%", "%%");
-        format = format.replace("%message%", safeMessage);
+        // Extract plain text from the Adventure Component
+        String messageText = LegacyComponentSerializer.legacySection().serialize(event.message());
+        format = format.replace("%message%", messageText);
 
         // Colors
         format = CC.translate(format);
 
-        event.setFormat(format);
+        final String finalFormat = format;
+        event.renderer((source, displayName, message, viewer) ->
+                LegacyComponentSerializer.legacySection().deserialize(finalFormat));
     }
 
     /**
