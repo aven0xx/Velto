@@ -5,6 +5,7 @@ import com.aven0x.VeltoBukkit.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends BaseCommand {
@@ -41,7 +42,11 @@ public class ReloadCommand extends BaseCommand {
         }
 
         Bukkit.getLogger().info("[Velto] Reload complete.");
-        // No success message to player; confirmation is console-only as requested.
+
+        if (sender instanceof Player player) {
+            LangUtil.send(player, "reload-success");
+        }
+
         return true;
     }
 }
