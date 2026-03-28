@@ -1,7 +1,9 @@
 package com.aven0x.VeltoPaper.utils;
 
 import com.aven0x.VeltoPaper.VeltoPaper;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -32,11 +34,30 @@ public class ConfigUtil {
         return getConfig().getBoolean("afkzone.enabled", true);
     }
 
-    /** Reads afkzone.location from config.yml */
+    /** Reads afkzone.location from config.yml. Returns null if the section is missing or the world is not loaded. */
     public static Location getAfkzone() {
-        return getConfig().isLocation("afkzone.location")
-                ? getConfig().getLocation("afkzone.location")
-                : null;
+        ConfigurationSection section = getConfig().getConfigurationSection("afkzone.location");
+        if (section == null) return null;
+
+        String worldName = section.getString("world");
+        if (worldName == null || worldName.isBlank()) {
+            VeltoPaper.getInstance().getLogger().warning("[Velto] AFK zone world name is not set in config.yml.");
+            return null;
+        }
+
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            VeltoPaper.getInstance().getLogger().warning("[Velto] AFK zone world '" + worldName + "' is not loaded or does not exist.");
+            return null;
+        }
+
+        double x = section.getDouble("x", 0);
+        double y = section.getDouble("y", 0);
+        double z = section.getDouble("z", 0);
+        float yaw = (float) section.getDouble("yaw", 0);
+        float pitch = (float) section.getDouble("pitch", 0);
+
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     /** Convenience setter if you ever add a /setafkzone command */
