@@ -8,7 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GodCommand extends BaseCommand {
@@ -46,5 +48,19 @@ public class GodCommand extends BaseCommand {
         }
 
         return true;
+    }
+
+    @Override
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1 && sender.hasPermission("velto.god.others")) {
+            List<String> names = new ArrayList<>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                    names.add(p.getName());
+                }
+            }
+            return names;
+        }
+        return List.of();
     }
 }

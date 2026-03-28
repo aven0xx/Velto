@@ -240,14 +240,80 @@ reload-success:
   type: chat
   message: "&aVelto configuration reloaded successfully."
 
-  alert-usage:
-    type: chat
-    message: "&cUsage: /alert <chat|actionbar|bossbar|title> <ticks> <message...>"
+alert-usage:
+  type: chat
+  message: "&cUsage: /alert <chat|actionbar|bossbar|title> <ticks> <message...>"
 
-  alert-invalid-type:
-    type: chat
-    message: "&cInvalid type. Allowed: chat, actionbar, bossbar, title."
+alert-invalid-type:
+  type: chat
+  message: "&cInvalid type. Allowed: chat, actionbar, bossbar, title."
 
-  alert-invalid-duration:
-    type: chat
-    message: "&cInvalid duration. Must be a number of ticks (>= 1)."
+alert-invalid-duration:
+  type: chat
+  message: "&cInvalid duration. Must be a number of ticks (>= 1)."
+
+god-enabled-other:
+  type: chat
+  message: "&aEnabled god mode for &e%target%&a."
+
+god-disabled-other:
+  type: chat
+  message: "&cDisabled god mode for &e%target%&c."
+
+fly-enabled:
+  type: actionbar
+  message: "&aFlight enabled."
+  duration: 60
+
+fly-disabled:
+  type: actionbar
+  message: "&cFlight disabled."
+  duration: 60
+
+fly-enabled-other:
+  type: chat
+  message: "&aEnabled flight for &e%target%&a."
+
+fly-disabled-other:
+  type: chat
+  message: "&cDisabled flight for &e%target%&c."
+
+msg-usage:
+  type: chat
+  message: "&eUsage: &f/msg <player> <message>"
+
+msg-self:
+  type: chat
+  message: "&cYou cannot message yourself."
+
+msg-sent:
+  type: chat
+  message: "&7[&fYou &7-> &f%recipient%&7] &f%message%"
+
+msg-received:
+  type: chat
+  message: "&7[&f%sender% &7-> &fYou&7] &f%message%"
+
+reply-usage:
+  type: chat
+  message: "&eUsage: &f/reply <message>"
+
+reply-no-target:
+  type: chat
+  message: "&cNo one to reply to."
+
+reply-offline:
+  type: chat
+  message: "&cThat player is no longer online."
+
+tpall-success:
+  type: chat
+  message: "&aTeleported all players to your location."
+
+sudo-usage:
+  type: chat
+  message: "&eUsage: &f/sudo <player> <command...>"
+
+sudo-success:
+  type: chat
+  message: "&aForced &e%target% &ato run: &f%command%"

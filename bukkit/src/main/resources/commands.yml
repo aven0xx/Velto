@@ -79,3 +79,18 @@ afk:
 back:
   enabled: true
   aliases: []
+fly:
+  enabled: true
+  aliases: []
+msg:
+  enabled: true
+  aliases: ["tell", "w", "whisper"]
+reply:
+  enabled: true
+  aliases: ["r"]
+tpall:
+  enabled: true
+  aliases: []
+sudo:
+  enabled: true
+  aliases: []

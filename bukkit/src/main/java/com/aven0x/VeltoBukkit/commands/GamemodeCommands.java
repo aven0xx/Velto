@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class GamemodeCommands {
@@ -82,6 +84,25 @@ public class GamemodeCommands {
             }
 
             return true;
+        }
+
+        @Override
+        public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+            if (args.length == 1) {
+                return List.of("survival", "creative", "adventure", "spectator").stream()
+                        .filter(s -> s.startsWith(args[0].toLowerCase()))
+                        .toList();
+            }
+            if (args.length == 2) {
+                List<String> names = new ArrayList<>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                        names.add(p.getName());
+                    }
+                }
+                return names;
+            }
+            return List.of();
         }
     }
 
@@ -160,6 +181,20 @@ public class GamemodeCommands {
             }
 
             return true;
+        }
+
+        @Override
+        public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+            if (args.length == 1) {
+                List<String> names = new ArrayList<>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                        names.add(p.getName());
+                    }
+                }
+                return names;
+            }
+            return List.of();
         }
     }
 }

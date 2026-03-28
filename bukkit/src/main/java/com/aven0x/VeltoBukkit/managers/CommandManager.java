@@ -37,6 +37,11 @@ public class CommandManager {
         register("veltoreload", ReloadCommand::new);
         register("afk", AfkCommand::new);
         register("back", BackCommand::new);
+        register("fly", FlyCommand::new);
+        register("msg", MsgCommand::new);
+        register("reply", ReplyCommand::new);
+        register("tpall", TpAllCommand::new);
+        register("sudo", SudoCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {
