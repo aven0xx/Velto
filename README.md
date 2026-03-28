@@ -54,7 +54,7 @@ Placeholders are supported for dynamic values.
 ## ❌ What Velto Does Not Include
 
 - Economy  
-- Homes/TPA/Warps (only `/spawn` is provided)  
+- Homes/TPA/Warps (only `/spawn` and `/back` are provided)  
 - Kits, claims, towns, minigames
 
 These are intentionally left out so you can use the best existing plugins for your needs.
