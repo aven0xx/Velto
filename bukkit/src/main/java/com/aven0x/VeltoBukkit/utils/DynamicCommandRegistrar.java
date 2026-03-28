@@ -19,6 +19,7 @@ public class DynamicCommandRegistrar {
             field.setAccessible(true);
             commandMap = (CommandMap) field.get(Bukkit.getServer());
         } catch (Exception e) {
+            Bukkit.getLogger().severe("[Velto] FATAL: Could not access CommandMap via reflection. No commands will be registered!");
             e.printStackTrace();
         }
     }

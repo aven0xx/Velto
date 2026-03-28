@@ -70,9 +70,9 @@ rename:
 itemlore:
   enabled: true
   aliases: []
-  veltoreload:
-    enabled: true
-    aliases: [ ]
-  afk:
-    enabled: true
-    aliases: [ "away" ]
+veltoreload:
+  enabled: true
+  aliases: [ ]
+afk:
+  enabled: true
+  aliases: [ "away" ]

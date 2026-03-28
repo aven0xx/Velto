@@ -28,6 +28,13 @@ public class ConfigUtil {
         return getConfig().isLocation("spawn") ? getConfig().getLocation("spawn") : null;
     }
 
+    // === AFK ===
+
+    public static long getAfkTimeoutMillis() {
+        int seconds = getConfig().getInt("afk-timeout-seconds", 300);
+        return seconds * 1000L;
+    }
+
     // === AFK ZONE ===
 
     public static boolean isAfkzoneOn() {

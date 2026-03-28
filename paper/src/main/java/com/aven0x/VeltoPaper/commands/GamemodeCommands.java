@@ -130,8 +130,8 @@ public class GamemodeCommands {
             boolean self = args.length == 0;
 
             String perm = self
-                    ? "xcore.gamemode." + mode.name().toLowerCase()
-                    : "xcore.gamemode." + mode.name().toLowerCase() + ".others";
+                    ? "velto.gamemode." + mode.name().toLowerCase()
+                    : "velto.gamemode." + mode.name().toLowerCase() + ".others";
             if (!hasPermission(sender, perm)) return true;
 
             if (target == null || !target.isOnline()) {
