@@ -6,6 +6,11 @@
 spawn: null
 #
 #
+# AFK system
+# Time in seconds before a player is marked as AFK (default: 300 = 5 minutes)
+afk-timeout-seconds: 300
+#
+#
 # AFK Zone
 afkzone:
   enabled: false

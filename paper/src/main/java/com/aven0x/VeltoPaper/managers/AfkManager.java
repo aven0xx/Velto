@@ -34,7 +34,10 @@ public class AfkManager implements Listener {
     // ✅ NEW: ignore movement for 1s after teleport to avoid "moved too quickly" spam / teleport loop
     private static final Map<UUID, Long> ignoreMoveUntil = new ConcurrentHashMap<>();
 
-    private static final long AFK_TIMEOUT = 300000; // 5 minutes
+    // Read from config.yml (afk-timeout-seconds); fallback: 300s
+    private static long getAfkTimeout() {
+        return ConfigUtil.getAfkTimeoutMillis();
+    }
     private static BukkitRunnable afkChecker;
 
     // Simple debug toggle (optional): plug into your config if you want
@@ -66,7 +69,7 @@ public class AfkManager implements Listener {
                     long lastActivityTime = lastActivity.getOrDefault(uuid, currentTime);
 
                     boolean wasAfk = afkPlayers.contains(uuid);
-                    boolean shouldBeAfk = (currentTime - lastActivityTime) >= AFK_TIMEOUT;
+                    boolean shouldBeAfk = (currentTime - lastActivityTime) >= getAfkTimeout();
 
                     if (!wasAfk && shouldBeAfk) {
                         setAfk(player, true);
@@ -254,7 +257,7 @@ public class AfkManager implements Listener {
     }
 
     public static int getAfkTimeoutSeconds() {
-        return (int) (AFK_TIMEOUT / 1000);
+        return (int) (getAfkTimeout() / 1000);
     }
 
     // ===== EVENT LISTENERS =====

@@ -77,7 +77,7 @@ public class ChatManager implements Listener {
             if (groupFormat == null || groupFormat.isBlank()) continue;
 
             String perm = sec.getString("permission", "");
-            if (perm == null || perm.isBlank() || player.hasPermission(perm)) {
+            if (perm != null && !perm.isBlank() && player.hasPermission(perm)) {
                 return groupFormat;
             }
         }
