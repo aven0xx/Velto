@@ -36,6 +36,7 @@ public class CommandManager {
         register("itemlore", ItemLoreCommand::new);
         register("veltoreload", ReloadCommand::new);
         register("afk", AfkCommand::new);
+        register("back", BackCommand::new);
         register("anvil", AnvilCommand::new);
     }
 

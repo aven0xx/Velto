@@ -1,6 +1,7 @@
 package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.VeltoPaper.listeners.BackListener;
 import com.aven0x.VeltoPaper.managers.*;
 import com.aven0x.VeltoPaper.utils.AfkPositionStorage;
 import com.aven0x.VeltoPaper.utils.CommandUtil;
@@ -46,6 +47,7 @@ public class VeltoPaper extends JavaPlugin {
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
+        getServer().getPluginManager().registerEvents(new BackListener(), this);
 
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);

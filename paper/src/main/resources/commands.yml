@@ -76,3 +76,6 @@ veltoreload:
 afk:
   enabled: true
   aliases: [ "away" ]
+back:
+  enabled: true
+  aliases: []
