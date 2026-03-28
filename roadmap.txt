@@ -1,3 +1,17 @@
 #Velto Roadmap
 
 FOR 0.7.2:
+
+  Commands:
+  - /fly              Toggle flight for a player (admin/self), fits naturally with /god and /speed
+  - /msg + /reply     Basic private messaging between players, a staple core feature
+  - /tpall            Teleport all online players to the sender
+  - /sudo             Execute a command as another player (admin utility)
+  - /invsee           View another player's inventory (read-only, admin utility)
+  - /broadcast        Add color/formatting support and optional cooldown config
+
+  Improvements:
+  - Tab completion    Add player-name tab completion to all commands that accept a player argument
+  - /back             Extend to also save location on teleport commands (currently only on death)
+  - commands.yml      Add per-command permission node overrides so servers can remap permissions
+  - lang.yml          Add missing messages for newer commands (afk, back, alert, list)
