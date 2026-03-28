@@ -36,6 +36,7 @@ public class CommandManager {
         register("itemlore", ItemLoreCommand::new);
         register("veltoreload", ReloadCommand::new);
         register("afk", AfkCommand::new);
+        register("back", BackCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {

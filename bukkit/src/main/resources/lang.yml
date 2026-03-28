@@ -227,6 +227,15 @@ afk-list:
   type: chat
   message: "&7AFK Players (%count%): &f%players%"
 
+back-teleported:
+  type: actionbar
+  message: "&aTeleported to your last location."
+  duration: 60
+
+back-no-location:
+  type: chat
+  message: "&cNo previous location found."
+
 reload-success:
   type: chat
   message: "&aVelto configuration reloaded successfully."

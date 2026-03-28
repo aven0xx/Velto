@@ -1,6 +1,7 @@
 package com.aven0x.VeltoBukkit;
 
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.VeltoBukkit.listeners.BackListener;
 import com.aven0x.VeltoBukkit.managers.*;
 import com.aven0x.VeltoBukkit.utils.AfkPositionStorage;
 import com.aven0x.VeltoBukkit.utils.CommandUtil;
@@ -46,6 +47,7 @@ public class VeltoBukkit extends JavaPlugin {
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
+        getServer().getPluginManager().registerEvents(new BackListener(), this);
 
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);
