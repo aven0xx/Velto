@@ -23,6 +23,7 @@
 
 | Minecraft Version | Status |
 |:-----------------:|:------:|
+| 1.21.3 and less | ❌ Unsupported |
 | 1.21.4 | 🟢 LTS (until summer 2026) |
 | 1.21.5 | ✅ Supported |
 | 1.21.6 | ✅ Supported |
