@@ -9,9 +9,6 @@ import org.bukkit.entity.Player;
 public class WeatherCommand extends BaseCommand {
     public WeatherCommand() {
         super("weather");
-        new SunCommand();
-        new RainCommand();
-        new ThunderCommand();
     }
 
     @Override
@@ -97,37 +94,37 @@ public class WeatherCommand extends BaseCommand {
 
         return Bukkit.dispatchCommand(sender, "weather " + mode + " " + worldName);
     }
-}
 
-class SunCommand extends BaseCommand {
-    public SunCommand() {
-        super("sun");
+    public static class SunCommand extends BaseCommand {
+        public SunCommand() {
+            super("sun");
+        }
+
+        @Override
+        public boolean execute(CommandSender sender, String label, String[] args) {
+            return WeatherCommand.dispatchWeather(sender, "sun", args);
+        }
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String label, String[] args) {
-        return WeatherCommand.dispatchWeather(sender, "sun", args);
-    }
-}
+    public static class RainCommand extends BaseCommand {
+        public RainCommand() {
+            super("rain");
+        }
 
-class RainCommand extends BaseCommand {
-    public RainCommand() {
-        super("rain");
-    }
-
-    @Override
-    public boolean execute(CommandSender sender, String label, String[] args) {
-        return WeatherCommand.dispatchWeather(sender, "rain", args);
-    }
-}
-
-class ThunderCommand extends BaseCommand {
-    public ThunderCommand() {
-        super("thunder");
+        @Override
+        public boolean execute(CommandSender sender, String label, String[] args) {
+            return WeatherCommand.dispatchWeather(sender, "rain", args);
+        }
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String label, String[] args) {
-        return WeatherCommand.dispatchWeather(sender, "thunder", args);
+    public static class ThunderCommand extends BaseCommand {
+        public ThunderCommand() {
+            super("thunder");
+        }
+
+        @Override
+        public boolean execute(CommandSender sender, String label, String[] args) {
+            return WeatherCommand.dispatchWeather(sender, "thunder", args);
+        }
     }
 }

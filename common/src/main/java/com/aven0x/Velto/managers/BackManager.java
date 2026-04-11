@@ -3,16 +3,15 @@ package com.aven0x.Velto.managers;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BackManager {
 
-    private static final Map<UUID, Location> lastLocations = new HashMap<>();
-    private static final Set<UUID> backing = new HashSet<>();
+    private static final Map<UUID, Location> lastLocations = new ConcurrentHashMap<>();
+    private static final Set<UUID> backing = ConcurrentHashMap.newKeySet();
 
     public static void saveLocation(Player player) {
         lastLocations.put(player.getUniqueId(), player.getLocation().clone());

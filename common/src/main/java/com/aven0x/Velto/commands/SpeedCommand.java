@@ -50,7 +50,7 @@ public class SpeedCommand extends BaseCommand {
             return true;
         }
 
-        boolean self = (target == sender);
+        boolean self = sender instanceof Player p && target.getUniqueId().equals(p.getUniqueId());
         String perm = self ? "velto.speed" : "velto.speed.others";
 
         if (!hasPermission(sender, perm)) {

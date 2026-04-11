@@ -25,6 +25,9 @@ public class CommandManager {
         register("heal", HealCommand::new);
         register("alert", AlertCommand::new);
         register("weather", WeatherCommand::new);
+        register("sun", WeatherCommand.SunCommand::new);
+        register("rain", WeatherCommand.RainCommand::new);
+        register("thunder", WeatherCommand.ThunderCommand::new);
         register("kill", KillCommand::new);
         register("speed", SpeedCommand::new);
         register("god", GodCommand::new);
