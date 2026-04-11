@@ -4,9 +4,9 @@ This file provides guidance for Claude Code when working in this repository.
 
 ## RULES
 
--A session link must never be attached to a commit or a Pull Request made by Claude
--Aven0xx is always the author of every commit while Claude is Co-Author
--Always ask before making a changes to the codebase to get the permission to do it
+- A session link must never be attached to a commit or a Pull Request made by Claude
+- Aven0xx is always the author of every commit while Claude is Co-Author
+- Always ask before making a changes to the codebase to get the permission to do it
 
 
 ## Project Overview
