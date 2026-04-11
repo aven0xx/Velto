@@ -40,7 +40,8 @@ public class ChatManager implements Listener {
         format = format.replace("%player_name%", player.getName());
 
         if (papiAvailable) {
-            format = PlaceholderAPI.setPlaceholders(player, format);
+            String resolved = PlaceholderAPI.setPlaceholders(player, format);
+            if (resolved != null) format = resolved;
         }
 
         String safeMessage = event.getMessage().replace("%", "%%");
@@ -86,7 +87,8 @@ public class ChatManager implements Listener {
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
-            msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            String resolved = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            if (resolved != null) msg = resolved;
         }
 
         event.setJoinMessage(CC.translate(msg));
@@ -103,7 +105,8 @@ public class ChatManager implements Listener {
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
-            msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            String resolved = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            if (resolved != null) msg = resolved;
         }
 
         event.setQuitMessage(CC.translate(msg));

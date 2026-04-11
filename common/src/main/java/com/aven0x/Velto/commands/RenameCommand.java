@@ -34,6 +34,7 @@ public class RenameCommand extends BaseCommand {
         }
         if (args.length == 1 && (args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("clear"))) {
             ItemMeta meta = item.getItemMeta();
+            if (meta == null) return true;
             meta.setDisplayName(null);
             item.setItemMeta(meta);
             LangUtil.send(player, "rename-cleared");
@@ -44,6 +45,7 @@ public class RenameCommand extends BaseCommand {
         String colored = ChatColor.translateAlternateColorCodes('&', raw);
 
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) return true;
         meta.setDisplayName(colored);
         item.setItemMeta(meta);
 

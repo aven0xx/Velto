@@ -41,6 +41,7 @@ public class ItemLoreCommand extends BaseCommand {
 
         @SuppressWarnings("deprecation")
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) return true;
         @SuppressWarnings("deprecation")
         List<String> lore = meta.getLore();
         if (lore == null) lore = new ArrayList<>();
@@ -61,6 +62,7 @@ public class ItemLoreCommand extends BaseCommand {
             case "clear": {
                 @SuppressWarnings("deprecation")
                 ItemMeta m2 = item.getItemMeta();
+                if (m2 == null) return true;
                 m2.setLore(null);
                 item.setItemMeta(m2);
                 LangUtil.send(player, "lore-cleared");
@@ -75,6 +77,7 @@ public class ItemLoreCommand extends BaseCommand {
                 lore.add(text);
                 @SuppressWarnings("deprecation")
                 ItemMeta m2 = item.getItemMeta();
+                if (m2 == null) return true;
                 m2.setLore(lore);
                 item.setItemMeta(m2);
                 LangUtil.send(player, "lore-add-success");
@@ -100,6 +103,7 @@ public class ItemLoreCommand extends BaseCommand {
                 lore.add(index0, text);
                 @SuppressWarnings("deprecation")
                 ItemMeta m2 = item.getItemMeta();
+                if (m2 == null) return true;
                 m2.setLore(lore);
                 item.setItemMeta(m2);
                 LangUtil.send(player, "lore-insert-success");
@@ -129,6 +133,7 @@ public class ItemLoreCommand extends BaseCommand {
                 lore.set(index0, text);
                 @SuppressWarnings("deprecation")
                 ItemMeta m2 = item.getItemMeta();
+                if (m2 == null) return true;
                 m2.setLore(lore);
                 item.setItemMeta(m2);
                 LangUtil.send(player, "lore-set-success");
@@ -157,6 +162,7 @@ public class ItemLoreCommand extends BaseCommand {
                 lore.remove(index0);
                 @SuppressWarnings("deprecation")
                 ItemMeta m2 = item.getItemMeta();
+                if (m2 == null) return true;
                 m2.setLore(lore.isEmpty() ? null : lore);
                 item.setItemMeta(m2);
                 LangUtil.send(player, "lore-remove-success");
@@ -221,7 +227,8 @@ public class ItemLoreCommand extends BaseCommand {
                 ItemStack item = player.getInventory().getItemInMainHand();
                 if (item != null && !item.getType().isAir()) {
                     @SuppressWarnings("deprecation")
-                    List<String> lore = item.getItemMeta().getLore();
+                    ItemMeta completeMeta = item.getItemMeta();
+                    List<String> lore = completeMeta != null ? completeMeta.getLore() : null;
                     int size = lore == null ? 0 : lore.size();
                     int max = s.equals("insert") ? size + 1 : size;
                     for (int i = 1; i <= Math.max(1, max); i++) {

@@ -35,7 +35,7 @@ public class DynamicCommandRegistrar {
             @Override
             public @NotNull Collection<String> suggest(@NotNull CommandSourceStack source, @NotNull String[] args) {
                 List<String> completions = command.complete(source.getSender(), alias, args);
-                return completions;
+                return completions != null ? completions : List.of();
             }
         });
     }
