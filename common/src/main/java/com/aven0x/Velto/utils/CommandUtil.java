@@ -29,4 +29,9 @@ public class CommandUtil {
         List<String> aliases = commands.getStringList(commandName + ".aliases");
         return aliases != null ? aliases : Collections.emptyList();
     }
+
+    public static String getPermission(String commandName, String defaultPerm) {
+        if (commands == null) load();
+        return commands.getString(commandName + ".permissions." + defaultPerm, defaultPerm);
+    }
 }

@@ -11,5 +11,5 @@ FOR 0.7.2:
   Improvements:
   - [DONE] Tab completion    Add player-name tab completion to all commands that accept a player argument
   - [DONE] /back             Extend to also save location on teleport commands (currently only on death)
-  - [TODO] commands.yml      Add per-command permission node overrides so servers can remap permissions
+  - [DONE] commands.yml      Add per-command permission node overrides so servers can remap permissions
   - [DONE] lang.yml          Add missing messages for newer commands (afk, back, alert, list)

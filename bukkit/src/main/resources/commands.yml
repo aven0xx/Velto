@@ -1,3 +1,18 @@
+# Velto Command Configuration
+# Each command supports:
+#   enabled: true/false       - whether the command is registered on startup
+#   aliases: []               - additional names for the command
+#   permissions:              - optional permission node overrides
+#     velto.xxx: custom.perm  - maps the default velto permission to a custom one
+#
+# Example override:
+#   fly:
+#     enabled: true
+#     aliases: []
+#     permissions:
+#       velto.fly: myplugin.fly
+#       velto.fly.others: myplugin.fly.others
+
 spawn:
   enabled: true
   aliases: []

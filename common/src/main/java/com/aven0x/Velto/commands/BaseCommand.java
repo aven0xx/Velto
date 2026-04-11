@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,7 +37,8 @@ public abstract class BaseCommand {
     }
 
     protected boolean hasPermission(CommandSender sender, String perm) {
-        if (!sender.hasPermission(perm)) {
+        String effectivePerm = CommandUtil.getPermission(this.name, perm);
+        if (!sender.hasPermission(effectivePerm)) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "no-permission");
             } else {
