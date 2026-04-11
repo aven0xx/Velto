@@ -31,6 +31,15 @@ alert:
 weather:
   enabled: true
   aliases: []
+sun:
+  enabled: true
+  aliases: []
+rain:
+  enabled: true
+  aliases: []
+thunder:
+  enabled: true
+  aliases: []
 speed:
   enabled: true
   aliases: []
