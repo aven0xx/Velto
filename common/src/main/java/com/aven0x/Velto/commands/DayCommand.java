@@ -2,10 +2,8 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class DayCommand extends BaseCommand {
     public DayCommand() {
@@ -13,11 +11,8 @@ public class DayCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.timeset")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 

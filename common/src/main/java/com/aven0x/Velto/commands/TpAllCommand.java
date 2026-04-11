@@ -2,12 +2,8 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class TpAllCommand extends BaseCommand {
 
@@ -16,7 +12,7 @@ public class TpAllCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.tpall")) return true;
 
@@ -30,10 +26,5 @@ public class TpAllCommand extends BaseCommand {
 
         LangUtil.send(target, "tpall-success");
         return true;
-    }
-
-    @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        return List.of();
     }
 }

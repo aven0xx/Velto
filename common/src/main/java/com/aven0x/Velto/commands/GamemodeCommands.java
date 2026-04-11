@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+        public boolean execute(CommandSender sender, String label, String[] args) {
             if (args.length < 1) {
                 if (sender instanceof Player player) {
                     LangUtil.send(player, "invalid-usage-gamemode");
@@ -87,7 +85,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        public List<String> complete(CommandSender sender, String label, String[] args) {
             if (args.length == 1) {
                 return List.of("survival", "creative", "adventure", "spectator").stream()
                         .filter(s -> s.startsWith(args[0].toLowerCase()))
@@ -144,7 +142,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+        public boolean execute(CommandSender sender, String label, String[] args) {
             Player target = args.length > 0
                     ? Bukkit.getPlayer(args[0])
                     : (sender instanceof Player ? (Player) sender : null);
@@ -184,7 +182,7 @@ public class GamemodeCommands {
         }
 
         @Override
-        public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        public List<String> complete(CommandSender sender, String label, String[] args) {
             if (args.length == 1) {
                 List<String> names = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {

@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends BaseCommand {
     public ReloadCommand() {
@@ -14,7 +12,7 @@ public class ReloadCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.reload")) {
             sender.sendMessage("§cYou do not have permission to run this command.");
             return true;

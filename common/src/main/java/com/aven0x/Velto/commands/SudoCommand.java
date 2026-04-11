@@ -2,10 +2,8 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +18,7 @@ public class SudoCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.sudo")) return true;
 
         if (args.length < 2) {
@@ -58,7 +56,7 @@ public class SudoCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 1 && sender.hasPermission("velto.sudo")) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {

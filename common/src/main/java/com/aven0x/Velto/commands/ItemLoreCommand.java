@@ -2,32 +2,23 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ItemLoreCommand extends BaseCommand implements TabExecutor {
+public class ItemLoreCommand extends BaseCommand {
     public ItemLoreCommand() {
         super("itemlore");
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command command,
-                             @NotNull String label,
-                             @NotNull String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.lore")) {
-            if (sender instanceof Player p) {
-                LangUtil.send(p, "no-permission");
-            }
             return true;
         }
 
@@ -178,7 +169,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
         }
     }
 
-    private void sendUsage(@NotNull Player player, @NotNull String label) {
+    private void sendUsage(Player player, String label) {
         LangUtil.send(player, "lore-usage");
         player.sendMessage(ChatColor.YELLOW + "Usage:");
         player.sendMessage(ChatColor.GRAY + "/" + label + " show");
@@ -189,7 +180,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
         player.sendMessage(ChatColor.GRAY + "/" + label + " remove <line>");
     }
 
-    private @NotNull String joinFrom(@NotNull String[] arr, int start) {
+    private String joinFrom(String[] arr, int start) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < arr.length; i++) {
             if (i > start) sb.append(' ');
@@ -198,7 +189,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
         return sb.toString();
     }
 
-    private @NotNull String colorize(@NotNull String s) {
+    private String colorize(String s) {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
@@ -212,10 +203,7 @@ public class ItemLoreCommand extends BaseCommand implements TabExecutor {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender,
-                                               @NotNull Command command,
-                                               @NotNull String alias,
-                                               @NotNull String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         List<String> out = new ArrayList<>();
         if (!(sender instanceof Player player)) return out;
 

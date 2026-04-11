@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +16,7 @@ public class FeedCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : (sender instanceof Player ? (Player) sender : null);
         boolean self = args.length == 0;
         String perm = self ? "velto.feed" : "velto.feed.others";
@@ -52,7 +50,7 @@ public class FeedCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 1 && sender.hasPermission("velto.feed.others")) {
             return Bukkit.getOnlinePlayers().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))

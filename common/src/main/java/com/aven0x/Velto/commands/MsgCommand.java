@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.MsgManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +19,7 @@ public class MsgCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.msg")) return true;
 
@@ -62,7 +60,7 @@ public class MsgCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 1) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {

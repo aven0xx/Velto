@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class WeatherCommand extends BaseCommand {
     public WeatherCommand() {
@@ -17,7 +15,7 @@ public class WeatherCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.weather")) {
             return true;
         }
@@ -107,7 +105,7 @@ class SunCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         return WeatherCommand.dispatchWeather(sender, "sun", args);
     }
 }
@@ -118,7 +116,7 @@ class RainCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         return WeatherCommand.dispatchWeather(sender, "rain", args);
     }
 }
@@ -129,7 +127,7 @@ class ThunderCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         return WeatherCommand.dispatchWeather(sender, "thunder", args);
     }
 }

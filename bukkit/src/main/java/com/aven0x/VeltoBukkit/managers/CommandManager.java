@@ -2,7 +2,7 @@ package com.aven0x.VeltoBukkit.managers;
 
 import com.aven0x.Velto.commands.*;
 import com.aven0x.Velto.utils.CommandUtil;
-import com.aven0x.Velto.utils.DynamicCommandRegistrar;
+import com.aven0x.VeltoBukkit.utils.DynamicCommandRegistrar;
 
 import java.util.function.Supplier;
 
@@ -44,10 +44,10 @@ public class CommandManager {
         register("sudo", SudoCommand::new);
     }
 
-    private static void register(String name, Supplier<? extends com.aven0x.Velto.commands.BaseCommand> factory) {
+    private static void register(String name, Supplier<? extends BaseCommand> factory) {
         if (!CommandUtil.isEnabled(name)) return;
 
-        com.aven0x.Velto.commands.BaseCommand command = factory.get();
+        BaseCommand command = factory.get();
 
         DynamicCommandRegistrar.registerCommand(name, command);
 

@@ -2,10 +2,8 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ public class SpeedCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length < 1) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-usage");
@@ -56,9 +54,6 @@ public class SpeedCommand extends BaseCommand {
         String perm = self ? "velto.speed" : "velto.speed.others";
 
         if (!hasPermission(sender, perm)) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 
@@ -85,7 +80,7 @@ public class SpeedCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 2 && sender.hasPermission("velto.speed.others")) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {

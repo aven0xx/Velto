@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -17,13 +15,8 @@ public class KillCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.kill")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            } else {
-                sender.sendMessage("§cYou don't have permission.");
-            }
             return true;
         }
 
@@ -52,7 +45,7 @@ public class KillCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 1 && sender.hasPermission("velto.kill")) {
             return Bukkit.getOnlinePlayers().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))

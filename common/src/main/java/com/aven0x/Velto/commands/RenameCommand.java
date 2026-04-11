@@ -2,12 +2,10 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 public class RenameCommand extends BaseCommand {
     public RenameCommand() {
@@ -15,14 +13,8 @@ public class RenameCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command command,
-                             @NotNull String label,
-                             @NotNull String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.rename")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 

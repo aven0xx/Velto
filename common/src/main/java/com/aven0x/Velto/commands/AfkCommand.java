@@ -3,10 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,7 @@ public class AfkCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
 
         if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
             if (!hasPermission(sender, "velto.afk.list")) return true;
@@ -74,7 +72,7 @@ public class AfkCommand extends BaseCommand {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {

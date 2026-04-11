@@ -1,7 +1,6 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -12,7 +11,7 @@ public class NotifTestCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage("Only players can use this command.");
             return true;

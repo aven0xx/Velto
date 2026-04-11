@@ -3,12 +3,8 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.BackManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class BackCommand extends BaseCommand {
 
@@ -17,7 +13,7 @@ public class BackCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.back")) return true;
 
@@ -33,10 +29,5 @@ public class BackCommand extends BaseCommand {
         player.teleport(last);
         LangUtil.send(player, "back-teleported");
         return true;
-    }
-
-    @Override
-    public @NotNull List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return List.of();
     }
 }

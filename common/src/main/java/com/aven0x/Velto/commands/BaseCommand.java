@@ -1,31 +1,29 @@
 package com.aven0x.Velto.commands;
 
-import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.LangUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class BaseCommand implements CommandExecutor, TabCompleter {
+public abstract class BaseCommand {
+
+    protected final String name;
 
     public BaseCommand(String name) {
-        PluginCommand cmd = Bukkit.getPluginCommand(name);
-        if (cmd != null) {
-            cmd.setExecutor(this);
-            cmd.setAliases(CommandUtil.getAliases(name));
-            cmd.setTabCompleter(this);
-        }
+        this.name = name;
     }
 
-    @Override
-    public abstract boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args);
+    /**
+     * Execute the command. Return true if handled, false to show usage.
+     */
+    public abstract boolean execute(CommandSender sender, String label, String[] args);
 
-    @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    /**
+     * Provide tab completion suggestions.
+     */
+    public List<String> complete(CommandSender sender, String label, String[] args) {
         return Collections.emptyList();
     }
 
@@ -47,5 +45,9 @@ public abstract class BaseCommand implements CommandExecutor, TabCompleter {
             return false;
         }
         return true;
+    }
+
+    public String getName() {
+        return name;
     }
 }

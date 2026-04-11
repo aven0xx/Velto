@@ -2,8 +2,8 @@ package com.aven0x.VeltoPaper.managers;
 
 import com.aven0x.Velto.commands.*;
 import com.aven0x.Velto.utils.CommandUtil;
-import com.aven0x.Velto.utils.DynamicCommandRegistrar;
 import com.aven0x.VeltoPaper.commands.AnvilCommand;
+import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
 
 import java.util.function.Supplier;
 

@@ -3,12 +3,10 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -18,11 +16,8 @@ public class KillAllCommand extends BaseCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.killall")) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "no-permission");
-            }
             return true;
         }
 

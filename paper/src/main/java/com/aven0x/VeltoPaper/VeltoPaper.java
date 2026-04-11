@@ -10,26 +10,22 @@ import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.LangUtil;
-import com.aven0x.Velto.utils.ServerUtil;
 import com.aven0x.VeltoPaper.managers.ChatManager;
 import com.aven0x.VeltoPaper.managers.CommandManager;
+import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("UnstableApiUsage")
 public class VeltoPaper extends JavaPlugin {
 
     @Override
     public void onEnable() {
         VeltoPlugin.set(this);
 
-        // Detect server type (Spigot vs Paper)
-        if (ServerUtil.isPaper()) {
-            Bukkit.getLogger().info("[Velto] has been enabled");
-            Bukkit.getLogger().info("[Velto] Paper detected. All features enabled.");
-        } else {
-            Bukkit.getLogger().info("[Velto] has been enabled");
-            Bukkit.getLogger().warning("[Velto] Spigot detected. Some features (like /anvil) are disabled.");
-        }
+        Bukkit.getLogger().info("[Velto] has been enabled");
+        Bukkit.getLogger().info("[Velto] Paper detected. All features enabled.");
 
         // Load config.yml if not already created
         saveDefaultConfig();
@@ -44,8 +40,11 @@ public class VeltoPaper extends JavaPlugin {
         autoMsgManager.start();
         new ChatManager(this);
 
-        // Register commands
-        CommandManager.registerAllCommands();
+        // Register commands via Paper's native lifecycle API (no reflection)
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            DynamicCommandRegistrar.setRegistrar(event.registrar());
+            CommandManager.registerAllCommands();
+        });
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
