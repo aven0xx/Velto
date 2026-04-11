@@ -3,13 +3,13 @@ package com.aven0x.Velto.managers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GodManager {
 
-    private static final Set<UUID> godPlayers = new HashSet<>();
+    private static final Set<UUID> godPlayers = ConcurrentHashMap.newKeySet();
 
     public static boolean isGod(Player player) {
         return godPlayers.contains(player.getUniqueId());
@@ -31,7 +31,7 @@ public class GodManager {
     }
 
     public static Set<Player> getGodPlayers() {
-        Set<Player> players = new HashSet<>();
+        Set<Player> players = ConcurrentHashMap.newKeySet();
         for (UUID uuid : godPlayers) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isOnline()) {

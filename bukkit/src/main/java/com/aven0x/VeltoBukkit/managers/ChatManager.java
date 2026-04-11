@@ -1,8 +1,8 @@
 package com.aven0x.VeltoBukkit.managers;
 
-import com.aven0x.VeltoBukkit.VeltoBukkit;
-import com.aven0x.VeltoBukkit.utils.ConfigUtil;
+import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
+import com.aven0x.VeltoBukkit.VeltoBukkit;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -37,30 +37,21 @@ public class ChatManager implements Listener {
 
         String format = resolveChatFormat(player);
 
-        // Manual placeholder
         format = format.replace("%player_name%", player.getName());
 
-        // PAPI placeholders
         if (papiAvailable) {
-            format = PlaceholderAPI.setPlaceholders(player, format);
+            String resolved = PlaceholderAPI.setPlaceholders(player, format);
+            if (resolved != null) format = resolved;
         }
 
-        // Escape % to avoid String.format issues in Bukkit chat format
         String safeMessage = event.getMessage().replace("%", "%%");
         format = format.replace("%message%", safeMessage);
 
-        // Colors
         format = CC.translate(format);
 
         event.setFormat(format);
     }
 
-    /**
-     * Dynamic groups:
-     * - Default: messages.chat (required)
-     * - Optional priority list: messages.chat-priority
-     * - Optional groups: messages.chat-groups.<group>.format + .permission(optional)
-     */
     private String resolveChatFormat(Player player) {
         String fallback = ConfigUtil.getChatFormat();
 
@@ -96,7 +87,8 @@ public class ChatManager implements Listener {
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
-            msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            String resolved = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            if (resolved != null) msg = resolved;
         }
 
         event.setJoinMessage(CC.translate(msg));
@@ -113,7 +105,8 @@ public class ChatManager implements Listener {
         msg = msg.replace("%player_name%", event.getPlayer().getName());
 
         if (papiAvailable) {
-            msg = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            String resolved = PlaceholderAPI.setPlaceholders(event.getPlayer(), msg);
+            if (resolved != null) msg = resolved;
         }
 
         event.setQuitMessage(CC.translate(msg));
@@ -126,8 +119,8 @@ public class ChatManager implements Listener {
             if (input == null) return "";
             Matcher matcher = HEX_PATTERN.matcher(input);
             while (matcher.find()) {
-                String token = matcher.group();  // "&#RRGGBB"
-                String hex = token.substring(1); // "#RRGGBB"
+                String token = matcher.group();
+                String hex = token.substring(1);
                 input = input.replace(token, ChatColor.of(hex).toString());
             }
             return input.replace("&", "§");

@@ -1,9 +1,11 @@
 package com.aven0x.VeltoBukkit.utils;
 
-import com.aven0x.VeltoBukkit.VeltoBukkit;
-import com.aven0x.VeltoBukkit.commands.BaseCommand;
+import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.commands.BaseCommand;
 import org.bukkit.Bukkit;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 
 import java.lang.reflect.Field;
@@ -30,15 +32,15 @@ public class DynamicCommandRegistrar {
         Command cmd = new BukkitCommand(alias) {
             @Override
             public boolean execute(CommandSender sender, String label, String[] args) {
-                return command.onCommand(sender, this, label, args);
+                return command.execute(sender, label, args);
             }
 
             @Override
             public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-                return command.onTabComplete(sender, this, alias, args);
+                return command.complete(sender, alias, args);
             }
         };
 
-        commandMap.register(VeltoBukkit.getInstance().getName(), cmd);
+        commandMap.register(VeltoPlugin.get().getName(), cmd);
     }
 }

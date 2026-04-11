@@ -1,0 +1,39 @@
+package com.aven0x.Velto.commands;
+
+import com.aven0x.Velto.utils.LangUtil;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+public class DayCommand extends BaseCommand {
+    public DayCommand() {
+        super("day");
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!hasPermission(sender, "velto.timeset")) {
+            return true;
+        }
+
+        World world = args.length > 0
+                ? sender.getServer().getWorld(args[0])
+                : sender instanceof Player
+                ? ((Player) sender).getWorld()
+                : null;
+
+        if (world == null) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "invalid-world");
+            }
+            return true;
+        }
+
+        world.setTime(1000);
+
+        if (sender instanceof Player player) {
+            LangUtil.send(player, "time-set-day");
+        }
+        return true;
+    }
+}
