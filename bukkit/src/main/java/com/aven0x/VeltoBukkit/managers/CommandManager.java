@@ -1,12 +1,12 @@
 package com.aven0x.VeltoBukkit.managers;
 
-import com.aven0x.VeltoBukkit.commands.*;
-import com.aven0x.VeltoBukkit.utils.CommandUtil;
-import com.aven0x.VeltoBukkit.utils.DynamicCommandRegistrar;
+import com.aven0x.Velto.commands.*;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.DynamicCommandRegistrar;
 
 import java.util.function.Supplier;
 
-import static com.aven0x.VeltoBukkit.commands.GamemodeCommands.*;
+import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
@@ -44,15 +44,13 @@ public class CommandManager {
         register("sudo", SudoCommand::new);
     }
 
-    private static void register(String name, Supplier<? extends BaseCommand> factory) {
+    private static void register(String name, Supplier<? extends com.aven0x.Velto.commands.BaseCommand> factory) {
         if (!CommandUtil.isEnabled(name)) return;
 
-        BaseCommand command = factory.get(); // only constructed if enabled
+        com.aven0x.Velto.commands.BaseCommand command = factory.get();
 
-        // Register the MAIN command name dynamically
         DynamicCommandRegistrar.registerCommand(name, command);
 
-        // Register aliases dynamically
         for (String alias : CommandUtil.getAliases(name)) {
             DynamicCommandRegistrar.registerCommand(alias, command);
         }

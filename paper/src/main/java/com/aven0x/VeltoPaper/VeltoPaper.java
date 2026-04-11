@@ -1,24 +1,26 @@
 package com.aven0x.VeltoPaper;
 
+import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.listeners.BackListener;
 import com.aven0x.Velto.listeners.GodListener;
-import com.aven0x.VeltoPaper.listeners.BackListener;
-import com.aven0x.VeltoPaper.managers.*;
-import com.aven0x.VeltoPaper.utils.AfkPositionStorage;
-import com.aven0x.VeltoPaper.utils.CommandUtil;
-import com.aven0x.VeltoPaper.utils.LangUtil;
+import com.aven0x.Velto.managers.AfkManager;
+import com.aven0x.Velto.managers.AutoMsgManager;
+import com.aven0x.Velto.managers.PlaceholderManager;
+import com.aven0x.Velto.managers.TeleportManager;
+import com.aven0x.Velto.utils.AfkPositionStorage;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
+import com.aven0x.VeltoPaper.managers.ChatManager;
+import com.aven0x.VeltoPaper.managers.CommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class VeltoPaper extends JavaPlugin {
 
-    private static VeltoPaper instance;
-    private TeleportManager teleportManager;
-    private AutoMsgManager autoMsgManager;
-
     @Override
     public void onEnable() {
-        instance = this;
+        VeltoPlugin.set(this);
 
         // Detect server type (Spigot vs Paper)
         if (ServerUtil.isPaper()) {
@@ -37,9 +39,9 @@ public class VeltoPaper extends JavaPlugin {
         CommandUtil.load();
 
         // Setup managers
-        this.teleportManager = new TeleportManager();
-        this.autoMsgManager = new AutoMsgManager();
-        this.autoMsgManager.start();
+        new TeleportManager();
+        AutoMsgManager autoMsgManager = new AutoMsgManager();
+        autoMsgManager.start();
         new ChatManager(this);
 
         // Register commands
@@ -58,17 +60,14 @@ public class VeltoPaper extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // nothing special to close now that Adventure is removed
-
-        // Arrêter le système AFK
         AfkManager.stop();
     }
 
     public static VeltoPaper getInstance() {
-        return instance;
+        return (VeltoPaper) VeltoPlugin.get();
     }
 
     public TeleportManager getTeleportManager() {
-        return teleportManager;
+        return TeleportManager.getInstance();
     }
 }

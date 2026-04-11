@@ -1,12 +1,13 @@
 package com.aven0x.VeltoPaper.managers;
 
-import com.aven0x.VeltoPaper.commands.*;
-import com.aven0x.VeltoPaper.utils.CommandUtil;
-import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
+import com.aven0x.Velto.commands.*;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.DynamicCommandRegistrar;
+import com.aven0x.VeltoPaper.commands.AnvilCommand;
 
 import java.util.function.Supplier;
 
-import static com.aven0x.VeltoPaper.commands.GamemodeCommands.*;
+import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
@@ -48,12 +49,10 @@ public class CommandManager {
     private static void register(String name, Supplier<? extends BaseCommand> factory) {
         if (!CommandUtil.isEnabled(name)) return;
 
-        BaseCommand command = factory.get(); // only constructed if enabled
+        BaseCommand command = factory.get();
 
-        // Register the MAIN command name dynamically
         DynamicCommandRegistrar.registerCommand(name, command);
 
-        // Register aliases dynamically
         for (String alias : CommandUtil.getAliases(name)) {
             DynamicCommandRegistrar.registerCommand(alias, command);
         }
