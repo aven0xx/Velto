@@ -33,10 +33,7 @@ public class TeleportManager {
     }
 
     private void bukkitTeleport(Player player, Location location) {
-        // Load the destination chunk async via the official Spigot API,
-        // then teleport on the main thread once the chunk is ready
-        location.getWorld().getChunkAtAsync(location).thenAccept(chunk ->
-                Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> player.teleport(location))
-        );
+        location.getWorld().getChunkAt(location);
+        player.teleport(location);
     }
 }
