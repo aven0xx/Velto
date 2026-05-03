@@ -1,12 +1,13 @@
 package com.aven0x.VeltoPaper.managers;
 
-import com.aven0x.VeltoPaper.commands.*;
-import com.aven0x.VeltoPaper.utils.CommandUtil;
+import com.aven0x.Velto.commands.*;
+import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.VeltoPaper.commands.AnvilCommand;
 import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
 
 import java.util.function.Supplier;
 
-import static com.aven0x.VeltoPaper.commands.GamemodeCommands.*;
+import static com.aven0x.Velto.commands.GamemodeCommands.*;
 
 public class CommandManager {
 
@@ -24,6 +25,9 @@ public class CommandManager {
         register("heal", HealCommand::new);
         register("alert", AlertCommand::new);
         register("weather", WeatherCommand::new);
+        register("sun", WeatherCommand.SunCommand::new);
+        register("rain", WeatherCommand.RainCommand::new);
+        register("thunder", WeatherCommand.ThunderCommand::new);
         register("kill", KillCommand::new);
         register("speed", SpeedCommand::new);
         register("god", GodCommand::new);
@@ -36,18 +40,22 @@ public class CommandManager {
         register("itemlore", ItemLoreCommand::new);
         register("veltoreload", ReloadCommand::new);
         register("afk", AfkCommand::new);
+        register("back", BackCommand::new);
         register("anvil", AnvilCommand::new);
+        register("fly", FlyCommand::new);
+        register("msg", MsgCommand::new);
+        register("reply", ReplyCommand::new);
+        register("tpall", TpAllCommand::new);
+        register("sudo", SudoCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {
         if (!CommandUtil.isEnabled(name)) return;
 
-        BaseCommand command = factory.get(); // only constructed if enabled
+        BaseCommand command = factory.get();
 
-        // Register the MAIN command name dynamically
         DynamicCommandRegistrar.registerCommand(name, command);
 
-        // Register aliases dynamically
         for (String alias : CommandUtil.getAliases(name)) {
             DynamicCommandRegistrar.registerCommand(alias, command);
         }

@@ -1,8 +1,15 @@
 #Velto Roadmap
 
-FOR 0.7.1:
+FOR 0.7.2:
 
--Adding PlaceholderManager (Hook with PlaceholderAPI) / Done
--Registering %velto_afk% placeholder that return true or false status for AFK / Done
--Fix of Build not working in 0.7.0 on Gradle / Done
--Native Paper-plugin.yml / Done
+  Commands:
+  - [DONE] /fly              Toggle flight for a player (admin/self), fits naturally with /god and /speed
+  - [DONE] /msg + /reply     Basic private messaging between players, a staple core feature
+  - [DONE] /tpall            Teleport all online players to the sender
+  - [DONE] /sudo             Execute a command as another player (admin utility)
+
+  Improvements:
+  - [DONE] Tab completion    Add player-name tab completion to all commands that accept a player argument
+  - [DONE] /back             Extend to also save location on teleport commands (currently only on death)
+  - [DONE] commands.yml      Add per-command permission node overrides so servers can remap permissions
+  - [DONE] lang.yml          Add missing messages for newer commands (afk, back, alert, list)

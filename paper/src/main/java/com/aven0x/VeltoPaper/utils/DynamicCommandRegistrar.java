@@ -1,43 +1,42 @@
 package com.aven0x.VeltoPaper.utils;
 
-import com.aven0x.VeltoPaper.VeltoPaper;
-import com.aven0x.VeltoPaper.commands.BaseCommand;
-import org.bukkit.Bukkit;
-import org.bukkit.command.*;
-import org.bukkit.command.defaults.BukkitCommand;
+import com.aven0x.Velto.commands.BaseCommand;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 
+/**
+ * Paper-native command registrar using Paper's BasicCommand API and LifecycleEvents.
+ * Set the registrar before calling registerCommand via setRegistrar().
+ */
+@SuppressWarnings("UnstableApiUsage")
 public class DynamicCommandRegistrar {
 
-    private static CommandMap commandMap;
+    private static Commands registrar;
 
-    static {
-        try {
-            Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            field.setAccessible(true);
-            commandMap = (CommandMap) field.get(Bukkit.getServer());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void setRegistrar(Commands registrar) {
+        DynamicCommandRegistrar.registrar = registrar;
     }
 
     public static void registerCommand(String alias, BaseCommand command) {
-        if (commandMap == null) return;
+        if (registrar == null) return;
 
-        Command cmd = new BukkitCommand(alias) {
+        registrar.register(alias, new BasicCommand() {
             @Override
-            public boolean execute(CommandSender sender, String label, String[] args) {
-                return command.onCommand(sender, this, label, args);
+            public void execute(@NotNull CommandSourceStack source, @NotNull String[] args) {
+                command.execute(source.getSender(), alias, args);
             }
 
             @Override
-            public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-                return command.onTabComplete(sender, this, alias, args);
+            public @NotNull Collection<String> suggest(@NotNull CommandSourceStack source, @NotNull String[] args) {
+                List<String> completions = command.complete(source.getSender(), alias, args);
+                return completions != null ? completions : List.of();
             }
-        };
-
-        commandMap.register(VeltoPaper.getInstance().getName(), cmd);
+        });
     }
 }

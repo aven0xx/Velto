@@ -1,0 +1,76 @@
+package com.aven0x.Velto.commands;
+
+import com.aven0x.Velto.utils.LangUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+
+import java.util.Locale;
+
+public class KillAllCommand extends BaseCommand {
+    public KillAllCommand() {
+        super("killall");
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!hasPermission(sender, "velto.killall")) {
+            return true;
+        }
+
+        if (!(sender instanceof Player player)) {
+            return true;
+        }
+
+        if (args.length < 1) {
+            player.sendMessage("§cUsage: /" + label + " <entityType|ALL> [world]");
+            return true;
+        }
+
+        final String typeArg = args[0].toUpperCase(Locale.ROOT);
+        final boolean killAll = typeArg.equals("ALL") || typeArg.equals("*");
+
+        final World targetWorld;
+        if (args.length >= 2) {
+            targetWorld = Bukkit.getWorld(args[1]);
+            if (targetWorld == null) {
+                player.sendMessage("§cWorld not found: §f" + args[1]);
+                return true;
+            }
+        } else {
+            targetWorld = player.getWorld();
+        }
+
+        EntityType targetType = null;
+        if (!killAll) {
+            try {
+                targetType = EntityType.valueOf(typeArg);
+            } catch (IllegalArgumentException ex) {
+                player.sendMessage("§cInvalid entity type: §f" + args[0]);
+                return true;
+            }
+            if (targetType == EntityType.PLAYER) {
+                player.sendMessage("§cRefusing to target players.");
+                return true;
+            }
+        }
+
+        int removed = 0;
+        for (Entity e : targetWorld.getEntities()) {
+            if (e.getType() == EntityType.PLAYER) continue;
+            if (killAll || e.getType() == targetType) {
+                e.remove();
+                removed++;
+            }
+        }
+
+        LangUtil.send(player, "killall-done");
+        player.sendMessage("§aRemoved §f" + removed + " §aentities of type §f" +
+                (killAll ? "ALL" : targetType) + " §ain world §f" + targetWorld.getName() + "§a.");
+
+        return true;
+    }
+}

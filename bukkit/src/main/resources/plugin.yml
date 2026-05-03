@@ -1,7 +1,48 @@
 name: Velto
 version: ${version}
 main: com.aven0x.VeltoBukkit.VeltoBukkit
-api-version: 1.21
+api-version: 1.21.4
 
 softdepend: ["PlaceholderAPI"]
 
+permissions:
+  velto.*:
+    description: Grants access to all Velto commands
+    children:
+      velto.list: true
+      velto.rename: true
+      velto.kill: true
+      velto.killall: true
+      velto.msg: true
+      velto.reload: true
+      velto.setspawn: true
+      velto.spawn: true
+      velto.back: true
+      velto.craft: true
+      velto.lore: true
+      velto.alert: true
+      velto.tpall: true
+      velto.sudo: true
+      velto.notiftest: true
+      velto.timeset: true
+      velto.weather: true
+      velto.god: true
+      velto.god.others: true
+      velto.fly: true
+      velto.fly.others: true
+      velto.feed: true
+      velto.feed.others: true
+      velto.heal: true
+      velto.heal.others: true
+      velto.speed: true
+      velto.speed.others: true
+      velto.gamemode.creative: true
+      velto.gamemode.creative.others: true
+      velto.gamemode.survival: true
+      velto.gamemode.survival.others: true
+      velto.gamemode.adventure: true
+      velto.gamemode.adventure.others: true
+      velto.gamemode.spectator: true
+      velto.gamemode.spectator.others: true
+      velto.afk.list: true
+      velto.afk.others: true
