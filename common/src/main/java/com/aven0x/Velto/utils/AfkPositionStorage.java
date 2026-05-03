@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,25 +107,27 @@ public final class AfkPositionStorage {
     }
 
     /**
-     * Writes memory map to YAML and saves to disk.
-     * Call only when the map changes (quit AFK / join after teleport).
+     * Writes memory map to YAML asynchronously.
+     * Snapshots the map on the calling thread for consistency, then does I/O off-thread.
      */
     public static void save() {
-        if (config == null || file == null) {
+        if (!initialized) {
             if (logger != null) logger.warning("AfkPositionStorage.save() called before init().");
             return;
         }
 
-        config.set("pending", null);
+        Map<UUID, Location> snapshot = new HashMap<>(pendingReturns);
 
-        for (Map.Entry<UUID, Location> entry : pendingReturns.entrySet()) {
-            config.set("pending." + entry.getKey().toString(), entry.getValue());
-        }
-
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to save afkposition.yml", e);
-        }
+        VeltoPlugin.get().getServer().getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
+            YamlConfiguration fresh = new YamlConfiguration();
+            for (Map.Entry<UUID, Location> entry : snapshot.entrySet()) {
+                fresh.set("pending." + entry.getKey().toString(), entry.getValue());
+            }
+            try {
+                fresh.save(file);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to save afkposition.yml", e);
+            }
+        });
     }
 }
