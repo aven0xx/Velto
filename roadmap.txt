@@ -1,15 +1,8 @@
 #Velto Roadmap
 
-FOR 0.7.2:
+FOR 0.7.5:
 
   Commands:
-  - [DONE] /fly              Toggle flight for a player (admin/self), fits naturally with /god and /speed
-  - [DONE] /msg + /reply     Basic private messaging between players, a staple core feature
-  - [DONE] /tpall            Teleport all online players to the sender
-  - [DONE] /sudo             Execute a command as another player (admin utility)
-
-  Improvements:
-  - [DONE] Tab completion    Add player-name tab completion to all commands that accept a player argument
-  - [DONE] /back             Extend to also save location on teleport commands (currently only on death)
-  - [DONE] commands.yml      Add per-command permission node overrides so servers can remap permissions
-  - [DONE] lang.yml          Add missing messages for newer commands (afk, back, alert, list)
+  - [PLANNED] Userdata folder for future data of players in a optimize way (caching need to be considered) Local has to be YAML format
+  - [PLANNED] /home, /sethome command using the TeleportManager class for teleportation handling. Possibility of setting multiple home with name by player but the default home is name home and is the default one. Stored in the userdata 
+  - [PLANNED] /kit system to distribute kits to players configurable in a kits.yml file. Need to support only Vanilla item for now. There will be a /kit command that will support 2 args : arg1 will be the kit and optional arg2 will be the player defaulting to the sender 
