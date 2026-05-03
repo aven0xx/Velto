@@ -45,14 +45,8 @@ public class AfkManager implements Listener {
     }
     private static BukkitRunnable afkChecker;
 
-    private static boolean DEBUG = false;
-
     private static Logger log() {
         return VeltoPlugin.get().getLogger();
-    }
-
-    private static void debug(String msg) {
-        if (DEBUG) log().info("[AFK-DEBUG] " + msg);
     }
 
     /**
@@ -107,7 +101,11 @@ public class AfkManager implements Listener {
         if (player == null || !player.isOnline()) return;
 
         UUID uuid = player.getUniqueId();
-        lastActivity.put(uuid, System.currentTimeMillis());
+        long now = System.currentTimeMillis();
+
+        if (now - lastActivity.getOrDefault(uuid, 0L) < 1000L && !afkPlayers.contains(uuid)) return;
+
+        lastActivity.put(uuid, now);
 
         if (afkPlayers.contains(uuid)) {
             setAfk(player, false);
@@ -122,13 +120,13 @@ public class AfkManager implements Listener {
      * Toggle AFK
      */
     public static void setAfk(Player player, boolean afk) {
+        if (player == null || !player.isOnline()) return;
+
         // Airbag: ensure main thread
         if (!Bukkit.isPrimaryThread()) {
             Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> setAfk(player, afk));
             return;
         }
-
-        if (player == null || !player.isOnline()) return;
 
         UUID uuid = player.getUniqueId();
         boolean wasAfk = afkPlayers.contains(uuid);
@@ -138,20 +136,18 @@ public class AfkManager implements Listener {
             afkPlayers.add(uuid);
 
             boolean afkzoneEnabled = ConfigUtil.isAfkzoneOn();
-            debug("Player " + player.getName() + " becoming AFK. afkzoneEnabled=" + afkzoneEnabled);
 
             if (afkzoneEnabled) {
-                // Save current location BEFORE teleporting
                 try {
                     preAfkLocations.put(uuid, player.getLocation().clone());
-                    debug("Saved pre-AFK location: " + preAfkLocations.get(uuid));
                 } catch (Exception e) {
                     log().warning("Failed to save pre-AFK location for " + player.getName() + ": " + e.getMessage());
                 }
 
                 Location afkZone = ConfigUtil.getAfkzone();
                 if (afkZone != null && afkZone.getWorld() != null) {
-                    tryTeleportWithRetry(player, afkZone, "AFK teleport");
+                    ignoreMoveUntil.put(uuid, System.currentTimeMillis() + 1000);
+                    TeleportManager.getInstance().teleportAsync(player, afkZone);
                 } else {
                     log().warning("AFK zone is null or world is null (check config).");
                 }
@@ -177,10 +173,9 @@ public class AfkManager implements Listener {
                     if (back.getWorld() == null) {
                         log().warning("Return location world is null for " + player.getName() + ". Not teleporting.");
                     } else {
-                        tryTeleportWithRetry(player, back, "Return from AFK");
+                        ignoreMoveUntil.put(uuid, System.currentTimeMillis() + 1000);
+                        TeleportManager.getInstance().teleportAsync(player, back);
                     }
-                } else {
-                    debug("No pre-AFK location stored for " + player.getName() + ".");
                 }
             } else {
                 preAfkLocations.remove(uuid);
@@ -193,16 +188,6 @@ public class AfkManager implements Listener {
             if (!PlayerUtil.isVanished(player)) {
                 LangUtil.sendGlobal("afk-player-back", placeholders);
             }
-        }
-    }
-
-    private static void tryTeleportWithRetry(Player player, Location target, String label) {
-        try {
-            ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
-            TeleportManager.getInstance().teleportAsync(player, target);
-            debug(label + " dispatched");
-        } catch (Exception e) {
-            log().warning(label + " exception for " + player.getName() + ": " + e.getMessage());
         }
     }
 
@@ -307,7 +292,8 @@ public class AfkManager implements Listener {
 
             Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
                 if (player.isOnline() && back != null && back.getWorld() != null) {
-                    tryTeleportWithRetry(player, back, "Pending return teleport");
+                    ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
+                    TeleportManager.getInstance().teleportAsync(player, back);
                 } else {
                     log().warning("Pending return invalid for " + player.getName() + " (location/world missing).");
                 }
@@ -329,7 +315,6 @@ public class AfkManager implements Listener {
             if (back != null) {
                 AfkPositionStorage.put(uuid, back);
                 AfkPositionStorage.save();
-                debug("Saved pending return for " + player.getName());
             }
         }
 
