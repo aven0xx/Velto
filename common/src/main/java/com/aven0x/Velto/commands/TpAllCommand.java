@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ public class TpAllCommand extends BaseCommand {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.equals(target)) {
-                p.teleport(target.getLocation());
+                TeleportManager.getInstance().teleportAsync(p, target.getLocation());
             }
         }
 

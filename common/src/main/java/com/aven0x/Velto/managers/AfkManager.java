@@ -2,6 +2,7 @@ package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.utils.AfkPositionStorage;
+import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
@@ -176,10 +177,6 @@ public class AfkManager implements Listener {
                     if (back.getWorld() == null) {
                         log().warning("Return location world is null for " + player.getName() + ". Not teleporting.");
                     } else {
-                        try {
-                            back.getChunk().load();
-                        } catch (Exception ignored) {}
-
                         tryTeleportWithRetry(player, back, "Return from AFK");
                     }
                 } else {
@@ -202,22 +199,8 @@ public class AfkManager implements Listener {
     private static void tryTeleportWithRetry(Player player, Location target, String label) {
         try {
             ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
-
-            boolean success = player.teleport(target);
-            debug(label + " result: " + success);
-
-            if (!success) {
-                Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
-                    try {
-                        ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
-
-                        boolean delayed = player.teleport(target);
-                        debug(label + " delayed result: " + delayed);
-                    } catch (Exception e) {
-                        log().warning(label + " delayed exception for " + player.getName() + ": " + e.getMessage());
-                    }
-                }, 1L);
-            }
+            TeleportManager.getInstance().teleportAsync(player, target);
+            debug(label + " dispatched");
         } catch (Exception e) {
             log().warning(label + " exception for " + player.getName() + ": " + e.getMessage());
         }
@@ -324,10 +307,6 @@ public class AfkManager implements Listener {
 
             Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
                 if (player.isOnline() && back != null && back.getWorld() != null) {
-                    try {
-                        back.getChunk().load();
-                    } catch (Exception ignored) {}
-
                     tryTeleportWithRetry(player, back, "Pending return teleport");
                 } else {
                     log().warning("Pending return invalid for " + player.getName() + " (location/world missing).");
