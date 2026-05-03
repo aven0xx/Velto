@@ -9,6 +9,7 @@ import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
+import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
 import com.aven0x.VeltoBukkit.managers.ChatManager;
@@ -33,6 +34,7 @@ public class VeltoBukkit extends JavaPlugin {
 
         // Load config.yml if not already created
         saveDefaultConfig();
+        ConfigUtil.refreshCache();
 
         // Load custom configs
         LangUtil.load();

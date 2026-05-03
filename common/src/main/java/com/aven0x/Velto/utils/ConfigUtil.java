@@ -8,42 +8,53 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigUtil {
 
-    // Do NOT make this final — we want to always get the latest config
+    // === CACHE ===
+
+    private static volatile long cachedAfkTimeoutMillis = 300_000L;
+    private static volatile boolean cachedAfkzoneEnabled = false;
+    private static volatile Location cachedAfkzone = null;
+    private static volatile boolean cachedAutoMessagesEnabled = true;
+    private static volatile int cachedAutoMessagesIntervalTicks = 2400;
+    private static volatile boolean cachedAutoMessagesRandom = true;
+    private static volatile List<String> cachedAutoMessageKeys = Collections.emptyList();
+    private static volatile String cachedChatFormat = "<%player_name%> %message%";
+    private static volatile List<String> cachedChatPriority = Collections.emptyList();
+    private static volatile Map<String, ConfigurationSection> cachedChatGroups = Collections.emptyMap();
+    private static volatile String cachedJoinMessage = "&e%player_name% joined the game.";
+    private static volatile String cachedQuitMessage = "&c%player_name% left the game.";
+    private static volatile String cachedReloadMessage = "&aChat configuration reloaded.";
+
     private static FileConfiguration getConfig() {
         return VeltoPlugin.get().getConfig();
     }
 
-    // === SPAWN ===
+    public static void refreshCache() {
+        FileConfiguration c = getConfig();
 
-    public static void setSpawn(Location location) {
-        getConfig().set("spawn", location);
-        VeltoPlugin.get().saveConfig();
+        cachedAfkTimeoutMillis = c.getInt("afk-timeout-seconds", 300) * 1000L;
+        cachedAfkzoneEnabled = c.getBoolean("afkzone.enabled", true);
+        cachedAfkzone = buildAfkzone(c);
+        cachedAutoMessagesEnabled = c.getBoolean("auto-messages.enabled", true);
+        cachedAutoMessagesIntervalTicks = c.getInt("auto-messages.interval-seconds", 120) * 20;
+        cachedAutoMessagesRandom = c.getBoolean("auto-messages.random", true);
+        cachedAutoMessageKeys = buildAutoMessageKeys(c);
+        cachedChatFormat = c.getString("messages.chat", "<%player_name%> %message%");
+        List<String> prio = c.getStringList("messages.chat-priority");
+        cachedChatPriority = (prio == null) ? Collections.emptyList() : Collections.unmodifiableList(prio);
+        cachedChatGroups = buildChatGroups(c, cachedChatPriority);
+        cachedJoinMessage = c.getString("messages.join", "&e%player_name% joined the game.");
+        cachedQuitMessage = c.getString("messages.quit", "&c%player_name% left the game.");
+        cachedReloadMessage = c.getString("messages.reload", "&aChat configuration reloaded.");
     }
 
-    public static Location getSpawn() {
-        return getConfig().isLocation("spawn") ? getConfig().getLocation("spawn") : null;
-    }
-
-    // === AFK ===
-
-    public static long getAfkTimeoutMillis() {
-        int seconds = getConfig().getInt("afk-timeout-seconds", 300);
-        return seconds * 1000L;
-    }
-
-    // === AFK ZONE ===
-
-    public static boolean isAfkzoneOn() {
-        return getConfig().getBoolean("afkzone.enabled", true);
-    }
-
-    /** Reads afkzone.location from config.yml. Returns null if the section is missing or the world is not loaded. */
-    public static Location getAfkzone() {
-        ConfigurationSection section = getConfig().getConfigurationSection("afkzone.location");
+    private static Location buildAfkzone(FileConfiguration c) {
+        ConfigurationSection section = c.getConfigurationSection("afkzone.location");
         if (section == null) return null;
 
         String worldName = section.getString("world");
@@ -67,66 +78,103 @@ public class ConfigUtil {
         return new Location(world, x, y, z, yaw, pitch);
     }
 
-    /** Convenience setter if you ever add a /setafkzone command */
-    public static void setAfkzone(Location location) {
-        getConfig().set("afkzone.location", location);
-        VeltoPlugin.get().saveConfig();
-    }
-
-    // === AUTO MESSAGES ===
-
-    public static boolean isAutoMessagesEnabled() {
-        return getConfig().getBoolean("auto-messages.enabled", true);
-    }
-
-    public static int getAutoMessagesIntervalTicks() {
-        int seconds = getConfig().getInt("auto-messages.interval-seconds", 120);
-        return seconds * 20;
-    }
-
-    public static boolean isAutoMessagesRandom() {
-        return getConfig().getBoolean("auto-messages.random", true);
-    }
-
-    public static List<String> getAutoMessageKeys() {
-        List<String> raw = getConfig().getStringList("auto-messages.messages");
+    private static List<String> buildAutoMessageKeys(FileConfiguration c) {
+        List<String> raw = c.getStringList("auto-messages.messages");
         if (raw == null) return Collections.emptyList();
-
         return raw.stream()
                 .map(entry -> entry != null && entry.startsWith("key: ") ? entry.substring(5) : entry)
                 .filter(s -> s != null && !s.isBlank())
                 .toList();
     }
 
+    private static Map<String, ConfigurationSection> buildChatGroups(FileConfiguration c, List<String> priority) {
+        if (priority.isEmpty()) return Collections.emptyMap();
+        Map<String, ConfigurationSection> map = new HashMap<>();
+        for (String group : priority) {
+            ConfigurationSection sec = c.getConfigurationSection("messages.chat-groups." + group);
+            if (sec != null) map.put(group, sec);
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
+    // === SPAWN ===
+
+    public static void setSpawn(Location location) {
+        getConfig().set("spawn", location);
+        VeltoPlugin.get().saveConfig();
+    }
+
+    public static Location getSpawn() {
+        FileConfiguration c = getConfig();
+        return c.isLocation("spawn") ? c.getLocation("spawn") : null;
+    }
+
+    // === AFK ===
+
+    public static long getAfkTimeoutMillis() {
+        return cachedAfkTimeoutMillis;
+    }
+
+    // === AFK ZONE ===
+
+    public static boolean isAfkzoneOn() {
+        return cachedAfkzoneEnabled;
+    }
+
+    public static Location getAfkzone() {
+        Location loc = cachedAfkzone;
+        return (loc == null) ? null : loc.clone();
+    }
+
+    public static void setAfkzone(Location location) {
+        getConfig().set("afkzone.location", location);
+        VeltoPlugin.get().saveConfig();
+        cachedAfkzone = (location != null) ? location.clone() : null;
+    }
+
+    // === AUTO MESSAGES ===
+
+    public static boolean isAutoMessagesEnabled() {
+        return cachedAutoMessagesEnabled;
+    }
+
+    public static int getAutoMessagesIntervalTicks() {
+        return cachedAutoMessagesIntervalTicks;
+    }
+
+    public static boolean isAutoMessagesRandom() {
+        return cachedAutoMessagesRandom;
+    }
+
+    public static List<String> getAutoMessageKeys() {
+        return cachedAutoMessageKeys;
+    }
+
     // === CHAT CONFIGURATION ===
 
-    /** REQUIRED fallback chat format */
     public static String getChatFormat() {
-        return getConfig().getString("messages.chat", "<%player_name%> %message%");
+        return cachedChatFormat;
     }
 
-    /** Optional: defines group order (first match wins) */
     public static List<String> getChatPriority() {
-        List<String> list = getConfig().getStringList("messages.chat-priority");
-        return (list == null) ? Collections.emptyList() : list;
+        return cachedChatPriority;
     }
 
-    /** Optional: returns the section for a given group name */
     public static ConfigurationSection getChatGroupSection(String group) {
         if (group == null || group.isBlank()) return null;
-        return getConfig().getConfigurationSection("messages.chat-groups." + group);
+        return cachedChatGroups.get(group);
     }
 
     public static String getJoinMessage() {
-        return getConfig().getString("messages.join", "&e%player_name% joined the game.");
+        return cachedJoinMessage;
     }
 
     public static String getQuitMessage() {
-        return getConfig().getString("messages.quit", "&c%player_name% left the game.");
+        return cachedQuitMessage;
     }
 
     public static String getReloadMessage() {
-        return getConfig().getString("messages.reload", "&aChat configuration reloaded.");
+        return cachedReloadMessage;
     }
 
     // === RAW + UTILITIES ===
@@ -137,6 +185,7 @@ public class ConfigUtil {
 
     public static void reload() {
         VeltoPlugin.get().reloadConfig();
+        refreshCache();
     }
 
     public static void save() {

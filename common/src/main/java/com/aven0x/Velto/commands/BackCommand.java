@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.BackManager;
+import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -26,7 +27,7 @@ public class BackCommand extends BaseCommand {
         }
 
         BackManager.markBacking(player.getUniqueId());
-        player.teleport(last);
+        TeleportManager.getInstance().teleportAsync(player, last);
         LangUtil.send(player, "back-teleported");
         return true;
     }

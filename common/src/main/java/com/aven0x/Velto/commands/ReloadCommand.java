@@ -1,6 +1,6 @@
 package com.aven0x.Velto.commands;
 
-import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -21,7 +21,7 @@ public class ReloadCommand extends BaseCommand {
         Bukkit.getLogger().info("[Velto] Starting reload...");
 
         try {
-            VeltoPlugin.get().reloadConfig();
+            ConfigUtil.reload();
             Bukkit.getLogger().info("[Velto] config.yml reloaded");
         } catch (Exception e) {
             Bukkit.getLogger().severe("[Velto] Failed to reload config.yml: " + e.getMessage());
