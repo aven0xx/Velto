@@ -240,6 +240,31 @@ back-world-blacklisted:
   type: chat
   message: "&cYou cannot use /back to return to that world."
 
+home-teleported:
+  type: actionbar
+  message: "&aTeleported to home &f%home%&a."
+  duration: 60
+
+home-set:
+  type: chat
+  message: "&aHome &f%home%&a set."
+
+home-deleted:
+  type: chat
+  message: "&aHome &f%home%&a deleted."
+
+home-list:
+  type: chat
+  message: "&7Your homes: &f%homes%"
+
+home-not-found:
+  type: chat
+  message: "&cHome '%home%' not found."
+
+home-no-homes:
+  type: chat
+  message: "&cYou have no homes set."
+
 reload-success:
   type: chat
   message: "&aVelto configuration reloaded successfully."
