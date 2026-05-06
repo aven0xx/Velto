@@ -23,6 +23,7 @@ public class ConfigUtil {
     private static volatile int cachedAutoMessagesIntervalTicks = 2400;
     private static volatile boolean cachedAutoMessagesRandom = true;
     private static volatile List<String> cachedAutoMessageKeys = Collections.emptyList();
+    private static volatile List<String> cachedBackBlacklistedWorlds = Collections.emptyList();
     private static volatile String cachedChatFormat = "<%player_name%> %message%";
     private static volatile List<String> cachedChatPriority = Collections.emptyList();
     private static volatile Map<String, ConfigurationSection> cachedChatGroups = Collections.emptyMap();
@@ -44,6 +45,8 @@ public class ConfigUtil {
         cachedAutoMessagesIntervalTicks = c.getInt("auto-messages.interval-seconds", 120) * 20;
         cachedAutoMessagesRandom = c.getBoolean("auto-messages.random", true);
         cachedAutoMessageKeys = buildAutoMessageKeys(c);
+        List<String> backWorlds = c.getStringList("back.blacklisted-worlds");
+        cachedBackBlacklistedWorlds = (backWorlds == null) ? Collections.emptyList() : Collections.unmodifiableList(backWorlds);
         cachedChatFormat = c.getString("messages.chat", "<%player_name%> %message%");
         List<String> prio = c.getStringList("messages.chat-priority");
         cachedChatPriority = (prio == null) ? Collections.emptyList() : Collections.unmodifiableList(prio);
@@ -130,6 +133,12 @@ public class ConfigUtil {
         getConfig().set("afkzone.location", location);
         VeltoPlugin.get().saveConfig();
         cachedAfkzone = (location != null) ? location.clone() : null;
+    }
+
+    // === BACK ===
+
+    public static List<String> getBackBlacklistedWorlds() {
+        return cachedBackBlacklistedWorlds;
     }
 
     // === AUTO MESSAGES ===

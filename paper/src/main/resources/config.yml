@@ -19,6 +19,14 @@ afkzone:
     x: 0
     y: 0
     z: 0
+# /back world blacklist
+# Players cannot use /back if their previous location was in one of these worlds
+back:
+  blacklisted-worlds:
+    - world_nether
+    - world_the_end
+#
+#
 # Auto-messaging system
 auto-messages:
   enabled: true

@@ -236,6 +236,10 @@ back-no-location:
   type: chat
   message: "&cNo previous location found."
 
+back-world-blacklisted:
+  type: chat
+  message: "&cYou cannot use /back to return to that world."
+
 reload-success:
   type: chat
   message: "&aVelto configuration reloaded successfully."
