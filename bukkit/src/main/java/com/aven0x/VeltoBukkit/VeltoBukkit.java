@@ -3,10 +3,12 @@ package com.aven0x.VeltoBukkit;
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.listeners.BackListener;
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.Velto.listeners.UserdataListener;
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.AutoMsgManager;
 import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
+import com.aven0x.Velto.managers.UserdataManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -58,11 +60,14 @@ public class VeltoBukkit extends JavaPlugin {
         PlaceholderManager.init();
         AfkManager.start();
         AfkPositionStorage.init(getDataFolder());
+        UserdataManager.init(getDataFolder());
+        getServer().getPluginManager().registerEvents(new UserdataListener(), this);
     }
 
     @Override
     public void onDisable() {
         AfkManager.stop();
+        UserdataManager.saveAll();
     }
 
     public static VeltoBukkit getInstance() {
