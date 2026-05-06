@@ -27,6 +27,12 @@ back:
     - world_the_end
 #
 #
+# Userdata
+# How often player data is flushed to disk (in seconds). Default: 300 (5 minutes)
+userdata:
+  autosave-interval-seconds: 300
+#
+#
 # Auto-messaging system
 auto-messages:
   enabled: true

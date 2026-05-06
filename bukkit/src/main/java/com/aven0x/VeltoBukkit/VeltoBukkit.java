@@ -61,12 +61,14 @@ public class VeltoBukkit extends JavaPlugin {
         AfkManager.start();
         AfkPositionStorage.init(getDataFolder());
         UserdataManager.init(getDataFolder());
+        UserdataManager.startAutosave(ConfigUtil.getUserdataAutosaveIntervalTicks());
         getServer().getPluginManager().registerEvents(new UserdataListener(), this);
     }
 
     @Override
     public void onDisable() {
         AfkManager.stop();
+        UserdataManager.stopAutosave();
         UserdataManager.saveAll();
     }
 

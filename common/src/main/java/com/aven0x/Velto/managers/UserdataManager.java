@@ -3,6 +3,8 @@ package com.aven0x.Velto.managers;
 import com.aven0x.Velto.VeltoPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import org.bukkit.scheduler.BukkitTask;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -19,6 +21,7 @@ public final class UserdataManager {
     private static File userdataFolder;
     private static Logger logger;
     private static volatile boolean initialized = false;
+    private static BukkitTask autosaveTask = null;
 
     public static void init(File dataFolder) {
         logger = VeltoPlugin.get().getLogger();
@@ -93,6 +96,28 @@ public final class UserdataManager {
                 logger.log(Level.SEVERE, "[Velto] Failed to save userdata for " + uuid, e);
             }
         });
+    }
+
+    public static void startAutosave(long intervalTicks) {
+        if (autosaveTask != null) return;
+        autosaveTask = VeltoPlugin.get().getServer().getScheduler()
+                .runTaskTimerAsynchronously(VeltoPlugin.get(), () -> {
+                    for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
+                        YamlConfiguration snapshot = copyOf(entry.getValue());
+                        try {
+                            snapshot.save(fileFor(entry.getKey()));
+                        } catch (IOException e) {
+                            logger.log(Level.SEVERE, "[Velto] Autosave failed for " + entry.getKey(), e);
+                        }
+                    }
+                }, intervalTicks, intervalTicks);
+    }
+
+    public static void stopAutosave() {
+        if (autosaveTask != null) {
+            autosaveTask.cancel();
+            autosaveTask = null;
+        }
     }
 
     // Synchronous — call only from onDisable where async tasks won't run.
