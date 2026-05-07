@@ -19,7 +19,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LangUtil {
@@ -27,21 +30,63 @@ public class LangUtil {
     private static FileConfiguration lang;
     private static final Map<String, ParsedMessage> cache = new HashMap<>();
 
+    // One independently-styled, independently-clickable span of text.
+    private static final class ParsedSegment {
+        final String rawText;
+        final String coloredText;        // null when rawText contains %
+        final ClickEvent.Action clickAction;
+        final String rawClickValue;
+        final String coloredClickValue;  // null when rawClickValue contains %
+        final String rawHover;
+        final String coloredHover;       // null when rawHover contains %
+        final BaseComponent[] prebuiltComponents; // non-null when fully static
+
+        ParsedSegment(Map<?, ?> map) {
+            rawText = map.getOrDefault("text", "").toString();
+            coloredText = rawText.contains("%") ? null
+                    : ChatColor.translateAlternateColorCodes('&', rawText);
+
+            Object clickObj = map.get("click");
+            if (clickObj instanceof Map<?, ?> clickMap) {
+                clickAction = parseClickAction(clickMap.getOrDefault("action", "").toString());
+                rawClickValue = clickMap.getOrDefault("value", "").toString();
+                coloredClickValue = rawClickValue.contains("%") ? null : rawClickValue;
+            } else {
+                clickAction = null;
+                rawClickValue = null;
+                coloredClickValue = null;
+            }
+
+            Object hoverObj = map.get("hover");
+            rawHover = hoverObj instanceof String s ? s : null;
+            coloredHover = (rawHover != null && !rawHover.contains("%"))
+                    ? ChatColor.translateAlternateColorCodes('&', rawHover)
+                    : null;
+
+            boolean fullyStatic = coloredText != null
+                    && (rawClickValue == null || coloredClickValue != null)
+                    && (rawHover == null || coloredHover != null);
+            prebuiltComponents = fullyStatic ? buildSegmentComponents(this, coloredText, null) : null;
+        }
+    }
+
     private static final class ParsedMessage {
         final String type;
         final String rawMessage;
-        final String coloredMessage;    // pre-translated; null if rawMessage contains placeholders
+        final String coloredMessage;
         final int duration;
         final String rawSubtitle;
-        final String coloredSubtitle;   // pre-translated; null if rawSubtitle contains placeholders
+        final String coloredSubtitle;
         final BarColor barColor;
-        final BaseComponent[] prebuiltComponents; // pre-built for static actionbar messages
-        // Click / hover (chat type only)
-        final ClickEvent.Action clickAction;  // null = no click event
-        final String rawClickValue;           // may contain % placeholders
-        final String coloredClickValue;       // pre-resolved if no placeholders, else null
-        final String rawHover;               // null = no hover tooltip
-        final String coloredHover;           // pre-translated if no placeholders, else null
+        final BaseComponent[] prebuiltComponents;
+        // Click / hover (legacy single-message format only)
+        final ClickEvent.Action clickAction;
+        final String rawClickValue;
+        final String coloredClickValue;
+        final String rawHover;
+        final String coloredHover;
+        // Segmented format — null means use the legacy fields above
+        final List<ParsedSegment> segments;
 
         ParsedMessage(ConfigurationSection sec) {
             type = sec.getString("type", "chat").toLowerCase();
@@ -51,7 +96,6 @@ public class LangUtil {
 
             coloredMessage = rawMessage.contains("%") ? null
                     : ChatColor.translateAlternateColorCodes('&', rawMessage);
-
             coloredSubtitle = rawSubtitle.contains("%") ? null
                     : ChatColor.translateAlternateColorCodes('&', rawSubtitle);
 
@@ -64,7 +108,6 @@ public class LangUtil {
                     ? TextComponent.fromLegacyText(coloredMessage)
                     : null;
 
-            // Parse optional click event
             ConfigurationSection clickSec = sec.getConfigurationSection("click");
             if (clickSec != null) {
                 clickAction = parseClickAction(clickSec.getString("action", ""));
@@ -76,24 +119,26 @@ public class LangUtil {
                 coloredClickValue = null;
             }
 
-            // Parse optional hover tooltip
             String hover = sec.getString("hover", null);
             rawHover = hover;
             coloredHover = (hover != null && !hover.contains("%"))
                     ? ChatColor.translateAlternateColorCodes('&', hover)
                     : null;
-        }
 
-        private static ClickEvent.Action parseClickAction(String raw) {
-            return switch (raw.toLowerCase()) {
-                case "run_command"      -> ClickEvent.Action.RUN_COMMAND;
-                case "suggest_command"  -> ClickEvent.Action.SUGGEST_COMMAND;
-                case "open_url"         -> ClickEvent.Action.OPEN_URL;
-                case "copy_to_clipboard"-> ClickEvent.Action.COPY_TO_CLIPBOARD;
-                default                 -> null;
-            };
+            List<?> segList = sec.getList("segments");
+            if (segList != null && !segList.isEmpty()) {
+                List<ParsedSegment> segs = new ArrayList<>(segList.size());
+                for (Object item : segList) {
+                    if (item instanceof Map<?, ?> segMap) segs.add(new ParsedSegment(segMap));
+                }
+                segments = segs.isEmpty() ? null : segs;
+            } else {
+                segments = null;
+            }
         }
     }
+
+    // ===== Load =====
 
     public static void load() {
         File file = new File(VeltoPlugin.get().getDataFolder(), "lang.yml");
@@ -131,7 +176,9 @@ public class LangUtil {
 
         switch (msg.type) {
             case "chat" -> {
-                if (msg.clickAction != null || msg.rawHover != null) {
+                if (msg.segments != null) {
+                    player.spigot().sendMessage(buildSegmentedComponents(msg, placeholders));
+                } else if (msg.clickAction != null || msg.rawHover != null) {
                     player.spigot().sendMessage(buildInteractive(msg, colored, placeholders));
                 } else {
                     player.sendMessage(colored);
@@ -173,7 +220,10 @@ public class LangUtil {
 
         switch (msg.type) {
             case "chat" -> {
-                if (msg.clickAction != null || msg.rawHover != null) {
+                if (msg.segments != null) {
+                    BaseComponent[] components = buildSegmentedComponents(msg, placeholders);
+                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                } else if (msg.clickAction != null || msg.rawHover != null) {
                     BaseComponent[] components = buildInteractive(msg, colored, placeholders);
                     for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
                 } else {
@@ -246,6 +296,17 @@ public class LangUtil {
 
     // ===== Helpers =====
 
+    private static ClickEvent.Action parseClickAction(String raw) {
+        if (raw == null) return null;
+        return switch (raw.toLowerCase()) {
+            case "run_command"       -> ClickEvent.Action.RUN_COMMAND;
+            case "suggest_command"   -> ClickEvent.Action.SUGGEST_COMMAND;
+            case "open_url"          -> ClickEvent.Action.OPEN_URL;
+            case "copy_to_clipboard" -> ClickEvent.Action.COPY_TO_CLIPBOARD;
+            default                  -> null;
+        };
+    }
+
     private static String resolveColored(String raw, String preColored, Map<String, String> placeholders) {
         if (placeholders != null && !placeholders.isEmpty()) {
             return ChatColor.translateAlternateColorCodes('&', applyPlaceholders(raw, placeholders));
@@ -265,7 +326,51 @@ public class LangUtil {
         return raw;
     }
 
-    // Builds a component array with click and/or hover events applied.
+    // Assembles components from all segments, reusing pre-built arrays when static.
+    private static BaseComponent[] buildSegmentedComponents(ParsedMessage msg, Map<String, String> placeholders) {
+        boolean hasPlaceholders = placeholders != null && !placeholders.isEmpty();
+        List<BaseComponent> all = new ArrayList<>();
+        for (ParsedSegment seg : msg.segments) {
+            if (!hasPlaceholders && seg.prebuiltComponents != null) {
+                all.addAll(Arrays.asList(seg.prebuiltComponents));
+            } else {
+                String text = hasPlaceholders
+                        ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(seg.rawText, placeholders))
+                        : (seg.coloredText != null ? seg.coloredText : ChatColor.translateAlternateColorCodes('&', seg.rawText));
+                all.addAll(Arrays.asList(buildSegmentComponents(seg, text, hasPlaceholders ? placeholders : null)));
+            }
+        }
+        return all.toArray(new BaseComponent[0]);
+    }
+
+    // Builds components for one segment with its own click/hover events applied.
+    private static BaseComponent[] buildSegmentComponents(ParsedSegment seg, String colored, Map<String, String> placeholders) {
+        BaseComponent[] comps = TextComponent.fromLegacyText(colored);
+
+        ClickEvent click = null;
+        if (seg.clickAction != null) {
+            String value = (placeholders != null && !placeholders.isEmpty() && seg.rawClickValue != null)
+                    ? applyPlaceholders(seg.rawClickValue, placeholders)
+                    : (seg.coloredClickValue != null ? seg.coloredClickValue : seg.rawClickValue);
+            if (value != null) click = new ClickEvent(seg.clickAction, value);
+        }
+
+        HoverEvent hover = null;
+        if (seg.rawHover != null) {
+            String hoverColored = (placeholders != null && !placeholders.isEmpty())
+                    ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(seg.rawHover, placeholders))
+                    : (seg.coloredHover != null ? seg.coloredHover : ChatColor.translateAlternateColorCodes('&', seg.rawHover));
+            hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverColored)));
+        }
+
+        for (BaseComponent c : comps) {
+            if (click != null) c.setClickEvent(click);
+            if (hover != null) c.setHoverEvent(hover);
+        }
+        return comps;
+    }
+
+    // Builds a component array with click/hover applied to every component (legacy whole-message format).
     private static BaseComponent[] buildInteractive(ParsedMessage msg, String colored, Map<String, String> placeholders) {
         BaseComponent[] components = TextComponent.fromLegacyText(colored);
 

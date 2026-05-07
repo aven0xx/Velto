@@ -397,11 +397,19 @@ tpa-sent:
 
 tpa-received:
   type: chat
-  message: "&e%requester% &awants to teleport to you. &f[Accept] &7/ &f[Deny]"
-  hover: "&7Click to accept the request"
-  click:
-    action: run_command
-    value: "/tpaaccept %requester%"
+  segments:
+    - text: "&e%requester% &awants to teleport to you. "
+    - text: "&a[Accept]"
+      hover: "&7Click to accept"
+      click:
+        action: run_command
+        value: "/tpaaccept %requester%"
+    - text: " &7/ "
+    - text: "&c[Deny]"
+      hover: "&7Click to deny"
+      click:
+        action: run_command
+        value: "/tpadeny %requester%"
 
 tpa-accepted-requester:
   type: chat
