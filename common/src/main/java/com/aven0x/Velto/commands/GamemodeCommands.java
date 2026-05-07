@@ -86,9 +86,10 @@ public class GamemodeCommands {
 
         @Override
         public List<String> complete(CommandSender sender, String label, String[] args) {
-            if (args.length == 1) {
+            if (args.length <= 1) {
+                String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
                 return List.of("survival", "creative", "adventure", "spectator").stream()
-                        .filter(s -> s.startsWith(args[0].toLowerCase()))
+                        .filter(s -> s.startsWith(typed))
                         .toList();
             }
             if (args.length == 2) {
@@ -183,10 +184,11 @@ public class GamemodeCommands {
 
         @Override
         public List<String> complete(CommandSender sender, String label, String[] args) {
-            if (args.length == 1) {
+            if (args.length <= 1) {
+                String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
                 List<String> names = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                    if (p.getName().toLowerCase().startsWith(typed)) {
                         names.add(p.getName());
                     }
                 }
