@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.BackManager;
 import com.aven0x.Velto.managers.TeleportManager;
+import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,12 @@ public class BackCommand extends BaseCommand {
 
         if (last == null) {
             LangUtil.send(player, "back-no-location");
+            return true;
+        }
+
+        String worldName = last.getWorld() != null ? last.getWorld().getName() : "";
+        if (ConfigUtil.getBackBlacklistedWorlds().contains(worldName)) {
+            LangUtil.send(player, "back-world-blacklisted");
             return true;
         }
 

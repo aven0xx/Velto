@@ -45,6 +45,10 @@ public class CommandManager {
         register("reply", ReplyCommand::new);
         register("tpall", TpAllCommand::new);
         register("sudo", SudoCommand::new);
+        register("home", HomeCommand::new);
+        register("sethome", SetHomeCommand::new);
+        register("delhome", DelHomeCommand::new);
+        register("homes", HomesCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {

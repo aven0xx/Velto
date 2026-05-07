@@ -118,3 +118,15 @@ tpall:
 sudo:
   enabled: true
   aliases: []
+home:
+  enabled: true
+  aliases: []
+sethome:
+  enabled: true
+  aliases: []
+delhome:
+  enabled: true
+  aliases: []
+homes:
+  enabled: true
+  aliases: []
