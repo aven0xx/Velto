@@ -180,18 +180,34 @@ lore-out-of-range:
 automsg1:
   type: chat
   message: "&bJoin our Discord to get updates and support!"
+  hover: "&7Click to open Discord"
+  click:
+    action: open_url
+    value: "https://discord.gg/example"
 
 automsg2:
   type: chat
   message: "&aNeed help? Type &f/help &afor commands."
+  hover: "&7Click to run /help"
+  click:
+    action: run_command
+    value: "/help"
 
 automsg3:
   type: chat
   message: "&dVote for rewards every day!"
+  hover: "&7Click to open the vote link"
+  click:
+    action: open_url
+    value: "https://example.com/vote"
 
 automsg4:
   type: chat
   message: "&eRemember to claim your daily kit!"
+  hover: "&7Click to claim your kit"
+  click:
+    action: suggest_command
+    value: "/kit daily"
 
 afk-enabled:
   type: actionbar
@@ -381,7 +397,11 @@ tpa-sent:
 
 tpa-received:
   type: chat
-  message: "&e%requester% &awants to teleport to you. Type &f/tpaaccept &aor &f/tpadeny&a."
+  message: "&e%requester% &awants to teleport to you. &f[Accept] &7/ &f[Deny]"
+  hover: "&7Click to accept the request"
+  click:
+    action: run_command
+    value: "/tpaaccept %requester%"
 
 tpa-accepted-requester:
   type: chat

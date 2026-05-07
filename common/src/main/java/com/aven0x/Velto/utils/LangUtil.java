@@ -3,7 +3,10 @@ package com.aven0x.Velto.utils;
 import com.aven0x.Velto.VeltoPlugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
@@ -33,6 +36,12 @@ public class LangUtil {
         final String coloredSubtitle;   // pre-translated; null if rawSubtitle contains placeholders
         final BarColor barColor;
         final BaseComponent[] prebuiltComponents; // pre-built for static actionbar messages
+        // Click / hover (chat type only)
+        final ClickEvent.Action clickAction;  // null = no click event
+        final String rawClickValue;           // may contain % placeholders
+        final String coloredClickValue;       // pre-resolved if no placeholders, else null
+        final String rawHover;               // null = no hover tooltip
+        final String coloredHover;           // pre-translated if no placeholders, else null
 
         ParsedMessage(ConfigurationSection sec) {
             type = sec.getString("type", "chat").toLowerCase();
@@ -54,6 +63,35 @@ public class LangUtil {
             prebuiltComponents = (coloredMessage != null && "actionbar".equals(type))
                     ? TextComponent.fromLegacyText(coloredMessage)
                     : null;
+
+            // Parse optional click event
+            ConfigurationSection clickSec = sec.getConfigurationSection("click");
+            if (clickSec != null) {
+                clickAction = parseClickAction(clickSec.getString("action", ""));
+                rawClickValue = clickSec.getString("value", "");
+                coloredClickValue = rawClickValue.contains("%") ? null : rawClickValue;
+            } else {
+                clickAction = null;
+                rawClickValue = null;
+                coloredClickValue = null;
+            }
+
+            // Parse optional hover tooltip
+            String hover = sec.getString("hover", null);
+            rawHover = hover;
+            coloredHover = (hover != null && !hover.contains("%"))
+                    ? ChatColor.translateAlternateColorCodes('&', hover)
+                    : null;
+        }
+
+        private static ClickEvent.Action parseClickAction(String raw) {
+            return switch (raw.toLowerCase()) {
+                case "run_command"      -> ClickEvent.Action.RUN_COMMAND;
+                case "suggest_command"  -> ClickEvent.Action.SUGGEST_COMMAND;
+                case "open_url"         -> ClickEvent.Action.OPEN_URL;
+                case "copy_to_clipboard"-> ClickEvent.Action.COPY_TO_CLIPBOARD;
+                default                 -> null;
+            };
         }
     }
 
@@ -92,7 +130,13 @@ public class LangUtil {
         String colored = resolveColored(msg.rawMessage, msg.coloredMessage, placeholders);
 
         switch (msg.type) {
-            case "chat" -> player.sendMessage(colored);
+            case "chat" -> {
+                if (msg.clickAction != null || msg.rawHover != null) {
+                    player.spigot().sendMessage(buildInteractive(msg, colored, placeholders));
+                } else {
+                    player.sendMessage(colored);
+                }
+            }
 
             case "actionbar" -> {
                 BaseComponent[] components = resolveComponents(msg, colored, placeholders);
@@ -128,7 +172,14 @@ public class LangUtil {
         String colored = resolveColored(msg.rawMessage, msg.coloredMessage, placeholders);
 
         switch (msg.type) {
-            case "chat" -> Bukkit.broadcastMessage(colored);
+            case "chat" -> {
+                if (msg.clickAction != null || msg.rawHover != null) {
+                    BaseComponent[] components = buildInteractive(msg, colored, placeholders);
+                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                } else {
+                    Bukkit.broadcastMessage(colored);
+                }
+            }
 
             case "actionbar" -> {
                 BaseComponent[] components = resolveComponents(msg, colored, placeholders);
@@ -212,6 +263,34 @@ public class LangUtil {
             raw = raw.replace(e.getKey(), e.getValue());
         }
         return raw;
+    }
+
+    // Builds a component array with click and/or hover events applied.
+    private static BaseComponent[] buildInteractive(ParsedMessage msg, String colored, Map<String, String> placeholders) {
+        BaseComponent[] components = TextComponent.fromLegacyText(colored);
+
+        ClickEvent click = null;
+        if (msg.clickAction != null) {
+            String value = (placeholders != null && !placeholders.isEmpty() && msg.rawClickValue != null)
+                    ? applyPlaceholders(msg.rawClickValue, placeholders)
+                    : (msg.coloredClickValue != null ? msg.coloredClickValue : msg.rawClickValue);
+            if (value != null) click = new ClickEvent(msg.clickAction, value);
+        }
+
+        HoverEvent hover = null;
+        if (msg.rawHover != null) {
+            String hoverColored = (placeholders != null && !placeholders.isEmpty())
+                    ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(msg.rawHover, placeholders))
+                    : (msg.coloredHover != null ? msg.coloredHover
+                            : ChatColor.translateAlternateColorCodes('&', msg.rawHover));
+            hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverColored)));
+        }
+
+        for (BaseComponent c : components) {
+            if (click != null) c.setClickEvent(click);
+            if (hover != null) c.setHoverEvent(hover);
+        }
+        return components;
     }
 
     private static void sendActionBar(Player player, BaseComponent[] components, int durationTicks) {
