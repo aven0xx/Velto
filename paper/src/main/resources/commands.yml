@@ -112,6 +112,9 @@ msg:
 reply:
   enabled: true
   aliases: ["r"]
+tp:
+  enabled: true
+  aliases: []
 tpall:
   enabled: true
   aliases: []

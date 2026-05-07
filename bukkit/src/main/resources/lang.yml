@@ -349,6 +349,24 @@ tpall-success:
   type: chat
   message: "&aTeleported all players to your location."
 
+tp-usage:
+  type: chat
+  message: "&eUsage: &f/tp <player> &7| &f/tp <x> <y> <z> &7| &f/tp <player> <player> &7| &f/tp <player> <x> <y> <z>"
+
+tp-self-player:
+  type: actionbar
+  message: "&aTeleported to &f%target%&a."
+  duration: 60
+
+tp-self-coords:
+  type: actionbar
+  message: "&aTeleported to &f%x%&a, &f%y%&a, &f%z%&a."
+  duration: 60
+
+tp-other-success:
+  type: chat
+  message: "&aTeleported &e%from% &ato &e%to%&a."
+
 sudo-usage:
   type: chat
   message: "&eUsage: &f/sudo <player> <command...>"

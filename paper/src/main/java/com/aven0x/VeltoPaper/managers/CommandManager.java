@@ -45,6 +45,7 @@ public class CommandManager {
         register("fly", FlyCommand::new);
         register("msg", MsgCommand::new);
         register("reply", ReplyCommand::new);
+        register("tp", TpCommand::new);
         register("tpall", TpAllCommand::new);
         register("sudo", SudoCommand::new);
         register("home", HomeCommand::new);
