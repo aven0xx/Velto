@@ -131,7 +131,19 @@ rename-no-item:
 
 rename-usage:
   type: chat
-  message: "&eUsage:&f /rename <name...> &7or&f /rename reset"
+  segments:
+    - text: "&eUsage: "
+    - text: "&f/rename <name...>"
+      hover: "&7Click to start renaming"
+      click:
+        action: suggest_command
+        value: "/rename "
+    - text: " &7or "
+    - text: "&f/rename reset"
+      hover: "&7Click to reset the name"
+      click:
+        action: run_command
+        value: "/rename reset"
 
 rename-cleared:
   type: chat
@@ -147,11 +159,51 @@ lore-no-item:
 
 lore-usage:
   type: chat
-  message: "&eUsage:&f /itemlore <show|clear|add|insert|set|remove> ..."
+  segments:
+    - text: "&eUsage: &f/itemlore "
+    - text: "&7show"
+      hover: "&7Display current lore"
+      click:
+        action: run_command
+        value: "/itemlore show"
+    - text: " &f| "
+    - text: "&7clear"
+      hover: "&7Remove all lore lines"
+      click:
+        action: run_command
+        value: "/itemlore clear"
+    - text: " &f| "
+    - text: "&7add"
+      hover: "&7Add a new lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore add "
+    - text: " &f| "
+    - text: "&7insert"
+      hover: "&7Insert at a position"
+      click:
+        action: suggest_command
+        value: "/itemlore insert "
+    - text: " &f| "
+    - text: "&7set"
+      hover: "&7Set a specific lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore set "
+    - text: " &f| "
+    - text: "&7remove"
+      hover: "&7Remove a lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore remove "
 
 lore-empty:
   type: chat
   message: "&7This item has no lore."
+  hover: "&7Click to add a lore line"
+  click:
+    action: suggest_command
+    value: "/itemlore add "
 
 lore-cleared:
   type: chat
@@ -229,7 +281,25 @@ afk-player-back:
 
 afk-usage:
   type: chat
-  message: "&eUsage: &f/afk [player] &7or &f/afk list"
+  segments:
+    - text: "&eUsage: "
+    - text: "&f/afk"
+      hover: "&7Toggle your own AFK status"
+      click:
+        action: run_command
+        value: "/afk"
+    - text: " &7| "
+    - text: "&f/afk <player>"
+      hover: "&7Toggle another player's AFK"
+      click:
+        action: suggest_command
+        value: "/afk "
+    - text: " &7| "
+    - text: "&f/afk list"
+      hover: "&7Show all AFK players"
+      click:
+        action: run_command
+        value: "/afk list"
 
 afk-set-other:
   type: chat
@@ -290,6 +360,10 @@ home-not-found:
 home-no-homes:
   type: chat
   message: "&cYou have no homes set."
+  hover: "&7Click to set a home"
+  click:
+    action: suggest_command
+    value: "/sethome "
 
 reload-success:
   type: chat
@@ -343,11 +417,23 @@ msg-self:
 
 msg-sent:
   type: chat
-  message: "&7[&fYou &7-> &f%recipient%&7] &f%message%"
+  segments:
+    - text: "&7[&fYou &7-> &f%recipient%&7] "
+      hover: "&7Click to message &f%recipient% &7again"
+      click:
+        action: suggest_command
+        value: "/msg %recipient% "
+    - text: "&f%message%"
 
 msg-received:
   type: chat
-  message: "&7[&f%sender% &7-> &fYou&7] &f%message%"
+  segments:
+    - text: "&7[&f%sender% &7-> &fYou&7] "
+      hover: "&7Click to reply to &f%sender%"
+      click:
+        action: suggest_command
+        value: "/reply "
+    - text: "&f%message%"
 
 reply-usage:
   type: chat
@@ -356,6 +442,10 @@ reply-usage:
 reply-no-target:
   type: chat
   message: "&cNo one to reply to."
+  hover: "&7Click to start a new conversation"
+  click:
+    action: suggest_command
+    value: "/msg "
 
 reply-offline:
   type: chat
@@ -434,6 +524,10 @@ tpa-expired:
 tpa-no-request:
   type: chat
   message: "&cNo pending teleport requests."
+  hover: "&7Click to send a teleport request"
+  click:
+    action: suggest_command
+    value: "/tpa "
 
 tpa-teleported:
   type: actionbar
