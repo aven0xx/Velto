@@ -34,8 +34,7 @@ public class BackCommand extends BaseCommand {
         }
 
         BackManager.markBacking(player.getUniqueId());
-        TeleportManager.getInstance().teleportAsync(player, last);
-        LangUtil.send(player, "back-teleported");
+        TeleportManager.getInstance().teleport(player, last, () -> LangUtil.send(player, "back-teleported"));
         return true;
     }
 }

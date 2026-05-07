@@ -30,8 +30,7 @@ public class HomeCommand extends BaseCommand {
             return true;
         }
 
-        TeleportManager.getInstance().teleportAsync(player, home);
-        LangUtil.send(player, "home-teleported", Map.of("%home%", name));
+        TeleportManager.getInstance().teleport(player, home, () -> LangUtil.send(player, "home-teleported", Map.of("%home%", name)));
         return true;
     }
 

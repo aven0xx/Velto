@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,9 @@ public class ConfigUtil {
     private static volatile String cachedJoinMessage = "&e%player_name% joined the game.";
     private static volatile String cachedQuitMessage = "&c%player_name% left the game.";
     private static volatile String cachedReloadMessage = "&aChat configuration reloaded.";
+    private static volatile boolean cachedTeleportCancelOnMove = true;
+    private static volatile int cachedTeleportCountdownDefault = 5;
+    private static volatile LinkedHashMap<String, Integer> cachedTeleportCountdownPermissions = new LinkedHashMap<>();
 
     private static FileConfiguration getConfig() {
         return VeltoPlugin.get().getConfig();
@@ -56,6 +60,9 @@ public class ConfigUtil {
         cachedJoinMessage = c.getString("messages.join", "&e%player_name% joined the game.");
         cachedQuitMessage = c.getString("messages.quit", "&c%player_name% left the game.");
         cachedReloadMessage = c.getString("messages.reload", "&aChat configuration reloaded.");
+        cachedTeleportCancelOnMove = c.getBoolean("teleport.cancel-on-move", true);
+        cachedTeleportCountdownDefault = c.getInt("teleport.countdown.default", 5);
+        cachedTeleportCountdownPermissions = buildTeleportCountdownPermissions(c);
     }
 
     private static Location buildAfkzone(FileConfiguration c) {
@@ -90,6 +97,16 @@ public class ConfigUtil {
                 .map(entry -> entry != null && entry.startsWith("key: ") ? entry.substring(5) : entry)
                 .filter(s -> s != null && !s.isBlank())
                 .toList();
+    }
+
+    private static LinkedHashMap<String, Integer> buildTeleportCountdownPermissions(FileConfiguration c) {
+        ConfigurationSection sec = c.getConfigurationSection("teleport.countdown.permissions");
+        LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+        if (sec == null) return map;
+        for (String key : sec.getKeys(false)) {
+            map.put(key, sec.getInt(key, 0));
+        }
+        return map;
     }
 
     private static Map<String, ConfigurationSection> buildChatGroups(FileConfiguration c, List<String> priority) {
@@ -192,6 +209,20 @@ public class ConfigUtil {
 
     public static String getReloadMessage() {
         return cachedReloadMessage;
+    }
+
+    // === TELEPORT ===
+
+    public static boolean isTeleportCancelOnMove() {
+        return cachedTeleportCancelOnMove;
+    }
+
+    public static int getTeleportCountdownDefault() {
+        return cachedTeleportCountdownDefault;
+    }
+
+    public static LinkedHashMap<String, Integer> getTeleportCountdownPermissions() {
+        return cachedTeleportCountdownPermissions;
     }
 
     // === RAW + UTILITIES ===

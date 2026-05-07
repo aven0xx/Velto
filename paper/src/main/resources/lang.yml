@@ -240,6 +240,16 @@ back-world-blacklisted:
   type: chat
   message: "&cYou cannot use /back to return to that world."
 
+teleport-countdown:
+  type: actionbar
+  message: "&eTeleporting in &6%seconds%s&e..."
+  duration: 25
+
+teleport-cancelled:
+  type: actionbar
+  message: "&cTeleportation cancelled."
+  duration: 40
+
 home-teleported:
   type: actionbar
   message: "&aTeleported to home &f%home%&a."

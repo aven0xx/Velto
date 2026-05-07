@@ -25,8 +25,7 @@ public class SpawnCommand extends BaseCommand {
             return true;
         }
 
-        TeleportManager.getInstance().teleportAsync(player, spawn);
-        LangUtil.send(player, "teleporting-spawn");
+        TeleportManager.getInstance().teleport(player, spawn);
         return true;
     }
 }
