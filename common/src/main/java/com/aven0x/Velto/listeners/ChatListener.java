@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.TabCompleteEvent;
+import org.bukkit.event.server.TabCompleteEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;

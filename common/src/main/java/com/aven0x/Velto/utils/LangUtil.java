@@ -42,14 +42,17 @@ public class LangUtil {
         final BaseComponent[] prebuiltComponents; // non-null when fully static
 
         ParsedSegment(Map<?, ?> map) {
-            rawText = map.getOrDefault("text", "").toString();
+            Object textObj = map.get("text");
+            rawText = textObj != null ? textObj.toString() : "";
             coloredText = rawText.contains("%") ? null
                     : ChatColor.translateAlternateColorCodes('&', rawText);
 
             Object clickObj = map.get("click");
             if (clickObj instanceof Map<?, ?> clickMap) {
-                clickAction = parseClickAction(clickMap.getOrDefault("action", "").toString());
-                rawClickValue = clickMap.getOrDefault("value", "").toString();
+                Object actionObj = clickMap.get("action");
+                clickAction = parseClickAction(actionObj != null ? actionObj.toString() : "");
+                Object valueObj = clickMap.get("value");
+                rawClickValue = valueObj != null ? valueObj.toString() : "";
                 coloredClickValue = rawClickValue.contains("%") ? null : rawClickValue;
             } else {
                 clickAction = null;
