@@ -27,8 +27,8 @@ public class TpCommand extends BaseCommand {
             if (!hasPermission(sender, "velto.tp")) return true;
             Player target = Bukkit.getPlayerExact(args[0]);
             if (target == null) { LangUtil.send(player, "invalid-player"); return true; }
-            TeleportManager.getInstance().teleport(player, target.getLocation(),
-                    () -> LangUtil.send(player, "tp-self-player", Map.of("%target%", target.getName())));
+            TeleportManager.getInstance().teleportAsync(player, target.getLocation());
+            LangUtil.send(player, "tp-self-player", Map.of("%target%", target.getName()));
             return true;
         }
 
@@ -37,11 +37,11 @@ public class TpCommand extends BaseCommand {
             if (!hasPermission(sender, "velto.tp")) return true;
             Location dest = resolveCoords(player.getLocation(), args[0], args[1], args[2]);
             if (dest == null) { LangUtil.send(player, "tp-usage"); return true; }
-            TeleportManager.getInstance().teleport(player, dest,
-                    () -> LangUtil.send(player, "tp-self-coords", Map.of(
-                            "%x%", String.valueOf(dest.getBlockX()),
-                            "%y%", String.valueOf(dest.getBlockY()),
-                            "%z%", String.valueOf(dest.getBlockZ()))));
+            TeleportManager.getInstance().teleportAsync(player, dest);
+            LangUtil.send(player, "tp-self-coords", Map.of(
+                    "%x%", String.valueOf(dest.getBlockX()),
+                    "%y%", String.valueOf(dest.getBlockY()),
+                    "%z%", String.valueOf(dest.getBlockZ())));
             return true;
         }
 
