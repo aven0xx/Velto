@@ -53,7 +53,9 @@ public class TpaAcceptCommand extends BaseCommand {
 
         LangUtil.send(target, "tpa-accepted-target", Map.of("%requester%", requester.getName()));
         LangUtil.send(requester, "tpa-accepted-requester", Map.of("%target%", target.getName()));
-        TeleportManager.getInstance().teleport(requester, target.getLocation());
+        final String targetName = target.getName();
+        TeleportManager.getInstance().teleport(requester, target.getLocation(),
+                () -> LangUtil.send(requester, "tpa-teleported", Map.of("%target%", targetName)));
         return true;
     }
 

@@ -407,6 +407,11 @@ tpa-no-request:
   type: chat
   message: "&cNo pending teleport requests."
 
+tpa-teleported:
+  type: actionbar
+  message: "&aTeleported to &f%target%&a."
+  duration: 60
+
 sudo-usage:
   type: chat
   message: "&eUsage: &f/sudo <player> <command...>"
