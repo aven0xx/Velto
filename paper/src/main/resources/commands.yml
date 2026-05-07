@@ -118,6 +118,15 @@ tp:
 tpall:
   enabled: true
   aliases: []
+tpa:
+  enabled: true
+  aliases: []
+tpaaccept:
+  enabled: true
+  aliases: ["tpaccept"]
+tpadeny:
+  enabled: true
+  aliases: ["tpdeny"]
 sudo:
   enabled: true
   aliases: []

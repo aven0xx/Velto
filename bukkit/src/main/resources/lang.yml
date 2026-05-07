@@ -367,6 +367,46 @@ tp-other-success:
   type: chat
   message: "&aTeleported &e%from% &ato &e%to%&a."
 
+tpa-usage:
+  type: chat
+  message: "&eUsage: &f/tpa <player>"
+
+tpa-self:
+  type: chat
+  message: "&cYou cannot send a teleport request to yourself."
+
+tpa-sent:
+  type: chat
+  message: "&aTeleport request sent to &e%target%&a."
+
+tpa-received:
+  type: chat
+  message: "&e%requester% &awants to teleport to you. Type &f/tpaaccept &aor &f/tpadeny&a."
+
+tpa-accepted-requester:
+  type: chat
+  message: "&e%target% &aaccepted your teleport request."
+
+tpa-accepted-target:
+  type: chat
+  message: "&aYou accepted &e%requester%&a's teleport request."
+
+tpa-denied-requester:
+  type: chat
+  message: "&e%target% &cdenied your teleport request."
+
+tpa-denied-target:
+  type: chat
+  message: "&cYou denied &e%requester%&c's teleport request."
+
+tpa-expired:
+  type: chat
+  message: "&cYour teleport request to &e%target% &chas expired."
+
+tpa-no-request:
+  type: chat
+  message: "&cNo pending teleport requests."
+
 sudo-usage:
   type: chat
   message: "&eUsage: &f/sudo <player> <command...>"

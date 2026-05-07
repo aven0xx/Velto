@@ -47,6 +47,9 @@ public class CommandManager {
         register("reply", ReplyCommand::new);
         register("tp", TpCommand::new);
         register("tpall", TpAllCommand::new);
+        register("tpa", TpaCommand::new);
+        register("tpaaccept", TpaAcceptCommand::new);
+        register("tpadeny", TpaDenyCommand::new);
         register("sudo", SudoCommand::new);
         register("home", HomeCommand::new);
         register("sethome", SetHomeCommand::new);

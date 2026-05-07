@@ -31,6 +31,12 @@ teleport:
       velto.teleport.instant: 0
 #
 #
+# TPA - teleport request system
+# expire-seconds: how long before an unanswered request is automatically cancelled
+tpa:
+  expire-seconds: 60
+#
+#
 # /back world blacklist
 # Players cannot use /back if their previous location was in one of these worlds
 back:

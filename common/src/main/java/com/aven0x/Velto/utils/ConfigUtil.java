@@ -35,6 +35,7 @@ public class ConfigUtil {
     private static volatile boolean cachedTeleportCancelOnMove = true;
     private static volatile int cachedTeleportCountdownDefault = 5;
     private static volatile LinkedHashMap<String, Integer> cachedTeleportCountdownPermissions = new LinkedHashMap<>();
+    private static volatile int cachedTpaExpireSeconds = 60;
 
     private static FileConfiguration getConfig() {
         return VeltoPlugin.get().getConfig();
@@ -63,6 +64,7 @@ public class ConfigUtil {
         cachedTeleportCancelOnMove = c.getBoolean("teleport.cancel-on-move", true);
         cachedTeleportCountdownDefault = c.getInt("teleport.countdown.default", 5);
         cachedTeleportCountdownPermissions = buildTeleportCountdownPermissions(c);
+        cachedTpaExpireSeconds = c.getInt("tpa.expire-seconds", 60);
     }
 
     private static Location buildAfkzone(FileConfiguration c) {
@@ -223,6 +225,10 @@ public class ConfigUtil {
 
     public static LinkedHashMap<String, Integer> getTeleportCountdownPermissions() {
         return cachedTeleportCountdownPermissions;
+    }
+
+    public static int getTpaExpireSeconds() {
+        return cachedTpaExpireSeconds;
     }
 
     // === RAW + UTILITIES ===
