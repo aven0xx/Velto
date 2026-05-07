@@ -2,6 +2,7 @@ package com.aven0x.VeltoBukkit;
 
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.listeners.BackListener;
+import com.aven0x.Velto.listeners.ChatListener;
 import com.aven0x.Velto.listeners.GodListener;
 import com.aven0x.Velto.listeners.UserdataListener;
 import com.aven0x.Velto.managers.AfkManager;
@@ -54,6 +55,7 @@ public class VeltoBukkit extends JavaPlugin {
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
         getServer().getPluginManager().registerEvents(new BackListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(), this);
 
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);
