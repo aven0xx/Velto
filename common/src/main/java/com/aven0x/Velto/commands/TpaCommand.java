@@ -46,11 +46,11 @@ public class TpaCommand extends BaseCommand {
 
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
-        if (args.length <= 1 && sender instanceof Player self) {
+        if (args.length <= 1 && sender instanceof Player) {
             String typed = args.length == 0 ? "" : args[0].toLowerCase();
             return Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.equals(self) && p.getName().toLowerCase().startsWith(typed))
                     .map(Player::getName)
+                    .filter(name -> name.toLowerCase().startsWith(typed))
                     .toList();
         }
         return List.of();

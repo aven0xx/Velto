@@ -65,7 +65,7 @@ public class MsgCommand extends BaseCommand {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!p.equals(sender) && p.getName().toLowerCase().startsWith(typed)) {
+                if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }
             }
