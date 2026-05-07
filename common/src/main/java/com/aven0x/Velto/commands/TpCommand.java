@@ -80,10 +80,11 @@ public class TpCommand extends BaseCommand {
         if (!(sender instanceof Player player)) return List.of();
 
         return switch (args.length) {
-            case 1 -> {
+            case 0, 1 -> {
                 // player names + "~" to hint coordinates are accepted
-                List<String> result = onlineNames(args[0]);
-                if ("~".startsWith(args[0])) result.add("~");
+                String typed = args.length == 0 ? "" : args[0];
+                List<String> result = onlineNames(typed);
+                if ("~".startsWith(typed)) result.add("~");
                 yield result;
             }
             case 2 -> {

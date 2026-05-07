@@ -59,8 +59,8 @@ public class TpaAcceptCommand extends BaseCommand {
 
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
-        if (args.length == 1 && sender instanceof Player target) {
-            String typed = args[0].toLowerCase();
+        if (args.length <= 1 && sender instanceof Player target) {
+            String typed = args.length == 0 ? "" : args[0].toLowerCase();
             return TpaManager.getIncoming(target.getUniqueId()).stream()
                     .map(r -> Bukkit.getPlayer(r.requester()))
                     .filter(p -> p != null && p.getName().toLowerCase().startsWith(typed))
