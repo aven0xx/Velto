@@ -16,12 +16,15 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player joined = event.getPlayer();
-        String atName = "@" + joined.getName();
+        String atJoined = "@" + joined.getName();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.equals(joined)) continue;
-            p.addCustomChatCompletions(List.of(atName));
-            joined.addCustomChatCompletions(List.of("@" + p.getName()));
+            // Every online player (including the joiner) gets the joiner's @Name
+            p.addCustomChatCompletions(List.of(atJoined));
+            // The joiner gets every other online player's @Name
+            if (!p.equals(joined)) {
+                joined.addCustomChatCompletions(List.of("@" + p.getName()));
+            }
         }
     }
 
