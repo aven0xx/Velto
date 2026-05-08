@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.TabCompleteEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,23 @@ public class ChatListener implements Listener {
                 joined.addCustomChatCompletions(othersAtNames);
             }
         });
+    }
+
+    @EventHandler
+    public void onTabComplete(TabCompleteEvent event) {
+        String buffer = event.getBuffer();
+        if (event.isCommand() || !buffer.startsWith("@") || buffer.contains(" ")) return;
+
+        String partial = buffer.substring(1).toLowerCase();
+        Player sender = event.getSender() instanceof Player p ? p : null;
+
+        List<String> completions = Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(n -> n.toLowerCase().startsWith(partial))
+                .map(n -> "@" + n + " ")
+                .collect(Collectors.toList());
+
+        event.setCompletions(completions);
     }
 
     @EventHandler
