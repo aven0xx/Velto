@@ -39,7 +39,7 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
         String buffer = event.getBuffer();
-        if (event.isCommand() || !buffer.startsWith("@") || buffer.contains(" ")) return;
+        if (buffer.startsWith("/") || !buffer.startsWith("@") || buffer.contains(" ")) return;
 
         String partial = buffer.substring(1).toLowerCase();
         Player sender = event.getSender() instanceof Player p ? p : null;
