@@ -1,5 +1,6 @@
 package com.aven0x.Velto.listeners;
 
+import com.aven0x.Velto.VeltoPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,27 +9,32 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatListener implements Listener {
 
-    // When a player joins, add their @Name to every online player's suggestions
-    // and seed the joiner with every existing player's @Name.
+    // Delay by 1 tick so the client connection is fully ready to receive the packet.
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player joined = event.getPlayer();
-        String atJoined = "@" + joined.getName();
+        Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> {
+            if (!joined.isOnline()) return;
+            String atJoined = "@" + joined.getName();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            // Every online player (including the joiner) gets the joiner's @Name
-            p.addCustomChatCompletions(List.of(atJoined));
-            // The joiner gets every other online player's @Name
-            if (!p.equals(joined)) {
-                joined.addCustomChatCompletions(List.of("@" + p.getName()));
+            List<String> othersAtNames = Bukkit.getOnlinePlayers().stream()
+                    .filter(p -> !p.equals(joined))
+                    .map(p -> "@" + p.getName())
+                    .collect(Collectors.toList());
+
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.addCustomChatCompletions(List.of(atJoined));
             }
-        }
+            if (!othersAtNames.isEmpty()) {
+                joined.addCustomChatCompletions(othersAtNames);
+            }
+        });
     }
 
-    // When a player leaves, remove their @Name from every remaining player's suggestions.
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         String atName = "@" + event.getPlayer().getName();

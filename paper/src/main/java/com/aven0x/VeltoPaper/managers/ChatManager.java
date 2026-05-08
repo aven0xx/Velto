@@ -5,6 +5,7 @@ import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoPaper.VeltoPaper;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import io.papermc.paper.event.player.AsyncTabCompleteEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -60,6 +61,25 @@ public class ChatManager implements Listener {
         final String finalFormat = format;
         event.renderer((source, displayName, message, viewer) ->
                 LegacyComponentSerializer.legacySection().deserialize(finalFormat));
+    }
+
+    @EventHandler
+    public void onTabComplete(AsyncTabCompleteEvent event) {
+        String buffer = event.getBuffer();
+        if (event.isCommand() || !buffer.startsWith("@") || buffer.contains(" ")) return;
+
+        String partial = buffer.substring(1).toLowerCase();
+
+        List<AsyncTabCompleteEvent.Completion> completions = Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(n -> n.toLowerCase().startsWith(partial))
+                .map(n -> AsyncTabCompleteEvent.Completion.completion("@" + n + " "))
+                .collect(Collectors.toList());
+
+        if (!completions.isEmpty()) {
+            event.completions(completions);
+            event.setHandled(true);
+        }
     }
 
     private String resolveChatFormat(Player player) {
