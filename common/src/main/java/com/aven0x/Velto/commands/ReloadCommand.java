@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
@@ -33,6 +34,14 @@ public class ReloadCommand extends BaseCommand {
             Bukkit.getLogger().info("[Velto] lang.yml reloaded.");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload lang.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            CommandUtil.load();
+            Bukkit.getLogger().info("[Velto] commands.yml reloaded.");
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to reload commands.yml: " + t.getMessage());
             t.printStackTrace();
         }
 
