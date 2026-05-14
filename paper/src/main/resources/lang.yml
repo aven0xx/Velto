@@ -131,7 +131,19 @@ rename-no-item:
 
 rename-usage:
   type: chat
-  message: "&eUsage:&f /rename <name...> &7or&f /rename reset"
+  segments:
+    - text: "&eUsage: "
+    - text: "&f/rename <name...>"
+      hover: "&7Click to start renaming"
+      click:
+        action: suggest_command
+        value: "/rename "
+    - text: " &7or "
+    - text: "&f/rename reset"
+      hover: "&7Click to reset the name"
+      click:
+        action: run_command
+        value: "/rename reset"
 
 rename-cleared:
   type: chat
@@ -147,11 +159,51 @@ lore-no-item:
 
 lore-usage:
   type: chat
-  message: "&eUsage:&f /itemlore <show|clear|add|insert|set|remove> ..."
+  segments:
+    - text: "&eUsage: &f/itemlore "
+    - text: "&7show"
+      hover: "&7Display current lore"
+      click:
+        action: run_command
+        value: "/itemlore show"
+    - text: " &f| "
+    - text: "&7clear"
+      hover: "&7Remove all lore lines"
+      click:
+        action: run_command
+        value: "/itemlore clear"
+    - text: " &f| "
+    - text: "&7add"
+      hover: "&7Add a new lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore add "
+    - text: " &f| "
+    - text: "&7insert"
+      hover: "&7Insert at a position"
+      click:
+        action: suggest_command
+        value: "/itemlore insert "
+    - text: " &f| "
+    - text: "&7set"
+      hover: "&7Set a specific lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore set "
+    - text: " &f| "
+    - text: "&7remove"
+      hover: "&7Remove a lore line"
+      click:
+        action: suggest_command
+        value: "/itemlore remove "
 
 lore-empty:
   type: chat
   message: "&7This item has no lore."
+  hover: "&7Click to add a lore line"
+  click:
+    action: suggest_command
+    value: "/itemlore add "
 
 lore-cleared:
   type: chat
@@ -180,18 +232,34 @@ lore-out-of-range:
 automsg1:
   type: chat
   message: "&bJoin our Discord to get updates and support!"
+  hover: "&7Click to open Discord"
+  click:
+    action: open_url
+    value: "https://discord.gg/example"
 
 automsg2:
   type: chat
   message: "&aNeed help? Type &f/help &afor commands."
+  hover: "&7Click to run /help"
+  click:
+    action: run_command
+    value: "/help"
 
 automsg3:
   type: chat
   message: "&dVote for rewards every day!"
+  hover: "&7Click to open the vote link"
+  click:
+    action: open_url
+    value: "https://example.com/vote"
 
 automsg4:
   type: chat
   message: "&eRemember to claim your daily kit!"
+  hover: "&7Click to claim your kit"
+  click:
+    action: suggest_command
+    value: "/kit daily"
 
 afk-enabled:
   type: actionbar
@@ -213,7 +281,25 @@ afk-player-back:
 
 afk-usage:
   type: chat
-  message: "&eUsage: &f/afk [player] &7or &f/afk list"
+  segments:
+    - text: "&eUsage: "
+    - text: "&f/afk"
+      hover: "&7Toggle your own AFK status"
+      click:
+        action: run_command
+        value: "/afk"
+    - text: " &7| "
+    - text: "&f/afk <player>"
+      hover: "&7Toggle another player's AFK"
+      click:
+        action: suggest_command
+        value: "/afk "
+    - text: " &7| "
+    - text: "&f/afk list"
+      hover: "&7Show all AFK players"
+      click:
+        action: run_command
+        value: "/afk list"
 
 afk-set-other:
   type: chat
@@ -240,6 +326,16 @@ back-world-blacklisted:
   type: chat
   message: "&cYou cannot use /back to return to that world."
 
+teleport-countdown:
+  type: actionbar
+  message: "&eTeleporting in &6%seconds%s&e..."
+  duration: 25
+
+teleport-cancelled:
+  type: actionbar
+  message: "&cTeleportation cancelled."
+  duration: 40
+
 home-teleported:
   type: actionbar
   message: "&aTeleported to home &f%home%&a."
@@ -264,6 +360,10 @@ home-not-found:
 home-no-homes:
   type: chat
   message: "&cYou have no homes set."
+  hover: "&7Click to set a home"
+  click:
+    action: suggest_command
+    value: "/sethome "
 
 reload-success:
   type: chat
@@ -317,11 +417,23 @@ msg-self:
 
 msg-sent:
   type: chat
-  message: "&7[&fYou &7-> &f%recipient%&7] &f%message%"
+  segments:
+    - text: "&7[&fYou &7-> &f%recipient%&7] "
+      hover: "&7Click to message &f%recipient% &7again"
+      click:
+        action: suggest_command
+        value: "/msg %recipient% "
+    - text: "&f%message%"
 
 msg-received:
   type: chat
-  message: "&7[&f%sender% &7-> &fYou&7] &f%message%"
+  segments:
+    - text: "&7[&f%sender% &7-> &fYou&7] "
+      hover: "&7Click to reply to &f%sender%"
+      click:
+        action: suggest_command
+        value: "/reply "
+    - text: "&f%message%"
 
 reply-usage:
   type: chat
@@ -330,6 +442,10 @@ reply-usage:
 reply-no-target:
   type: chat
   message: "&cNo one to reply to."
+  hover: "&7Click to start a new conversation"
+  click:
+    action: suggest_command
+    value: "/msg "
 
 reply-offline:
   type: chat
@@ -338,6 +454,85 @@ reply-offline:
 tpall-success:
   type: chat
   message: "&aTeleported all players to your location."
+
+tp-usage:
+  type: chat
+  message: "&eUsage: &f/tp <player> &7| &f/tp <x> <y> <z> &7| &f/tp <player> <player> &7| &f/tp <player> <x> <y> <z>"
+
+tp-self-player:
+  type: actionbar
+  message: "&aTeleported to &f%target%&a."
+  duration: 60
+
+tp-self-coords:
+  type: actionbar
+  message: "&aTeleported to &f%x%&a, &f%y%&a, &f%z%&a."
+  duration: 60
+
+tp-other-success:
+  type: chat
+  message: "&aTeleported &e%from% &ato &e%to%&a."
+
+tpa-usage:
+  type: chat
+  message: "&eUsage: &f/tpa <player>"
+
+tpa-self:
+  type: chat
+  message: "&cYou cannot send a teleport request to yourself."
+
+tpa-sent:
+  type: chat
+  message: "&aTeleport request sent to &e%target%&a."
+
+tpa-received:
+  type: chat
+  segments:
+    - text: "&e%requester% &awants to teleport to you. "
+    - text: "&a[Accept]"
+      hover: "&7Click to accept"
+      click:
+        action: run_command
+        value: "/tpaaccept %requester%"
+    - text: " &7/ "
+    - text: "&c[Deny]"
+      hover: "&7Click to deny"
+      click:
+        action: run_command
+        value: "/tpadeny %requester%"
+
+tpa-accepted-requester:
+  type: chat
+  message: "&e%target% &aaccepted your teleport request."
+
+tpa-accepted-target:
+  type: chat
+  message: "&aYou accepted &e%requester%&a's teleport request."
+
+tpa-denied-requester:
+  type: chat
+  message: "&e%target% &cdenied your teleport request."
+
+tpa-denied-target:
+  type: chat
+  message: "&cYou denied &e%requester%&c's teleport request."
+
+tpa-expired:
+  type: chat
+  message: "&cYour teleport request to &e%target% &chas expired."
+
+tpa-no-request:
+  type: chat
+  message: "&cNo pending teleport requests."
+  hover: "&7Click to send a teleport request"
+  click:
+    action: suggest_command
+    value: "/tpa "
+
+tpa-teleported:
+  type: actionbar
+  message: "&aTeleported to &f%target%&a."
+  duration: 60
 
 sudo-usage:
   type: chat

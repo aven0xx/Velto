@@ -1,9 +1,11 @@
 package com.aven0x.VeltoPaper.managers;
 
+import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoPaper.VeltoPaper;
 import io.papermc.paper.event.player.AsyncChatEvent;
+
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -35,6 +37,12 @@ public class ChatManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
+
+        String rawMessage = LegacyComponentSerializer.legacySection().serialize(event.message());
+        if (AtMentionHandler.handle(player, rawMessage)) {
+            event.setCancelled(true);
+            return;
+        }
 
         String format = resolveChatFormat(player);
 

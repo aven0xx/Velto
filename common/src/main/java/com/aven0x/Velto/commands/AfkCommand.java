@@ -75,8 +75,8 @@ public class AfkCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         List<String> completions = new ArrayList<>();
 
-        if (args.length == 1) {
-            String arg = args[0].toLowerCase();
+        if (args.length <= 1) {
+            String arg = (args.length == 0 ? "" : args[0]).toLowerCase();
 
             if (sender.hasPermission("velto.afk.list") && "list".startsWith(arg)) {
                 completions.add("list");

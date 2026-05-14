@@ -19,6 +19,24 @@ afkzone:
     x: 0
     y: 0
     z: 0
+# Teleport countdown
+# countdown.default: seconds to wait before teleporting (0 = instant)
+# countdown.permissions: first matching permission wins (list in priority order)
+# cancel-on-move: cancel the teleport if the player moves a block during countdown
+teleport:
+  cancel-on-move: true
+  countdown:
+    default: 5
+    permissions:
+      velto.teleport.instant: 0
+#
+#
+# TPA - teleport request system
+# expire-seconds: how long before an unanswered request is automatically cancelled
+tpa:
+  expire-seconds: 60
+#
+#
 # /back world blacklist
 # Players cannot use /back if their previous location was in one of these worlds
 back:

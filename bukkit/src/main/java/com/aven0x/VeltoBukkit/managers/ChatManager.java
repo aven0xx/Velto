@@ -1,5 +1,6 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoBukkit.VeltoBukkit;
@@ -34,6 +35,11 @@ public class ChatManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+
+        if (AtMentionHandler.handle(player, event.getMessage())) {
+            event.setCancelled(true);
+            return;
+        }
 
         String format = resolveChatFormat(player);
 
