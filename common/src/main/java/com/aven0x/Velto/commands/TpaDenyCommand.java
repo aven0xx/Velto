@@ -19,6 +19,7 @@ public class TpaDenyCommand extends BaseCommand {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
+        if (!hasPermission(sender, "velto.tpa")) return true;
 
         Player target = (Player) sender;
         TpaRequest request;

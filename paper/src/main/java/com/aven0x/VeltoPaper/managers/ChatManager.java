@@ -19,6 +19,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,15 +39,25 @@ public class ChatManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
-
         String rawMessage = LegacyComponentSerializer.legacySection().serialize(event.message());
-        if (AtMentionHandler.handle(player, rawMessage)) {
+
+        if (isAtMentionMessage(rawMessage)) {
             event.setCancelled(true);
+            runSync(() -> AtMentionHandler.handle(player, rawMessage));
             return;
         }
 
-        String format = resolveChatFormat(player);
+        String format = callSync(() -> buildChatFormat(player, rawMessage), CC.translate(ConfigUtil.getChatFormat())
+                .replace("%player_name%", player.getName())
+                .replace("%message%", rawMessage));
 
+        final String finalFormat = format;
+        event.renderer((source, displayName, message, viewer) ->
+                LegacyComponentSerializer.legacySection().deserialize(finalFormat));
+    }
+
+    private String buildChatFormat(Player player, String messageText) {
+        String format = resolveChatFormat(player);
         format = format.replace("%player_name%", player.getName());
 
         if (papiAvailable) {
@@ -53,14 +65,41 @@ public class ChatManager implements Listener {
             if (resolved != null) format = resolved;
         }
 
-        String messageText = LegacyComponentSerializer.legacySection().serialize(event.message());
         format = format.replace("%message%", messageText);
+        return CC.translate(format);
+    }
 
-        format = CC.translate(format);
+    private boolean isAtMentionMessage(String message) {
+        if (!message.startsWith("@")) return false;
+        int space = message.indexOf(' ');
+        return space > 1 && !message.substring(space + 1).trim().isEmpty();
+    }
 
-        final String finalFormat = format;
-        event.renderer((source, displayName, message, viewer) ->
-                LegacyComponentSerializer.legacySection().deserialize(finalFormat));
+    private void runSync(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(plugin, runnable);
+    }
+
+    private <T> T callSync(Callable<T> callable, T fallback) {
+        if (Bukkit.isPrimaryThread()) {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                plugin.getLogger().warning("[Velto] Failed to build chat format: " + e.getMessage());
+                return fallback;
+            }
+        }
+
+        try {
+            return Bukkit.getScheduler().callSyncMethod(plugin, callable).get(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            plugin.getLogger().warning("[Velto] Timed out while building chat format: " + e.getMessage());
+            return fallback;
+        }
     }
 
     private String resolveChatFormat(Player player) {

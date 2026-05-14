@@ -70,23 +70,38 @@ public final class UserdataManager {
     }
 
     public static Object get(UUID uuid, String key) {
-        return getData(uuid).get(key);
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            return yaml.get(key);
+        }
     }
 
     public static String getString(UUID uuid, String key, String def) {
-        return getData(uuid).getString(key, def);
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            return yaml.getString(key, def);
+        }
     }
 
     public static int getInt(UUID uuid, String key, int def) {
-        return getData(uuid).getInt(key, def);
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            return yaml.getInt(key, def);
+        }
     }
 
     public static boolean getBoolean(UUID uuid, String key, boolean def) {
-        return getData(uuid).getBoolean(key, def);
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            return yaml.getBoolean(key, def);
+        }
     }
 
     public static void set(UUID uuid, String key, Object value) {
-        getData(uuid).set(key, value);
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            yaml.set(key, value);
+        }
     }
 
     // === Persistence ===
@@ -103,7 +118,7 @@ public final class UserdataManager {
     public static void startAutosave(long intervalTicks) {
         if (autosaveTask != null) return;
         autosaveTask = VeltoPlugin.get().getServer().getScheduler()
-                .runTaskTimerAsynchronously(VeltoPlugin.get(), () -> {
+                .runTaskTimer(VeltoPlugin.get(), () -> {
                     for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
                         YamlConfiguration snapshot = copyOf(entry.getValue());
                         enqueueSave(entry.getKey(), snapshot);
@@ -196,8 +211,10 @@ public final class UserdataManager {
 
     private static YamlConfiguration copyOf(YamlConfiguration source) {
         YamlConfiguration copy = new YamlConfiguration();
-        for (String key : source.getKeys(true)) {
-            copy.set(key, source.get(key));
+        synchronized (source) {
+            for (String key : source.getKeys(true)) {
+                copy.set(key, source.get(key));
+            }
         }
         return copy;
     }
