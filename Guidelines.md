@@ -69,4 +69,4 @@ Do NOT run `./gradlew build` at the root — it is intentionally blocked.
 
 ## What Velto Intentionally Excludes
 
-Do not add: economy, warps, kits, claims, towns, or minigame systems. These are left to dedicated plugins by design.
+Do not add: economy, claims, towns, or minigame systems. These are left to dedicated plugins by design.
