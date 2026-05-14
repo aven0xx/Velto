@@ -1,11 +1,11 @@
-# CLAUDE.md
+# Guidelines.md
 
-This file provides guidance for Claude Code when working in this repository.
+This file provides guidance for Claude Code/ChatGPT Codex when working in this repository.
 
 ## RULES
 
-- A session link must never be attached to a commit or a Pull Request made by Claude
-- Aven0xx is always the author of every commit while Claude is Co-Author (`Co-Authored-By: Claude <claude@anthropic.com>`)
+- A session link must never be attached to a commit or a Pull Request made by Claude or ChatGPT Codex
+- Aven0xx is always the author of every commit while Claude/ChatGPT Codex is Co-Author
 - Always ask before making changes to the codebase to get the permission to do it
 
 
