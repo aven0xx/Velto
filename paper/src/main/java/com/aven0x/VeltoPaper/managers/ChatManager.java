@@ -1,94 +1,77 @@
 package com.aven0x.VeltoPaper.managers;
 
+import com.aven0x.Velto.managers.ChatFormatCache;
 import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoPaper.VeltoPaper;
 import io.papermc.paper.event.player.AsyncChatEvent;
-
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ChatManager implements Listener {
 
     private final VeltoPaper plugin;
     private final boolean papiAvailable;
+    private BukkitTask refreshTask;
 
     public ChatManager(VeltoPaper plugin) {
         this.plugin = plugin;
         this.papiAvailable = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        startFormatRefreshTask();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
-
         String rawMessage = LegacyComponentSerializer.legacySection().serialize(event.message());
-        if (AtMentionHandler.handle(player, rawMessage)) {
+
+        if (isAtMentionMessage(rawMessage)) {
             event.setCancelled(true);
+            runSync(() -> AtMentionHandler.handle(player, rawMessage));
             return;
         }
 
-        String format = resolveChatFormat(player);
-
-        format = format.replace("%player_name%", player.getName());
-
-        if (papiAvailable) {
-            String resolved = PlaceholderAPI.setPlaceholders(player, format);
-            if (resolved != null) format = resolved;
-        }
-
-        String messageText = LegacyComponentSerializer.legacySection().serialize(event.message());
-        format = format.replace("%message%", messageText);
-
-        format = CC.translate(format);
-
-        final String finalFormat = format;
+        String finalFormat = ChatFormatCache.get(player).replace("%message%", rawMessage);
         event.renderer((source, displayName, message, viewer) ->
                 LegacyComponentSerializer.legacySection().deserialize(finalFormat));
     }
 
-    private String resolveChatFormat(Player player) {
-        String fallback = ConfigUtil.getChatFormat();
+    private boolean isAtMentionMessage(String message) {
+        if (!message.startsWith("@")) return false;
+        int space = message.indexOf(' ');
+        return space > 1 && !message.substring(space + 1).trim().isEmpty();
+    }
 
-        List<String> priority = ConfigUtil.getChatPriority();
-        if (priority == null || priority.isEmpty()) {
-            return fallback;
+    private void runSync(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+            return;
         }
 
-        for (String group : priority) {
-            ConfigurationSection sec = ConfigUtil.getChatGroupSection(group);
-            if (sec == null) continue;
+        Bukkit.getScheduler().runTask(plugin, runnable);
+    }
 
-            String groupFormat = sec.getString("format", "");
-            if (groupFormat == null || groupFormat.isBlank()) continue;
-
-            String perm = sec.getString("permission", "");
-            if (perm != null && !perm.isBlank() && player.hasPermission(perm)) {
-                return groupFormat;
-            }
-        }
-
-        return fallback;
+    private void startFormatRefreshTask() {
+        if (refreshTask != null) return;
+        refreshTask = Bukkit.getScheduler().runTaskTimer(plugin, ChatFormatCache::refreshAll, 20L, 20L * 60L);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        Bukkit.getScheduler().runTask(plugin, () -> ChatFormatCache.refresh(event.getPlayer()));
+
         if (PlayerUtil.isVanished(event.getPlayer())) {
             event.setJoinMessage(null);
             return;
@@ -102,11 +85,13 @@ public class ChatManager implements Listener {
             if (resolved != null) msg = resolved;
         }
 
-        event.setJoinMessage(CC.translate(msg));
+        event.setJoinMessage(ChatFormatCache.translate(msg));
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        ChatFormatCache.remove(event.getPlayer().getUniqueId());
+
         if (PlayerUtil.isVanished(event.getPlayer())) {
             event.setQuitMessage(null);
             return;
@@ -120,25 +105,16 @@ public class ChatManager implements Listener {
             if (resolved != null) msg = resolved;
         }
 
-        event.setQuitMessage(CC.translate(msg));
+        event.setQuitMessage(ChatFormatCache.translate(msg));
     }
 
     public static class CC {
-        private static final Pattern HEX_PATTERN = Pattern.compile("&#[a-fA-F0-9]{6}");
-
         public static String translate(String input) {
-            if (input == null) return "";
-            Matcher matcher = HEX_PATTERN.matcher(input);
-            while (matcher.find()) {
-                String token = matcher.group();
-                String hex = token.substring(1);
-                input = input.replace(token, ChatColor.of(hex).toString());
-            }
-            return input.replace("&", "§");
+            return ChatFormatCache.translate(input);
         }
 
         public static List<String> translate(List<String> input) {
-            return input.stream().map(CC::translate).collect(Collectors.toList());
+            return ChatFormatCache.translate(input);
         }
     }
 }

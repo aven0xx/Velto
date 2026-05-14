@@ -10,8 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TeleportManager {
@@ -32,16 +34,15 @@ public class TeleportManager {
         teleport(player, location, null);
     }
 
-    // Player-initiated teleport with an optional callback executed the moment
-    // the actual teleport fires (end of countdown or instant when delay == 0).
+    // Player-initiated teleport with an optional callback executed after the
+    // teleport completes successfully.
     public void teleport(Player player, Location location, Runnable onComplete) {
         cancelPending(player);
 
         int seconds = resolveCountdown(player);
 
         if (seconds <= 0) {
-            teleportAsync(player, location);
-            if (onComplete != null) onComplete.run();
+            teleportAsync(player, location).thenAccept(success -> runCompletion(player, success, onComplete));
             return;
         }
 
@@ -68,8 +69,7 @@ public class TeleportManager {
                 if (remaining <= 0) {
                     pendingTeleports.remove(player.getUniqueId());
                     this.cancel();
-                    teleportAsync(player, location);
-                    if (onComplete != null) onComplete.run();
+                    teleportAsync(player, location).thenAccept(success -> runCompletion(player, success, onComplete));
                     return;
                 }
 
@@ -82,17 +82,20 @@ public class TeleportManager {
     }
 
     // System/admin teleport: bypasses countdown entirely (AFK zone, /tpall, etc.)
-    public void teleportAsync(Player player, Location location) {
+    public CompletableFuture<Boolean> teleportAsync(Player player, Location location) {
         if (ServerUtil.isPaper()) {
             try {
-                player.getClass().getMethod("teleportAsync", Location.class).invoke(player, location);
+                Method method = player.getClass().getMethod("teleportAsync", Location.class);
+                Object result = method.invoke(player, location);
+                if (result instanceof CompletableFuture<?> future) {
+                    return future.thenApply(Boolean.class::cast);
+                }
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[Velto] teleportAsync failed on Paper, falling back to sync chunk load: " + e.getMessage());
-                bukkitTeleport(player, location);
             }
-        } else {
-            bukkitTeleport(player, location);
         }
+
+        return CompletableFuture.completedFuture(bukkitTeleport(player, location));
     }
 
     // Cancels any pending countdown for the given player.
@@ -101,9 +104,23 @@ public class TeleportManager {
         if (task != null) task.cancel();
     }
 
-    private void bukkitTeleport(Player player, Location location) {
+    private boolean bukkitTeleport(Player player, Location location) {
+        if (location.getWorld() == null) return false;
         location.getWorld().getChunkAt(location);
-        player.teleport(location);
+        return player.teleport(location);
+    }
+
+    private void runCompletion(Player player, boolean success, Runnable onComplete) {
+        if (!success || onComplete == null) return;
+
+        if (Bukkit.isPrimaryThread()) {
+            if (player.isOnline()) onComplete.run();
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> {
+            if (player.isOnline()) onComplete.run();
+        });
     }
 
     private int resolveCountdown(Player player) {
