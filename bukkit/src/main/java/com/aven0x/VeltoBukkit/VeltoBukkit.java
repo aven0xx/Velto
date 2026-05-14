@@ -22,6 +22,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VeltoBukkit extends JavaPlugin {
 
+    private AutoMsgManager autoMsgManager;
+
     @Override
     public void onEnable() {
         VeltoPlugin.set(this);
@@ -45,7 +47,7 @@ public class VeltoBukkit extends JavaPlugin {
 
         // Setup managers
         new TeleportManager();
-        AutoMsgManager autoMsgManager = new AutoMsgManager();
+        autoMsgManager = new AutoMsgManager();
         autoMsgManager.start();
         new ChatManager(this);
 
@@ -70,6 +72,10 @@ public class VeltoBukkit extends JavaPlugin {
     @Override
     public void onDisable() {
         AfkManager.stop();
+        if (autoMsgManager != null) {
+            autoMsgManager.stop();
+            autoMsgManager = null;
+        }
         UserdataManager.stopAutosave();
         UserdataManager.saveAll();
     }

@@ -26,10 +26,12 @@ public final class UserdataManager {
 
     private static final class PendingSave {
         YamlConfiguration snapshot;
+        YamlConfiguration latestSnapshot;
         boolean running;
 
         PendingSave(YamlConfiguration snapshot) {
             this.snapshot = snapshot;
+            this.latestSnapshot = snapshot;
         }
     }
 
@@ -47,6 +49,10 @@ public final class UserdataManager {
 
     public static boolean isInitialized() {
         return initialized;
+    }
+
+    public static boolean isLoaded(UUID uuid) {
+        return cache.containsKey(uuid);
     }
 
     // === Load / Unload ===
@@ -144,6 +150,21 @@ public final class UserdataManager {
                 logger.log(Level.SEVERE, "[Velto] Failed to save userdata for " + entry.getKey() + " on shutdown", e);
             }
         }
+
+        for (Map.Entry<UUID, PendingSave> entry : pendingSaves.entrySet()) {
+            YamlConfiguration snapshot;
+            synchronized (entry.getValue()) {
+                snapshot = entry.getValue().latestSnapshot;
+            }
+            if (snapshot == null) continue;
+
+            try {
+                snapshot.save(fileFor(entry.getKey()));
+                pendingSaves.remove(entry.getKey());
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "[Velto] Failed to flush pending userdata for " + entry.getKey() + " on shutdown", e);
+            }
+        }
     }
 
     // === Helpers ===
@@ -157,6 +178,7 @@ public final class UserdataManager {
             if (existing == null) return new PendingSave(snapshot);
             synchronized (existing) {
                 existing.snapshot = snapshot;
+                existing.latestSnapshot = snapshot;
             }
             return existing;
         });

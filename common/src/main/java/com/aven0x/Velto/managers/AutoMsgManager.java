@@ -5,6 +5,7 @@ import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Random;
@@ -14,9 +15,12 @@ public class AutoMsgManager {
     private int index = 0;
     private String lastKey = null;
     private final Random rng = new Random();
+    private BukkitTask task;
 
     public void start() {
-        new BukkitRunnable() {
+        if (task != null) return;
+
+        task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!ConfigUtil.isAutoMessagesEnabled()) {
@@ -52,5 +56,11 @@ public class AutoMsgManager {
         }.runTaskTimer(VeltoPlugin.get(),
                 ConfigUtil.getAutoMessagesIntervalTicks(),
                 ConfigUtil.getAutoMessagesIntervalTicks());
+    }
+
+    public void stop() {
+        if (task == null) return;
+        task.cancel();
+        task = null;
     }
 }

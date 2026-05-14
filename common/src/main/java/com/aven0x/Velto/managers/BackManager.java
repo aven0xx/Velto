@@ -32,4 +32,9 @@ public class BackManager {
     public static void clearBacking(UUID uuid) {
         backing.remove(uuid);
     }
+
+    public static void cleanup(UUID uuid) {
+        lastLocations.remove(uuid);
+        backing.remove(uuid);
+    }
 }

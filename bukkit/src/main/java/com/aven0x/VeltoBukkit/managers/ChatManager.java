@@ -16,9 +16,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,6 +36,8 @@ public class ChatManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled()) return;
+
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
@@ -45,11 +47,20 @@ public class ChatManager implements Listener {
             return;
         }
 
-        String format = callSync(() -> buildChatFormat(player, rawMessage), CC.translate(ConfigUtil.getChatFormat())
-                .replace("%player_name%", player.getName())
-                .replace("%message%", rawMessage.replace("%", "%%")));
+        Set<Player> recipients = new HashSet<>(event.getRecipients());
+        event.setCancelled(true);
 
-        event.setFormat(format);
+        runSync(() -> {
+            if (!player.isOnline()) return;
+
+            String format = buildChatFormat(player, rawMessage);
+            for (Player recipient : recipients) {
+                if (recipient.isOnline()) {
+                    recipient.sendMessage(format);
+                }
+            }
+            Bukkit.getConsoleSender().sendMessage(format);
+        });
     }
 
     private String buildChatFormat(Player player, String rawMessage) {
@@ -79,24 +90,6 @@ public class ChatManager implements Listener {
         }
 
         Bukkit.getScheduler().runTask(plugin, runnable);
-    }
-
-    private <T> T callSync(Callable<T> callable, T fallback) {
-        if (Bukkit.isPrimaryThread()) {
-            try {
-                return callable.call();
-            } catch (Exception e) {
-                plugin.getLogger().warning("[Velto] Failed to build chat format: " + e.getMessage());
-                return fallback;
-            }
-        }
-
-        try {
-            return Bukkit.getScheduler().callSyncMethod(plugin, callable).get(2, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            plugin.getLogger().warning("[Velto] Timed out while building chat format: " + e.getMessage());
-            return fallback;
-        }
     }
 
     private String resolveChatFormat(Player player) {
