@@ -11,7 +11,7 @@ This file provides guidance for Claude Code/ChatGPT Codex when working in this r
 
 ## Project Overview
 
-**Velto** is a lightweight Minecraft core plugin (alpha) targeting Paper/Spigot/Bukkit servers. It is intentionally minimal — no economy, warps, kits, claims, towns, or minigame systems. The goal is a plug-and-play core that plays well with other plugins.
+**Velto** is a lightweight Minecraft core plugin (alpha) targeting Paper/Spigot/Bukkit servers. It is intentionally minimal — no economy, warps, towns, or minigame systems. The goal is a plug-and-play core that plays well with other plugins with every command that can be disabled.
 
 - Current version: `0.7.5-SNAPSHOT`
 - Supported MC versions: 1.21.4–1.21.11 (1.21.4 is LTS)
