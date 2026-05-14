@@ -44,7 +44,7 @@ public class TpaDenyCommand extends BaseCommand {
         TpaManager.cancelRequest(request.requester());
 
         LangUtil.send(target, "tpa-denied-target",
-                Map.of("%requester%", requester != null ? requester.getName() : args[0]));
+                Map.of("%requester%", requester != null ? requester.getName() : request.requesterName()));
         if (requester != null && requester.isOnline()) {
             LangUtil.send(requester, "tpa-denied-requester", Map.of("%target%", target.getName()));
         }

@@ -18,10 +18,20 @@ public final class UserdataManager {
     private UserdataManager() {}
 
     private static final Map<UUID, YamlConfiguration> cache = new ConcurrentHashMap<>();
+    private static final Map<UUID, PendingSave> pendingSaves = new ConcurrentHashMap<>();
     private static File userdataFolder;
     private static Logger logger;
     private static volatile boolean initialized = false;
     private static BukkitTask autosaveTask = null;
+
+    private static final class PendingSave {
+        YamlConfiguration snapshot;
+        boolean running;
+
+        PendingSave(YamlConfiguration snapshot) {
+            this.snapshot = snapshot;
+        }
+    }
 
     public static void init(File dataFolder) {
         logger = VeltoPlugin.get().getLogger();
@@ -87,15 +97,7 @@ public final class UserdataManager {
         if (yaml == null) return;
 
         YamlConfiguration snapshot = copyOf(yaml);
-        File target = fileFor(uuid);
-
-        VeltoPlugin.get().getServer().getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
-            try {
-                snapshot.save(target);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "[Velto] Failed to save userdata for " + uuid, e);
-            }
-        });
+        enqueueSave(uuid, snapshot);
     }
 
     public static void startAutosave(long intervalTicks) {
@@ -104,11 +106,7 @@ public final class UserdataManager {
                 .runTaskTimerAsynchronously(VeltoPlugin.get(), () -> {
                     for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
                         YamlConfiguration snapshot = copyOf(entry.getValue());
-                        try {
-                            snapshot.save(fileFor(entry.getKey()));
-                        } catch (IOException e) {
-                            logger.log(Level.SEVERE, "[Velto] Autosave failed for " + entry.getKey(), e);
-                        }
+                        enqueueSave(entry.getKey(), snapshot);
                     }
                 }, intervalTicks, intervalTicks);
     }
@@ -126,6 +124,7 @@ public final class UserdataManager {
         for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
             try {
                 entry.getValue().save(fileFor(entry.getKey()));
+                pendingSaves.remove(entry.getKey());
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "[Velto] Failed to save userdata for " + entry.getKey() + " on shutdown", e);
             }
@@ -136,6 +135,63 @@ public final class UserdataManager {
 
     private static File fileFor(UUID uuid) {
         return new File(userdataFolder, uuid.toString() + ".yml");
+    }
+
+    private static void enqueueSave(UUID uuid, YamlConfiguration snapshot) {
+        PendingSave save = pendingSaves.compute(uuid, (ignored, existing) -> {
+            if (existing == null) return new PendingSave(snapshot);
+            synchronized (existing) {
+                existing.snapshot = snapshot;
+            }
+            return existing;
+        });
+
+        boolean shouldStart;
+        synchronized (save) {
+            shouldStart = !save.running;
+            if (shouldStart) save.running = true;
+        }
+
+        if (shouldStart) {
+            runNextSave(uuid, save);
+        }
+    }
+
+    private static void runNextSave(UUID uuid, PendingSave save) {
+        YamlConfiguration snapshot;
+        synchronized (save) {
+            snapshot = save.snapshot;
+            save.snapshot = null;
+        }
+
+        if (snapshot == null) {
+            boolean hasMore;
+            synchronized (save) {
+                hasMore = save.snapshot != null;
+                save.running = hasMore;
+            }
+            if (hasMore) {
+                runNextSave(uuid, save);
+            } else {
+                pendingSaves.remove(uuid, save);
+            }
+            return;
+        }
+
+        File target = fileFor(uuid);
+        YamlConfiguration finalSnapshot = snapshot;
+
+        VeltoPlugin.get().getServer().getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
+            try {
+                if (pendingSaves.get(uuid) == save) {
+                    finalSnapshot.save(target);
+                }
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "[Velto] Failed to save userdata for " + uuid, e);
+            } finally {
+                runNextSave(uuid, save);
+            }
+        });
     }
 
     private static YamlConfiguration copyOf(YamlConfiguration source) {

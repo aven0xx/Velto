@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TpaManager {
 
-    public record TpaRequest(UUID requester, UUID target, long expiresAt) {}
+    public record TpaRequest(UUID requester, String requesterName, UUID target, long expiresAt) {}
 
     // One outgoing request per requester at a time.
     private static final Map<UUID, TpaRequest> pending = new ConcurrentHashMap<>();
@@ -23,7 +23,7 @@ public class TpaManager {
         cancelRequest(requester.getUniqueId());
 
         long expiresAt = System.currentTimeMillis() + ConfigUtil.getTpaExpireSeconds() * 1000L;
-        pending.put(requester.getUniqueId(), new TpaRequest(requester.getUniqueId(), target.getUniqueId(), expiresAt));
+        pending.put(requester.getUniqueId(), new TpaRequest(requester.getUniqueId(), requester.getName(), target.getUniqueId(), expiresAt));
 
         Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
             TpaRequest req = pending.get(requester.getUniqueId());
