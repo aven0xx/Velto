@@ -124,13 +124,9 @@ tpa:
 tpaaccept:
   enabled: true
   aliases: ["tpaccept"]
-  permissions:
-    velto.tpa: velto.tpa
 tpadeny:
   enabled: true
   aliases: ["tpdeny"]
-  permissions:
-    velto.tpa: velto.tpa
 sudo:
   enabled: true
   aliases: []
