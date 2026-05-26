@@ -24,13 +24,14 @@
 | Minecraft Version | Status |
 |:-----------------:|:------:|
 | 1.21.3 and less | ❌ Unsupported |
-| 1.21.4 | 🟢 LTS (until summer 2026) |
+| 1.21.4 | 🟢 LTS (until June 2026) |
 | 1.21.5 | ✅ Supported |
 | 1.21.6 | ✅ Supported |
-| 1.21.7 / 1.21.8 | ✅ Supported |
+| 1.21.7 | ✅ Supported |
+| 1.21.8 | 🟢 LTS (until Fall 2026) |
 | 1.21.9 / 1.21.10 | ✅ Supported |
 | 1.21.11 | ✅ Supported |
-| 26.1 | ❌ Unsupported (update needed) |
+| 26.1+ | ❌ Unsupported (update needed) |
 
 > **LTS** (Long-Term Support) versions receive priority bug fixes and compatibility updates.  
 > Unsupported versions may work but are not tested or officially maintained.
