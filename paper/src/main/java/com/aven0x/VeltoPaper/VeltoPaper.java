@@ -7,6 +7,7 @@ import com.aven0x.Velto.listeners.GodListener;
 import com.aven0x.Velto.listeners.UserdataListener;
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.AutoMsgManager;
+import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.UserdataManager;
@@ -40,6 +41,7 @@ public class VeltoPaper extends JavaPlugin {
         // Load custom configs
         LangUtil.load();
         CommandUtil.load();
+        KitManager.load();
 
         // Setup managers
         new TeleportManager();

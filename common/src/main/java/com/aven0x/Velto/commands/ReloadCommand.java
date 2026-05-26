@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
@@ -42,6 +43,14 @@ public class ReloadCommand extends BaseCommand {
             Bukkit.getLogger().info("[Velto] commands.yml reloaded.");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload commands.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            KitManager.load();
+            Bukkit.getLogger().info("[Velto] kits.yml reloaded.");
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to reload kits.yml: " + t.getMessage());
             t.printStackTrace();
         }
 
