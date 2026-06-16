@@ -64,7 +64,8 @@ public class AutoMsgManager {
                     }
                     lastKey = key;
                 } else {
-                    key = keys.get(index++ % keys.size());
+                    key = keys.get(index % keys.size());
+                    index = (index + 1) % keys.size();
                 }
 
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
