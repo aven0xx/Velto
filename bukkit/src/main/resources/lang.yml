@@ -541,3 +541,40 @@ sudo-usage:
 sudo-success:
   type: chat
   message: "&aForced &e%target% &ato run: &f%command%"
+
+kit-list-header:
+  type: chat
+  message: "&6Available kits &7(use /kit <name> to claim):"
+
+kit-list-empty:
+  type: chat
+  message: "&cNo kits are available to you."
+
+kit-not-found:
+  type: chat
+  message: "&cKit &f%kit% &cdoes not exist."
+
+kit-no-permission:
+  type: chat
+  message: "&cYou don't have access to this kit."
+
+kit-on-cooldown:
+  type: chat
+  message: "&cKit &f%kit% &cis on cooldown. Time remaining: &f%time%&c."
+
+kit-given-self:
+  type: actionbar
+  message: "&aKit &f%kit% &areceived!"
+  duration: 60
+
+kit-given-other:
+  type: chat
+  message: "&aYou gave the &f%kit% &akit to &e%player%&a."
+
+kit-received:
+  type: chat
+  message: "&aYou received the &f%kit% &akit from &e%sender%&a."
+
+kit-inventory-full:
+  type: chat
+  message: "&eYour inventory was full — some items were dropped at your feet."

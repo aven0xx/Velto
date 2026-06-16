@@ -3,6 +3,14 @@
 FOR 0.7.5:
 
   Commands:
-  - [PLANNED] Userdata folder for future data of players in a optimize way (caching need to be considered) Local has to be YAML format
-  - [PLANNED] /home, /sethome command using the TeleportManager class for teleportation handling. Possibility of setting multiple home with name by player but the default home is name home and is the default one. Stored in the userdata 
-  - [PLANNED] /kit system to distribute kits to players configurable in a kits.yml file. Need to support only Vanilla item for now. There will be a /kit command that will support 2 args : arg1 will be the kit and optional arg2 will be the player defaulting to the sender 
+  - [DONE] Userdata folder for player data with YAML format, in-memory caching, async debounced autosave (UserdataManager)
+  - [DONE] /home, /sethome using TeleportManager. Multiple named homes per player, default home named "home", stored in userdata. Also added: /delhome, /homes
+  - [DONE] /kit system. kits.yml configurable (material, amount, name, lore, enchantments, cooldown). /kit [name] [player]. Per-kit permission (velto.kit.<name>), cooldown bypass (velto.kit.cooldown.bypass), admin give to others (velto.kit.others). Cooldowns persisted in userdata. /veltoreload reloads kits.yml
+
+  Bug fixes:
+  - [DONE] AfkCommand: ClassCastException when console runs /afk list (unsafe Player cast)
+
+FOR FUTURE (no version assigned):
+
+  Technical debt:
+  - [DEFERRED] LangUtil: migrate from BungeeCord legacy API (net.md_5.bungee) to Adventure API. Blocked until Spigot support is dropped or Adventure is shaded into the common module

@@ -142,3 +142,6 @@ delhome:
 homes:
   enabled: true
   aliases: []
+kit:
+  enabled: true
+  aliases: []

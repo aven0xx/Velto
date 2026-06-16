@@ -5,7 +5,7 @@
 
 **Velto** is not meant to replace big all-in-one solutions like Essentials, CMI, or EternalCore. Instead, it focuses on providing a minimal set of utilities and a configurable message system. It can be used as:
 - A **simple core** for standalone servers.
-- A **foundation plugin** in a cross-server setup, leaving things like economy, homes, and teleports to dedicated plugins.
+- A **foundation plugin** in a cross-server setup since every feature are completely disablable. 
 
 📚 **[Read the Velto Wiki →](https://github.com/aven0xx/Velto/wiki)** for installation, configuration, and development guides.
 
@@ -24,13 +24,14 @@
 | Minecraft Version | Status |
 |:-----------------:|:------:|
 | 1.21.3 and less | ❌ Unsupported |
-| 1.21.4 | 🟢 LTS (until summer 2026) |
+| 1.21.4 | 🟢 LTS (until June 2026) |
 | 1.21.5 | ✅ Supported |
 | 1.21.6 | ✅ Supported |
-| 1.21.7 / 1.21.8 | ✅ Supported |
+| 1.21.7 | ✅ Supported |
+| 1.21.8 | 🟢 LTS (until Fall 2026) |
 | 1.21.9 / 1.21.10 | ✅ Supported |
 | 1.21.11 | ✅ Supported |
-| 26.1 | ❌ Unsupported (update needed) |
+| 26.1+ | ❌ Unsupported (update needed) |
 
 > **LTS** (Long-Term Support) versions receive priority bug fixes and compatibility updates.  
 > Unsupported versions may work but are not tested or officially maintained.
@@ -65,9 +66,7 @@ Placeholders are supported for dynamic values.
 ---
 
 ## ❌ What Velto Does Not Include
-- Economy  
-- Homes/TPA/Warps (only `/spawn` and `/back` are provided)  
-- Kits, claims, towns, minigames
+- Economy
 
 These are intentionally left out so you can use the best existing plugins for your needs.
 

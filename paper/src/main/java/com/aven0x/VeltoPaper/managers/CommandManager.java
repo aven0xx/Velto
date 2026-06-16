@@ -55,6 +55,7 @@ public class CommandManager {
         register("sethome", SetHomeCommand::new);
         register("delhome", DelHomeCommand::new);
         register("homes", HomesCommand::new);
+        register("kit", KitCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {
