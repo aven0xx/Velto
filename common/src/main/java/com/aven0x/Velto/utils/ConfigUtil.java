@@ -19,7 +19,9 @@ public class ConfigUtil {
 
     private static volatile long cachedAfkTimeoutMillis = 300_000L;
     private static volatile boolean cachedAfkzoneEnabled = false;
-    private static volatile Location cachedAfkzone = null;
+    private static volatile String cachedAfkzoneWorld = null;
+    private static volatile double cachedAfkzoneX = 0, cachedAfkzoneY = 0, cachedAfkzoneZ = 0;
+    private static volatile float cachedAfkzoneYaw = 0, cachedAfkzonePitch = 0;
     private static volatile boolean cachedAutoMessagesEnabled = true;
     private static volatile int cachedAutoMessagesIntervalTicks = 2400;
     private static volatile boolean cachedAutoMessagesRandom = true;
@@ -46,7 +48,7 @@ public class ConfigUtil {
 
         cachedAfkTimeoutMillis = c.getInt("afk-timeout-seconds", 300) * 1000L;
         cachedAfkzoneEnabled = c.getBoolean("afkzone.enabled", true);
-        cachedAfkzone = buildAfkzone(c);
+        buildAfkzone(c);
         cachedAutoMessagesEnabled = c.getBoolean("auto-messages.enabled", true);
         cachedAutoMessagesIntervalTicks = c.getInt("auto-messages.interval-seconds", 120) * 20;
         cachedAutoMessagesRandom = c.getBoolean("auto-messages.random", true);
@@ -67,29 +69,26 @@ public class ConfigUtil {
         cachedTpaExpireSeconds = c.getInt("tpa.expire-seconds", 60);
     }
 
-    private static Location buildAfkzone(FileConfiguration c) {
+    private static void buildAfkzone(FileConfiguration c) {
         ConfigurationSection section = c.getConfigurationSection("afkzone.location");
-        if (section == null) return null;
+        if (section == null) {
+            cachedAfkzoneWorld = null;
+            return;
+        }
 
         String worldName = section.getString("world");
         if (worldName == null || worldName.isBlank()) {
             VeltoPlugin.get().getLogger().warning("[Velto] AFK zone world name is not set in config.yml.");
-            return null;
+            cachedAfkzoneWorld = null;
+            return;
         }
 
-        World world = Bukkit.getWorld(worldName);
-        if (world == null) {
-            VeltoPlugin.get().getLogger().warning("[Velto] AFK zone world '" + worldName + "' is not loaded or does not exist.");
-            return null;
-        }
-
-        double x = section.getDouble("x", 0);
-        double y = section.getDouble("y", 0);
-        double z = section.getDouble("z", 0);
-        float yaw = (float) section.getDouble("yaw", 0);
-        float pitch = (float) section.getDouble("pitch", 0);
-
-        return new Location(world, x, y, z, yaw, pitch);
+        cachedAfkzoneWorld = worldName;
+        cachedAfkzoneX = section.getDouble("x", 0);
+        cachedAfkzoneY = section.getDouble("y", 0);
+        cachedAfkzoneZ = section.getDouble("z", 0);
+        cachedAfkzoneYaw = (float) section.getDouble("yaw", 0);
+        cachedAfkzonePitch = (float) section.getDouble("pitch", 0);
     }
 
     private static List<String> buildAutoMessageKeys(FileConfiguration c) {
@@ -146,14 +145,26 @@ public class ConfigUtil {
     }
 
     public static Location getAfkzone() {
-        Location loc = cachedAfkzone;
-        return (loc == null) ? null : loc.clone();
+        String worldName = cachedAfkzoneWorld;
+        if (worldName == null) return null;
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) return null;
+        return new Location(world, cachedAfkzoneX, cachedAfkzoneY, cachedAfkzoneZ, cachedAfkzoneYaw, cachedAfkzonePitch);
     }
 
     public static void setAfkzone(Location location) {
         getConfig().set("afkzone.location", location);
         VeltoPlugin.get().saveConfig();
-        cachedAfkzone = (location != null) ? location.clone() : null;
+        if (location == null || location.getWorld() == null) {
+            cachedAfkzoneWorld = null;
+        } else {
+            cachedAfkzoneWorld = location.getWorld().getName();
+            cachedAfkzoneX = location.getX();
+            cachedAfkzoneY = location.getY();
+            cachedAfkzoneZ = location.getZ();
+            cachedAfkzoneYaw = location.getYaw();
+            cachedAfkzonePitch = location.getPitch();
+        }
     }
 
     // === BACK ===

@@ -12,10 +12,27 @@ import java.util.Random;
 
 public class AutoMsgManager {
 
+    private static AutoMsgManager instance;
+
     private int index = 0;
     private String lastKey = null;
     private final Random rng = new Random();
     private BukkitTask task;
+
+    public AutoMsgManager() {
+        instance = this;
+    }
+
+    public static AutoMsgManager getInstance() {
+        return instance;
+    }
+
+    public void restart() {
+        stop();
+        index = 0;
+        lastKey = null;
+        start();
+    }
 
     public void start() {
         if (task != null) return;
