@@ -48,8 +48,9 @@ public class ReloadCommand extends BaseCommand {
         }
 
         try {
-            KitManager.load();
-            Bukkit.getLogger().info("[Velto] kits.yml reloaded.");
+            KitManager.LoadResult kitResult = KitManager.load();
+            Bukkit.getLogger().info("[Velto] kits.yml reloaded (" + kitResult.kitsLoaded() + " kit(s), "
+                    + kitResult.itemsSkipped() + " item(s) skipped).");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload kits.yml: " + t.getMessage());
             t.printStackTrace();

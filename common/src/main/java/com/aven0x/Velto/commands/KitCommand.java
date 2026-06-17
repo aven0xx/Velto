@@ -26,6 +26,10 @@ public class KitCommand extends BaseCommand {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("preview")) {
+            return handlePreview(sender, args);
+        }
+
         String kitName = args[0];
         KitManager.Kit kit = KitManager.getKit(kitName);
         if (kit == null) {
@@ -65,8 +69,20 @@ public class KitCommand extends BaseCommand {
             return true;
         }
 
+        boolean bypassCooldown = sender.hasPermission("velto.kit.cooldown.bypass");
+
+        // One-time kits: once claimed, blocked forever regardless of cooldown timer.
+        if (kit.oneTime() && !bypassCooldown && KitManager.hasClaimedOnce(target.getUniqueId(), kit.name())) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "kit-already-claimed", Map.of("%kit%", kit.name()));
+            } else {
+                sender.sendMessage("Kit '" + kit.name() + "' was already claimed by " + target.getName() + ".");
+            }
+            return true;
+        }
+
         // Cooldown (checked against the target for /kit <name> <player>, consistent with EssentialsX)
-        if (kit.cooldownSeconds() > 0 && !sender.hasPermission("velto.kit.cooldown.bypass")) {
+        if (!kit.oneTime() && kit.cooldownSeconds() > 0 && !bypassCooldown) {
             long remaining = KitManager.getCooldownRemaining(target.getUniqueId(), kit.name());
             if (remaining > 0) {
                 String time = KitManager.formatCooldown(remaining);
@@ -79,10 +95,23 @@ public class KitCommand extends BaseCommand {
             }
         }
 
-        boolean noOverflow = KitManager.giveKit(target, kit);
-        if (kit.cooldownSeconds() > 0) {
+        KitManager.GiveResult result = KitManager.giveKit(target, kit);
+        if (result == KitManager.GiveResult.ERROR) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "kit-give-failed", Map.of("%kit%", kit.name()));
+            } else {
+                sender.sendMessage("Failed to fully deliver kit '" + kit.name() + "' to " + target.getName() + ".");
+            }
+            return true;
+        }
+
+        if (kit.oneTime()) {
+            KitManager.markClaimedOnce(target.getUniqueId(), kit.name());
+        } else if (kit.cooldownSeconds() > 0) {
             KitManager.setCooldown(target.getUniqueId(), kit.name());
         }
+
+        boolean noOverflow = result != KitManager.GiveResult.OVERFLOW;
 
         if (self) {
             if (sender instanceof Player player) {
@@ -99,6 +128,30 @@ public class KitCommand extends BaseCommand {
             if (!noOverflow) LangUtil.send(target, "kit-inventory-full");
         }
 
+        return true;
+    }
+
+    private boolean handlePreview(CommandSender sender, String[] args) {
+        if (!isPlayer(sender)) return true;
+        Player player = (Player) sender;
+
+        if (args.length < 2) {
+            LangUtil.send(player, "kit-preview-usage");
+            return true;
+        }
+
+        KitManager.Kit kit = KitManager.getKit(args[1]);
+        if (kit == null) {
+            LangUtil.send(player, "kit-not-found", Map.of("%kit%", args[1]));
+            return true;
+        }
+
+        if (!player.hasPermission("velto.kit." + kit.name().toLowerCase())) {
+            LangUtil.send(player, "kit-no-permission");
+            return true;
+        }
+
+        player.openInventory(KitManager.buildPreviewInventory(kit));
         return true;
     }
 
@@ -121,7 +174,15 @@ public class KitCommand extends BaseCommand {
 
         for (KitManager.Kit kit : accessible) {
             String cooldownStr;
-            if (kit.cooldownSeconds() <= 0) {
+            if (kit.oneTime()) {
+                if (sender instanceof Player player) {
+                    cooldownStr = KitManager.hasClaimedOnce(player.getUniqueId(), kit.name())
+                            ? ChatColor.RED + "Claimed"
+                            : ChatColor.GREEN + "One-time";
+                } else {
+                    cooldownStr = "One-time";
+                }
+            } else if (kit.cooldownSeconds() <= 0) {
                 cooldownStr = ChatColor.GREEN + "No cooldown";
             } else if (sender instanceof Player player) {
                 long remaining = KitManager.getCooldownRemaining(player.getUniqueId(), kit.name());
@@ -142,6 +203,18 @@ public class KitCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length <= 1) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
+            List<String> names = new ArrayList<>();
+            if ("preview".startsWith(typed)) names.add("preview");
+            for (KitManager.Kit kit : KitManager.getKits()) {
+                if (kit.name().toLowerCase().startsWith(typed)
+                        && sender.hasPermission("velto.kit." + kit.name().toLowerCase())) {
+                    names.add(kit.name());
+                }
+            }
+            return names;
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("preview")) {
+            String typed = args[1].toLowerCase();
             List<String> names = new ArrayList<>();
             for (KitManager.Kit kit : KitManager.getKits()) {
                 if (kit.name().toLowerCase().startsWith(typed)

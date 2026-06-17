@@ -55,6 +55,7 @@ permissions:
       velto.homes: true
       velto.kit: true
       velto.kit.others: true
+      velto.kit.reset: true
       velto.kit.cooldown.bypass: true
       velto.kit.starter: true
       velto.kit.daily: true

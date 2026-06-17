@@ -578,3 +578,23 @@ kit-received:
 kit-inventory-full:
   type: chat
   message: "&eYour inventory was full — some items were dropped at your feet."
+
+kit-already-claimed:
+  type: chat
+  message: "&cYou have already claimed the &f%kit% &ckit."
+
+kit-give-failed:
+  type: chat
+  message: "&cFailed to deliver kit &f%kit%&c. Please try again or contact an admin."
+
+kit-preview-usage:
+  type: chat
+  message: "&eUsage: &f/kit preview <name>"
+
+kitreset-usage:
+  type: chat
+  message: "&eUsage: &f/kitreset <player> <kit>"
+
+kit-reset-success:
+  type: chat
+  message: "&aReset kit &f%kit% &afor &e%player%&a."

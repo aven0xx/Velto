@@ -1,6 +1,7 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -34,12 +36,18 @@ public final class KitManager {
             Map<Enchantment, Integer> enchantments
     ) {}
 
-    public record Kit(String name, long cooldownSeconds, List<KitItem> items) {}
+    public record Kit(String name, long cooldownSeconds, boolean oneTime, List<String> commands, List<KitItem> items) {}
+
+    public record LoadResult(int kitsLoaded, int itemsSkipped) {}
+
+    public enum GiveResult { SUCCESS, OVERFLOW, ERROR }
+
+    private record ParsedItems(List<KitItem> items, int skipped) {}
 
     private static final LinkedHashMap<String, Kit> kits = new LinkedHashMap<>();
     private static Logger logger;
 
-    public static void load() {
+    public static LoadResult load() {
         logger = VeltoPlugin.get().getLogger();
         File kitsFile = new File(VeltoPlugin.get().getDataFolder(), "kits.yml");
 
@@ -52,19 +60,26 @@ public final class KitManager {
         ConfigurationSection kitsSection = config.getConfigurationSection("kits");
         if (kitsSection == null) {
             logger.warning("[Velto] kits.yml has no 'kits' section — no kits loaded.");
-            return;
+            return new LoadResult(0, 0);
         }
 
+        int totalSkipped = 0;
         for (String kitName : kitsSection.getKeys(false)) {
             ConfigurationSection kitSec = kitsSection.getConfigurationSection(kitName);
             if (kitSec == null) continue;
 
             long cooldown = kitSec.getLong("cooldown", 0L);
-            List<KitItem> items = parseItems(kitSec.getMapList("items"), kitName);
-            kits.put(kitName.toLowerCase(), new Kit(kitName, cooldown, items));
+            boolean oneTime = kitSec.getBoolean("one-time", false);
+            List<String> commands = kitSec.getStringList("commands");
+            ParsedItems parsed = parseItems(kitSec.getMapList("items"), kitName);
+            totalSkipped += parsed.skipped();
+            kits.put(kitName.toLowerCase(), new Kit(kitName, cooldown, oneTime, commands, parsed.items()));
         }
 
-        logger.info("[Velto] Loaded " + kits.size() + " kit(s).");
+        logger.info("[Velto] Loaded " + kits.size() + " kit(s)"
+                + (totalSkipped > 0 ? " (" + totalSkipped + " item(s) skipped due to invalid material/enchantment)" : "")
+                + ".");
+        return new LoadResult(kits.size(), totalSkipped);
     }
 
     public static Kit getKit(String name) {
@@ -96,41 +111,95 @@ public final class KitManager {
         UserdataManager.save(uuid);
     }
 
-    // Returns true if the inventory had no overflow; false if items were dropped on the ground.
-    public static boolean giveKit(Player player, Kit kit) {
-        boolean dropped = false;
-        for (KitItem kitItem : kit.items()) {
-            ItemStack stack = new ItemStack(kitItem.material(), kitItem.amount());
-            ItemMeta meta = stack.getItemMeta();
-            if (meta != null) {
-                if (kitItem.displayName() != null) {
-                    @SuppressWarnings("deprecation")
-                    String colored = ChatColor.translateAlternateColorCodes('&', kitItem.displayName());
-                    meta.setDisplayName(colored);
-                }
-                if (!kitItem.lore().isEmpty()) {
-                    List<String> coloredLore = new ArrayList<>();
-                    for (String line : kitItem.lore()) {
-                        @SuppressWarnings("deprecation")
-                        String colored = ChatColor.translateAlternateColorCodes('&', line);
-                        coloredLore.add(colored);
-                    }
-                    meta.setLore(coloredLore);
-                }
-                for (Map.Entry<Enchantment, Integer> entry : kitItem.enchantments().entrySet()) {
-                    meta.addEnchant(entry.getKey(), entry.getValue(), true);
-                }
-                stack.setItemMeta(meta);
-            }
-            Map<Integer, ItemStack> overflow = player.getInventory().addItem(stack);
-            if (!overflow.isEmpty()) {
-                for (ItemStack leftover : overflow.values()) {
-                    player.getWorld().dropItemNaturally(player.getLocation(), leftover);
-                }
-                dropped = true;
-            }
+    // === One-time kits ===
+
+    public static boolean hasClaimedOnce(UUID uuid, String kitName) {
+        if (!UserdataManager.isInitialized()) return false;
+        YamlConfiguration data = UserdataManager.getData(uuid);
+        synchronized (data) {
+            return data.getBoolean("kit-claimed." + kitName.toLowerCase(), false);
         }
-        return !dropped;
+    }
+
+    public static void markClaimedOnce(UUID uuid, String kitName) {
+        UserdataManager.set(uuid, "kit-claimed." + kitName.toLowerCase(), true);
+        UserdataManager.save(uuid);
+    }
+
+    // Clears both the cooldown timestamp and the one-time-claim flag for a kit.
+    public static void resetCooldown(UUID uuid, String kitName) {
+        UserdataManager.set(uuid, "kit-cooldowns." + kitName.toLowerCase(), null);
+        UserdataManager.set(uuid, "kit-claimed." + kitName.toLowerCase(), null);
+        UserdataManager.save(uuid);
+    }
+
+    // Builds the actual items + runs any configured commands. Returns ERROR (and gives
+    // nothing further) if delivery fails partway, so the caller can skip setting the
+    // cooldown/claim instead of burning it on a botched delivery.
+    public static GiveResult giveKit(Player player, Kit kit) {
+        boolean overflowed = false;
+        try {
+            for (KitItem kitItem : kit.items()) {
+                ItemStack stack = buildItemStack(kitItem);
+                Map<Integer, ItemStack> overflow = player.getInventory().addItem(stack);
+                if (!overflow.isEmpty()) {
+                    overflowed = true;
+                    for (ItemStack leftover : overflow.values()) {
+                        player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+                    }
+                }
+            }
+            for (String command : kit.commands()) {
+                String parsed = command.replace("%player%", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed);
+            }
+        } catch (Exception e) {
+            logger.warning("[Velto] Failed to fully deliver kit '" + kit.name() + "' to " + player.getName() + ": " + e.getMessage());
+            return GiveResult.ERROR;
+        }
+        return overflowed ? GiveResult.OVERFLOW : GiveResult.SUCCESS;
+    }
+
+    // Read-only inventory showing what a kit contains, without granting it.
+    public static Inventory buildPreviewInventory(Kit kit) {
+        int rows = Math.max(1, (kit.items().size() + 8) / 9);
+        int size = Math.min(54, rows * 9);
+
+        KitPreviewHolder holder = new KitPreviewHolder(kit.name());
+        Inventory inv = Bukkit.createInventory(holder, size,
+                ChatColor.translateAlternateColorCodes('&', "&8Kit Preview: &f" + kit.name()));
+        holder.setInventory(inv);
+
+        for (int i = 0; i < kit.items().size() && i < size; i++) {
+            inv.setItem(i, buildItemStack(kit.items().get(i)));
+        }
+        return inv;
+    }
+
+    private static ItemStack buildItemStack(KitItem kitItem) {
+        ItemStack stack = new ItemStack(kitItem.material(), kitItem.amount());
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            if (kitItem.displayName() != null) {
+                @SuppressWarnings("deprecation")
+                String colored = ChatColor.translateAlternateColorCodes('&', kitItem.displayName());
+                meta.setDisplayName(colored);
+            }
+            if (!kitItem.lore().isEmpty()) {
+                List<String> coloredLore = new ArrayList<>(kitItem.lore().size());
+                for (String line : kitItem.lore()) {
+                    @SuppressWarnings("deprecation")
+                    String colored = ChatColor.translateAlternateColorCodes('&', line);
+                    coloredLore.add(colored);
+                }
+                meta.setLore(coloredLore);
+            }
+            for (Map.Entry<Enchantment, Integer> entry : kitItem.enchantments().entrySet()) {
+                meta.addEnchant(entry.getKey(), entry.getValue(), true);
+            }
+            stack.setItemMeta(meta);
+        }
+        return stack;
     }
 
     public static String formatCooldown(long seconds) {
@@ -147,19 +216,24 @@ public final class KitManager {
         return sb.toString().trim();
     }
 
-    private static List<KitItem> parseItems(List<Map<?, ?>> rawItems, String kitName) {
-        if (rawItems == null || rawItems.isEmpty()) return Collections.emptyList();
+    private static ParsedItems parseItems(List<Map<?, ?>> rawItems, String kitName) {
+        if (rawItems == null || rawItems.isEmpty()) return new ParsedItems(Collections.emptyList(), 0);
 
         List<KitItem> items = new ArrayList<>();
+        int skipped = 0;
         for (Map<?, ?> raw : rawItems) {
             Object matObj = raw.get("material");
-            if (matObj == null) continue;
+            if (matObj == null) {
+                skipped++;
+                continue;
+            }
 
             Material mat;
             try {
                 mat = Material.valueOf(matObj.toString().toUpperCase());
             } catch (IllegalArgumentException e) {
                 logger.warning("[Velto] Kit '" + kitName + "': unknown material '" + matObj + "', skipping item.");
+                skipped++;
                 continue;
             }
 
@@ -189,7 +263,7 @@ public final class KitManager {
 
             items.add(new KitItem(mat, amount, displayName, lore, enchantments));
         }
-        return items;
+        return new ParsedItems(items, skipped);
     }
 
     @SuppressWarnings("deprecation")

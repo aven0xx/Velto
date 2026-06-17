@@ -3,7 +3,12 @@
 # Each kit requires the permission: velto.kit.<kitname>
 #
 # Fields per kit:
-#   cooldown: seconds between uses (0 = no cooldown)
+#   cooldown:  seconds between uses (0 = no cooldown, ignored if one-time is true)
+#   one-time:  true/false (default: false) - once claimed, never available again,
+#              regardless of cooldown. Use /kitreset <player> <kit> to clear it.
+#   commands:                        (optional)
+#     - "<console command>"          run as console for each player who claims the
+#                                     kit; use %player% for the claimer's name
 #   items:
 #     - material: <MATERIAL_NAME>     (required)
 #       amount:   <1-64>              (default: 1)
@@ -20,6 +25,8 @@
 # Example:
 #   vip:
 #     cooldown: 3600
+#     commands:
+#       - "effect give %player% minecraft:speed 60 1"
 #     items:
 #       - material: DIAMOND_SWORD
 #         amount: 1
@@ -27,6 +34,12 @@
 #         enchantments:
 #           sharpness: 3
 #           unbreaking: 2
+#
+#   welcome:
+#     one-time: true
+#     items:
+#       - material: BREAD
+#         amount: 8
 
 kits:
 
