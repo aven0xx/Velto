@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.managers.AutoMsgManager;
 import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -47,10 +48,21 @@ public class ReloadCommand extends BaseCommand {
         }
 
         try {
-            KitManager.load();
-            Bukkit.getLogger().info("[Velto] kits.yml reloaded.");
+            KitManager.LoadResult kitResult = KitManager.load();
+            Bukkit.getLogger().info("[Velto] kits.yml reloaded (" + kitResult.kitsLoaded() + " kit(s), "
+                    + kitResult.itemsSkipped() + " item(s) skipped).");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload kits.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            if (AutoMsgManager.getInstance() != null) {
+                AutoMsgManager.getInstance().restart();
+                Bukkit.getLogger().info("[Velto] AutoMsgManager restarted with new interval.");
+            }
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to restart AutoMsgManager: " + t.getMessage());
             t.printStackTrace();
         }
 

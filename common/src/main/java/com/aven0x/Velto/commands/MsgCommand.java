@@ -55,6 +55,7 @@ public class MsgCommand extends BaseCommand {
         LangUtil.send(from, "msg-sent", fromPlaceholders);
 
         MsgManager.setLastMessenger(to.getUniqueId(), from.getUniqueId());
+        MsgManager.setLastMessenger(from.getUniqueId(), to.getUniqueId());
 
         return true;
     }

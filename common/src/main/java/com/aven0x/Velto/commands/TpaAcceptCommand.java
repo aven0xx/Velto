@@ -45,12 +45,14 @@ public class TpaAcceptCommand extends BaseCommand {
         }
 
         Player requester = Bukkit.getPlayer(request.requester());
-        TpaManager.cancelRequest(request.requester());
 
         if (requester == null || !requester.isOnline()) {
-            LangUtil.send(target, "tpa-no-request");
+            TpaManager.cancelRequest(request.requester());
+            LangUtil.send(target, "tpa-requester-offline");
             return true;
         }
+
+        TpaManager.cancelRequest(request.requester());
 
         LangUtil.send(target, "tpa-accepted-target", Map.of("%requester%", requester.getName()));
         LangUtil.send(requester, "tpa-accepted-requester", Map.of("%target%", target.getName()));

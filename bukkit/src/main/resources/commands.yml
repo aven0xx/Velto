@@ -145,3 +145,6 @@ homes:
 kit:
   enabled: true
   aliases: []
+kitreset:
+  enabled: true
+  aliases: []

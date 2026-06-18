@@ -23,6 +23,10 @@ public final class HomeManager {
     }
 
     public static void setHome(UUID uuid, String name, Location location) {
+        if (location.getWorld() == null) {
+            logger().warning("[Velto] Cannot set home '" + name + "' for " + uuid + ": world is null (unloaded?).");
+            return;
+        }
         String base = "homes." + name + ".";
         UserdataManager.set(uuid, base + "world", location.getWorld().getName());
         UserdataManager.set(uuid, base + "x", location.getX());
