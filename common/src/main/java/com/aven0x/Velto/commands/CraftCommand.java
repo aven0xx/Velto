@@ -10,6 +10,11 @@ public class CraftCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.craft");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.craft")) {
             return true;

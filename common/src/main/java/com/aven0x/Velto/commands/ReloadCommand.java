@@ -15,6 +15,11 @@ public class ReloadCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.reload");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.reload")) {
             sender.sendMessage("§cYou do not have permission to run this command.");

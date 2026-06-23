@@ -11,6 +11,11 @@ public class SetSpawnCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.setspawn");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.setspawn")) return true;
         if (!(sender instanceof Player player)) {

@@ -15,6 +15,11 @@ public class BackCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.back");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.back")) return true;

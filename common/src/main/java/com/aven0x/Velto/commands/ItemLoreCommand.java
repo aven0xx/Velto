@@ -17,6 +17,11 @@ public class ItemLoreCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.lore");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.lore")) {
             return true;

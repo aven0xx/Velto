@@ -19,6 +19,17 @@ public class GamemodeCommands {
         }
 
         @Override
+        public boolean canUse(CommandSender sender) {
+            for (GameMode mode : GameMode.values()) {
+                String base = "velto.gamemode." + mode.name().toLowerCase();
+                if (checkPermission(sender, base) || checkPermission(sender, base + ".others")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
             if (args.length < 1) {
                 if (sender instanceof Player player) {
@@ -140,6 +151,12 @@ public class GamemodeCommands {
         public GamemodeShortcutCommand(String name, GameMode mode) {
             super(name);
             this.mode = mode;
+        }
+
+        @Override
+        public boolean canUse(CommandSender sender) {
+            String base = "velto.gamemode." + mode.name().toLowerCase();
+            return checkPermission(sender, base) || checkPermission(sender, base + ".others");
         }
 
         @Override
