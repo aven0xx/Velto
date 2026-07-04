@@ -1,16 +1,3 @@
 #Velto Roadmap
 
-FOR 0.7.5:
-
-  Commands:
-  - [DONE] Userdata folder for player data with YAML format, in-memory caching, async debounced autosave (UserdataManager)
-  - [DONE] /home, /sethome using TeleportManager. Multiple named homes per player, default home named "home", stored in userdata. Also added: /delhome, /homes
-  - [DONE] /kit system. kits.yml configurable (material, amount, name, lore, enchantments, cooldown). /kit [name] [player]. Per-kit permission (velto.kit.<name>), cooldown bypass (velto.kit.cooldown.bypass), admin give to others (velto.kit.others). Cooldowns persisted in userdata. /veltoreload reloads kits.yml
-
-  Bug fixes:
-  - [DONE] AfkCommand: ClassCastException when console runs /afk list (unsafe Player cast)
-
-FOR FUTURE (no version assigned):
-
-  Technical debt:
-  - [DEFERRED] LangUtil: migrate from BungeeCord legacy API (net.md_5.bungee) to Adventure API. Blocked until Spigot support is dropped or Adventure is shaded into the common module
+WILL BE UPDATED LATER ON
