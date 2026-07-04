@@ -5,18 +5,39 @@ import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Random;
 
 public class AutoMsgManager {
 
+    private static AutoMsgManager instance;
+
     private int index = 0;
     private String lastKey = null;
     private final Random rng = new Random();
+    private BukkitTask task;
+
+    public AutoMsgManager() {
+        instance = this;
+    }
+
+    public static AutoMsgManager getInstance() {
+        return instance;
+    }
+
+    public void restart() {
+        stop();
+        index = 0;
+        lastKey = null;
+        start();
+    }
 
     public void start() {
-        new BukkitRunnable() {
+        if (task != null) return;
+
+        task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!ConfigUtil.isAutoMessagesEnabled()) {
@@ -43,7 +64,8 @@ public class AutoMsgManager {
                     }
                     lastKey = key;
                 } else {
-                    key = keys.get(index++ % keys.size());
+                    key = keys.get(index % keys.size());
+                    index = (index + 1) % keys.size();
                 }
 
                 Bukkit.getLogger().info("[Velto] Broadcasting auto-message: " + key);
@@ -52,5 +74,11 @@ public class AutoMsgManager {
         }.runTaskTimer(VeltoPlugin.get(),
                 ConfigUtil.getAutoMessagesIntervalTicks(),
                 ConfigUtil.getAutoMessagesIntervalTicks());
+    }
+
+    public void stop() {
+        if (task == null) return;
+        task.cancel();
+        task = null;
     }
 }

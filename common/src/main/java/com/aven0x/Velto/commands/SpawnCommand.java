@@ -13,6 +13,11 @@ public class SpawnCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.spawn");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.spawn")) return true;
         if (!(sender instanceof Player player)) {
@@ -25,8 +30,7 @@ public class SpawnCommand extends BaseCommand {
             return true;
         }
 
-        TeleportManager.getInstance().teleportAsync(player, spawn);
-        LangUtil.send(player, "teleporting-spawn");
+        TeleportManager.getInstance().teleport(player, spawn, () -> LangUtil.send(player, "teleporting-spawn"));
         return true;
     }
 }

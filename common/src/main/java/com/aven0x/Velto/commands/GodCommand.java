@@ -17,6 +17,11 @@ public class GodCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.god") || checkPermission(sender, "velto.god.others");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         Player target = args.length > 0 ? Bukkit.getPlayer(args[0]) : sender instanceof Player ? (Player) sender : null;
         boolean self = args.length == 0;
@@ -50,10 +55,11 @@ public class GodCommand extends BaseCommand {
 
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
-        if (args.length == 1 && sender.hasPermission("velto.god.others")) {
+        if (args.length <= 1 && sender.hasPermission("velto.god.others")) {
+            String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }
             }

@@ -1,10 +1,14 @@
 package com.aven0x.VeltoPaper.managers;
 
+import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoPaper.VeltoPaper;
 import io.papermc.paper.event.player.AsyncChatEvent;
+
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -16,7 +20,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,10 +40,33 @@ public class ChatManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncChatEvent event) {
+        if (event.isCancelled()) return;
+
         Player player = event.getPlayer();
+        String rawMessage = LegacyComponentSerializer.legacySection().serialize(event.message());
 
+        if (isAtMentionMessage(rawMessage)) {
+            event.setCancelled(true);
+            runSync(() -> AtMentionHandler.handle(player, rawMessage));
+            return;
+        }
+
+        Set<Audience> viewers = new HashSet<>(event.viewers());
+        event.setCancelled(true);
+
+        runSync(() -> {
+            if (!player.isOnline()) return;
+
+            Component formatted = LegacyComponentSerializer.legacySection()
+                    .deserialize(buildChatFormat(player, rawMessage));
+            for (Audience viewer : viewers) {
+                viewer.sendMessage(formatted);
+            }
+        });
+    }
+
+    private String buildChatFormat(Player player, String messageText) {
         String format = resolveChatFormat(player);
-
         format = format.replace("%player_name%", player.getName());
 
         if (papiAvailable) {
@@ -45,14 +74,23 @@ public class ChatManager implements Listener {
             if (resolved != null) format = resolved;
         }
 
-        String messageText = LegacyComponentSerializer.legacySection().serialize(event.message());
         format = format.replace("%message%", messageText);
+        return CC.translate(format);
+    }
 
-        format = CC.translate(format);
+    private boolean isAtMentionMessage(String message) {
+        if (!message.startsWith("@")) return false;
+        int space = message.indexOf(' ');
+        return space > 1 && !message.substring(space + 1).trim().isEmpty();
+    }
 
-        final String finalFormat = format;
-        event.renderer((source, displayName, message, viewer) ->
-                LegacyComponentSerializer.legacySection().deserialize(finalFormat));
+    private void runSync(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(plugin, runnable);
     }
 
     private String resolveChatFormat(Player player) {

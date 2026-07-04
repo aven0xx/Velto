@@ -25,7 +25,10 @@ permissions:
       velto.craft: true
       velto.lore: true
       velto.alert: true
+      velto.tp: true
+      velto.tp.others: true
       velto.tpall: true
+      velto.tpa: true
       velto.sudo: true
       velto.notiftest: true
       velto.timeset: true
@@ -48,6 +51,17 @@ permissions:
       velto.gamemode.adventure.others: true
       velto.gamemode.spectator: true
       velto.gamemode.spectator.others: true
+      velto.afk: true
       velto.afk.list: true
       velto.afk.others: true
       velto.anvil: true
+      velto.home: true
+      velto.sethome: true
+      velto.delhome: true
+      velto.homes: true
+      velto.kit: true
+      velto.kit.others: true
+      velto.kit.reset: true
+      velto.kit.cooldown.bypass: true
+      velto.kit.starter: true
+      velto.kit.daily: true

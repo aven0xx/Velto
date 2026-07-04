@@ -18,6 +18,11 @@ public class AfkCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.afk");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
 
         if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
@@ -25,7 +30,11 @@ public class AfkCommand extends BaseCommand {
 
             var afkPlayers = AfkManager.getAfkPlayers();
             if (afkPlayers.isEmpty()) {
-                LangUtil.send((Player) sender, "afk-list-empty");
+                if (sender instanceof Player player) {
+                    LangUtil.send(player, "afk-list-empty");
+                } else {
+                    sender.sendMessage("No players are currently AFK.");
+                }
             } else {
                 String playerNames = afkPlayers.stream()
                         .map(Player::getName)
@@ -35,12 +44,17 @@ public class AfkCommand extends BaseCommand {
                         "%count%", String.valueOf(afkPlayers.size()),
                         "%players%", playerNames
                 );
-                LangUtil.send((Player) sender, "afk-list", placeholders);
+                if (sender instanceof Player player) {
+                    LangUtil.send(player, "afk-list", placeholders);
+                } else {
+                    sender.sendMessage("AFK (" + afkPlayers.size() + "): " + playerNames);
+                }
             }
             return true;
         }
 
         if (!isPlayer(sender)) return true;
+        if (!hasPermission(sender, "velto.afk")) return true;
         Player player = (Player) sender;
 
         if (args.length == 0) {
@@ -75,8 +89,8 @@ public class AfkCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         List<String> completions = new ArrayList<>();
 
-        if (args.length == 1) {
-            String arg = args[0].toLowerCase();
+        if (args.length <= 1) {
+            String arg = (args.length == 0 ? "" : args[0]).toLowerCase();
 
             if (sender.hasPermission("velto.afk.list") && "list".startsWith(arg)) {
                 completions.add("list");

@@ -1,15 +1,16 @@
 #Velto Roadmap
 
-FOR 0.7.2:
+FOR 0.7.5:
 
   Commands:
-  - [DONE] /fly              Toggle flight for a player (admin/self), fits naturally with /god and /speed
-  - [DONE] /msg + /reply     Basic private messaging between players, a staple core feature
-  - [DONE] /tpall            Teleport all online players to the sender
-  - [DONE] /sudo             Execute a command as another player (admin utility)
+  - [DONE] Userdata folder for player data with YAML format, in-memory caching, async debounced autosave (UserdataManager)
+  - [DONE] /home, /sethome using TeleportManager. Multiple named homes per player, default home named "home", stored in userdata. Also added: /delhome, /homes
+  - [DONE] /kit system. kits.yml configurable (material, amount, name, lore, enchantments, cooldown). /kit [name] [player]. Per-kit permission (velto.kit.<name>), cooldown bypass (velto.kit.cooldown.bypass), admin give to others (velto.kit.others). Cooldowns persisted in userdata. /veltoreload reloads kits.yml
 
-  Improvements:
-  - [DONE] Tab completion    Add player-name tab completion to all commands that accept a player argument
-  - [DONE] /back             Extend to also save location on teleport commands (currently only on death)
-  - [DONE] commands.yml      Add per-command permission node overrides so servers can remap permissions
-  - [DONE] lang.yml          Add missing messages for newer commands (afk, back, alert, list)
+  Bug fixes:
+  - [DONE] AfkCommand: ClassCastException when console runs /afk list (unsafe Player cast)
+
+FOR FUTURE (no version assigned):
+
+  Technical debt:
+  - [DEFERRED] LangUtil: migrate from BungeeCord legacy API (net.md_5.bungee) to Adventure API. Blocked until Spigot support is dropped or Adventure is shaded into the common module

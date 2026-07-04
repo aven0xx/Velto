@@ -19,6 +19,11 @@ public class MsgCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.msg");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.msg")) return true;
@@ -55,16 +60,18 @@ public class MsgCommand extends BaseCommand {
         LangUtil.send(from, "msg-sent", fromPlaceholders);
 
         MsgManager.setLastMessenger(to.getUniqueId(), from.getUniqueId());
+        MsgManager.setLastMessenger(from.getUniqueId(), to.getUniqueId());
 
         return true;
     }
 
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
-        if (args.length == 1) {
+        if (args.length <= 1) {
+            String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!p.equals(sender) && p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }
             }

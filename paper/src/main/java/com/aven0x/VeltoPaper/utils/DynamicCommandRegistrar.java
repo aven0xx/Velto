@@ -37,6 +37,11 @@ public class DynamicCommandRegistrar {
                 List<String> completions = command.complete(source.getSender(), alias, args);
                 return completions != null ? completions : List.of();
             }
+
+            @Override
+            public boolean canUse(@NotNull CommandSender sender) {
+                return command.canUse(sender);
+            }
         });
     }
 }

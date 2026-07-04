@@ -45,8 +45,18 @@ public class CommandManager {
         register("fly", FlyCommand::new);
         register("msg", MsgCommand::new);
         register("reply", ReplyCommand::new);
+        register("tp", TpCommand::new);
         register("tpall", TpAllCommand::new);
+        register("tpa", TpaCommand::new);
+        register("tpaaccept", TpaAcceptCommand::new);
+        register("tpadeny", TpaDenyCommand::new);
         register("sudo", SudoCommand::new);
+        register("home", HomeCommand::new);
+        register("sethome", SetHomeCommand::new);
+        register("delhome", DelHomeCommand::new);
+        register("homes", HomesCommand::new);
+        register("kit", KitCommand::new);
+        register("kitreset", KitResetCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {

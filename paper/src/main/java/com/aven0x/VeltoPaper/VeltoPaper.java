@@ -2,11 +2,16 @@ package com.aven0x.VeltoPaper;
 
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.listeners.BackListener;
+import com.aven0x.Velto.listeners.ChatListener;
 import com.aven0x.Velto.listeners.GodListener;
+import com.aven0x.Velto.listeners.KitPreviewListener;
+import com.aven0x.Velto.listeners.UserdataListener;
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.AutoMsgManager;
+import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
+import com.aven0x.Velto.managers.UserdataManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -20,6 +25,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("UnstableApiUsage")
 public class VeltoPaper extends JavaPlugin {
+
+    private AutoMsgManager autoMsgManager;
 
     @Override
     public void onEnable() {
@@ -35,10 +42,11 @@ public class VeltoPaper extends JavaPlugin {
         // Load custom configs
         LangUtil.load();
         CommandUtil.load();
+        KitManager.load();
 
         // Setup managers
         new TeleportManager();
-        AutoMsgManager autoMsgManager = new AutoMsgManager();
+        autoMsgManager = new AutoMsgManager();
         autoMsgManager.start();
         new ChatManager(this);
 
@@ -51,17 +59,28 @@ public class VeltoPaper extends JavaPlugin {
         // Register listeners
         getServer().getPluginManager().registerEvents(new GodListener(), this);
         getServer().getPluginManager().registerEvents(new BackListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        getServer().getPluginManager().registerEvents(new KitPreviewListener(), this);
 
         AfkManager afkManager = new AfkManager();
         getServer().getPluginManager().registerEvents(afkManager, this);
         PlaceholderManager.init();
         AfkManager.start();
         AfkPositionStorage.init(getDataFolder());
+        UserdataManager.init(getDataFolder());
+        UserdataManager.startAutosave(ConfigUtil.getUserdataAutosaveIntervalTicks());
+        getServer().getPluginManager().registerEvents(new UserdataListener(), this);
     }
 
     @Override
     public void onDisable() {
         AfkManager.stop();
+        if (autoMsgManager != null) {
+            autoMsgManager.stop();
+            autoMsgManager = null;
+        }
+        UserdataManager.stopAutosave();
+        UserdataManager.saveAll();
     }
 
     public static VeltoPaper getInstance() {

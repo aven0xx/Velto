@@ -40,4 +40,8 @@ public class GodManager {
         }
         return players;
     }
+
+    public static void cleanup(UUID uuid) {
+        godPlayers.remove(uuid);
+    }
 }

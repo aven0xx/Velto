@@ -19,6 +19,17 @@ public class GamemodeCommands {
         }
 
         @Override
+        public boolean canUse(CommandSender sender) {
+            for (GameMode mode : GameMode.values()) {
+                String base = "velto.gamemode." + mode.name().toLowerCase();
+                if (checkPermission(sender, base) || checkPermission(sender, base + ".others")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
             if (args.length < 1) {
                 if (sender instanceof Player player) {
@@ -86,9 +97,10 @@ public class GamemodeCommands {
 
         @Override
         public List<String> complete(CommandSender sender, String label, String[] args) {
-            if (args.length == 1) {
+            if (args.length <= 1) {
+                String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
                 return List.of("survival", "creative", "adventure", "spectator").stream()
-                        .filter(s -> s.startsWith(args[0].toLowerCase()))
+                        .filter(s -> s.startsWith(typed))
                         .toList();
             }
             if (args.length == 2) {
@@ -142,6 +154,12 @@ public class GamemodeCommands {
         }
 
         @Override
+        public boolean canUse(CommandSender sender) {
+            String base = "velto.gamemode." + mode.name().toLowerCase();
+            return checkPermission(sender, base) || checkPermission(sender, base + ".others");
+        }
+
+        @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
             Player target = args.length > 0
                     ? Bukkit.getPlayer(args[0])
@@ -183,10 +201,11 @@ public class GamemodeCommands {
 
         @Override
         public List<String> complete(CommandSender sender, String label, String[] args) {
-            if (args.length == 1) {
+            if (args.length <= 1) {
+                String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
                 List<String> names = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                    if (p.getName().toLowerCase().startsWith(typed)) {
                         names.add(p.getName());
                     }
                 }

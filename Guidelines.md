@@ -1,19 +1,19 @@
-# CLAUDE.md
+# Guidelines.md
 
-This file provides guidance for Claude Code when working in this repository.
+This file provides guidance for Claude Code/ChatGPT Codex when working in this repository.
 
 ## RULES
 
-- A session link must never be attached to a commit or a Pull Request made by Claude
-- Aven0xx is always the author of every commit while Claude is Co-Author
+- A session link must never be attached to a commit or a Pull Request made by Claude or ChatGPT Codex
+- Aven0xx is always the author of every commit while Claude/ChatGPT Codex is Co-Author
 - Always ask before making changes to the codebase to get the permission to do it
 
 
 ## Project Overview
 
-**Velto** is a lightweight Minecraft core plugin (alpha) targeting Paper/Spigot/Bukkit servers. It is intentionally minimal — no economy, homes, or warps. The goal is a plug-and-play core that plays well with other plugins.
+**Velto** is a lightweight Minecraft core plugin (alpha) targeting Paper/Spigot/Bukkit servers. It is intentionally minimal — no economy, warps, towns, or minigame systems. The goal is a plug-and-play core that plays well with other plugins with every command that can be disabled.
 
-- Current version: `0.7.2-SNAPSHOT`
+- Current version: `0.7.5-SNAPSHOT`
 - Supported MC versions: 1.21.4–1.21.11 (1.21.4 is LTS)
 - Java package root: `com.aven0x`
 
@@ -69,4 +69,4 @@ Do NOT run `./gradlew build` at the root — it is intentionally blocked.
 
 ## What Velto Intentionally Excludes
 
-Do not add: economy, homes, TPA, warps, kits, claims, towns, or minigame systems. These are left to dedicated plugins by design.
+Do not add: economy, claims, towns, or minigame systems. These are left to dedicated plugins by design.

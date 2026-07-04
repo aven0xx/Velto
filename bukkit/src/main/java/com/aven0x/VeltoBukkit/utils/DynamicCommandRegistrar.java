@@ -39,6 +39,11 @@ public class DynamicCommandRegistrar {
             public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
                 return command.complete(sender, alias, args);
             }
+
+            @Override
+            public boolean testPermissionSilent(CommandSender target) {
+                return command.canUse(target);
+            }
         };
 
         commandMap.register(VeltoPlugin.get().getName(), cmd);

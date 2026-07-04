@@ -1,5 +1,6 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
 import com.aven0x.VeltoBukkit.VeltoBukkit;
@@ -15,7 +16,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,10 +36,35 @@ public class ChatManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled()) return;
+
         Player player = event.getPlayer();
+        String rawMessage = event.getMessage();
 
+        if (isAtMentionMessage(rawMessage)) {
+            event.setCancelled(true);
+            runSync(() -> AtMentionHandler.handle(player, rawMessage));
+            return;
+        }
+
+        Set<Player> recipients = new HashSet<>(event.getRecipients());
+        event.setCancelled(true);
+
+        runSync(() -> {
+            if (!player.isOnline()) return;
+
+            String format = buildChatFormat(player, rawMessage);
+            for (Player recipient : recipients) {
+                if (recipient.isOnline()) {
+                    recipient.sendMessage(format);
+                }
+            }
+            Bukkit.getConsoleSender().sendMessage(format);
+        });
+    }
+
+    private String buildChatFormat(Player player, String rawMessage) {
         String format = resolveChatFormat(player);
-
         format = format.replace("%player_name%", player.getName());
 
         if (papiAvailable) {
@@ -44,12 +72,24 @@ public class ChatManager implements Listener {
             if (resolved != null) format = resolved;
         }
 
-        String safeMessage = event.getMessage().replace("%", "%%");
+        String safeMessage = rawMessage.replace("%", "%%");
         format = format.replace("%message%", safeMessage);
+        return CC.translate(format);
+    }
 
-        format = CC.translate(format);
+    private boolean isAtMentionMessage(String message) {
+        if (!message.startsWith("@")) return false;
+        int space = message.indexOf(' ');
+        return space > 1 && !message.substring(space + 1).trim().isEmpty();
+    }
 
-        event.setFormat(format);
+    private void runSync(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(plugin, runnable);
     }
 
     private String resolveChatFormat(Player player) {

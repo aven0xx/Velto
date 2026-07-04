@@ -14,6 +14,11 @@ public class SpeedCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.speed") || checkPermission(sender, "velto.speed.others");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length < 1) {
             if (sender instanceof Player player) {

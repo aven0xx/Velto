@@ -1,0 +1,72 @@
+# Velto Kit Configuration
+#
+# Each kit requires the permission: velto.kit.<kitname>
+#
+# Fields per kit:
+#   cooldown:  seconds between uses (0 = no cooldown, ignored if one-time is true)
+#   one-time:  true/false (default: false) - once claimed, never available again,
+#              regardless of cooldown. Use /kitreset <player> <kit> to clear it.
+#   commands:                        (optional)
+#     - "<console command>"          run as console for each player who claims the
+#                                     kit; use %player% for the claimer's name
+#   items:
+#     - material: <MATERIAL_NAME>     (required)
+#       amount:   <1-64>              (default: 1)
+#       name:     "&6Custom name"     (optional, supports & color codes)
+#       lore:                         (optional)
+#         - "&7Line one"
+#         - "&7Line two"
+#       enchantments:                 (optional)
+#         <enchantment_name>: <level>
+#
+# Enchantment names use Minecraft keys (sharpness, protection, efficiency,
+# unbreaking, fortune, silk_touch, mending, flame, infinity, power, etc.)
+#
+# Example:
+#   vip:
+#     cooldown: 3600
+#     commands:
+#       - "effect give %player% minecraft:speed 60 1"
+#     items:
+#       - material: DIAMOND_SWORD
+#         amount: 1
+#         name: "&bVIP Sword"
+#         enchantments:
+#           sharpness: 3
+#           unbreaking: 2
+#
+#   welcome:
+#     one-time: true
+#     items:
+#       - material: BREAD
+#         amount: 8
+
+kits:
+
+  starter:
+    cooldown: 0
+    items:
+      - material: STONE_SWORD
+        amount: 1
+        enchantments:
+          sharpness: 1
+      - material: STONE_PICKAXE
+        amount: 1
+      - material: STONE_AXE
+        amount: 1
+      - material: STONE_SHOVEL
+        amount: 1
+      - material: COOKED_BEEF
+        amount: 16
+
+  daily:
+    cooldown: 86400
+    items:
+      - material: DIAMOND
+        amount: 3
+      - material: GOLDEN_APPLE
+        amount: 2
+      - material: EXPERIENCE_BOTTLE
+        amount: 5
+      - material: COOKED_BEEF
+        amount: 32

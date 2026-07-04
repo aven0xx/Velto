@@ -20,4 +20,9 @@ public class MsgManager {
     public static void remove(UUID uuid) {
         lastMessenger.remove(uuid);
     }
+
+    public static void cleanup(UUID uuid) {
+        lastMessenger.remove(uuid);
+        lastMessenger.entrySet().removeIf(entry -> entry.getValue().equals(uuid));
+    }
 }

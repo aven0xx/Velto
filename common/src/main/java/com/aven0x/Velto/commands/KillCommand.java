@@ -15,6 +15,11 @@ public class KillCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.kill");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.kill")) {
             return true;
@@ -46,11 +51,12 @@ public class KillCommand extends BaseCommand {
 
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
-        if (args.length == 1 && sender.hasPermission("velto.kill")) {
+        if (args.length <= 1 && sender.hasPermission("velto.kill")) {
+            String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             return Bukkit.getOnlinePlayers().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .filter(name -> name.toLowerCase().startsWith(typed))
                     .toList();
         }
         return List.of();

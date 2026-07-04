@@ -17,6 +17,11 @@ public class ItemLoreCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.lore");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.lore")) {
             return true;
@@ -213,8 +218,8 @@ public class ItemLoreCommand extends BaseCommand {
         List<String> out = new ArrayList<>();
         if (!(sender instanceof Player player)) return out;
 
-        if (args.length == 1) {
-            String p = args[0].toLowerCase(Locale.ROOT);
+        if (args.length <= 1) {
+            String p = (args.length == 0 ? "" : args[0]).toLowerCase(Locale.ROOT);
             for (String opt : new String[]{"show", "clear", "add", "insert", "set", "remove"}) {
                 if (opt.startsWith(p)) out.add(opt);
             }
