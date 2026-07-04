@@ -12,6 +12,11 @@ public class AlertCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.alert");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
 
         if (!hasPermission(sender, "velto.alert")) {

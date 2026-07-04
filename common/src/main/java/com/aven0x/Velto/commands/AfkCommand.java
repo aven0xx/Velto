@@ -18,6 +18,11 @@ public class AfkCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.afk");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
 
         if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
@@ -49,6 +54,7 @@ public class AfkCommand extends BaseCommand {
         }
 
         if (!isPlayer(sender)) return true;
+        if (!hasPermission(sender, "velto.afk")) return true;
         Player player = (Player) sender;
 
         if (args.length == 0) {

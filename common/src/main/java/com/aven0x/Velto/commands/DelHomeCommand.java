@@ -15,6 +15,11 @@ public class DelHomeCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.delhome");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.delhome")) return true;

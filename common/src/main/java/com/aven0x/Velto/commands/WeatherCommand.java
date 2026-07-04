@@ -12,6 +12,11 @@ public class WeatherCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.weather");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!hasPermission(sender, "velto.weather")) {
             return true;
@@ -101,6 +106,11 @@ public class WeatherCommand extends BaseCommand {
         }
 
         @Override
+        public boolean canUse(CommandSender sender) {
+            return checkPermission(sender, "velto.weather");
+        }
+
+        @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
             return WeatherCommand.dispatchWeather(sender, "sun", args);
         }
@@ -112,6 +122,11 @@ public class WeatherCommand extends BaseCommand {
         }
 
         @Override
+        public boolean canUse(CommandSender sender) {
+            return checkPermission(sender, "velto.weather");
+        }
+
+        @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
             return WeatherCommand.dispatchWeather(sender, "rain", args);
         }
@@ -120,6 +135,11 @@ public class WeatherCommand extends BaseCommand {
     public static class ThunderCommand extends BaseCommand {
         public ThunderCommand() {
             super("thunder");
+        }
+
+        @Override
+        public boolean canUse(CommandSender sender) {
+            return checkPermission(sender, "velto.weather");
         }
 
         @Override

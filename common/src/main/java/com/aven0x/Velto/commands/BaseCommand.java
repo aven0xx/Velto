@@ -28,6 +28,14 @@ public abstract class BaseCommand {
         return Collections.emptyList();
     }
 
+    /**
+     * Whether this command should be visible to the sender at all (gates tab-completion/listing
+     * on both Paper and Bukkit). Override with the same permission(s) checked in execute().
+     */
+    public boolean canUse(CommandSender sender) {
+        return true;
+    }
+
     protected boolean isPlayer(CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("§cOnly players can use this command.");
@@ -36,9 +44,12 @@ public abstract class BaseCommand {
         return true;
     }
 
+    protected boolean checkPermission(CommandSender sender, String perm) {
+        return sender.hasPermission(CommandUtil.getPermission(this.name, perm));
+    }
+
     protected boolean hasPermission(CommandSender sender, String perm) {
-        String effectivePerm = CommandUtil.getPermission(this.name, perm);
-        if (!sender.hasPermission(effectivePerm)) {
+        if (!checkPermission(sender, perm)) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "no-permission");
             } else {

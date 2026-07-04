@@ -18,6 +18,11 @@ public class TpaAcceptCommand extends BaseCommand {
     }
 
     @Override
+    public boolean canUse(CommandSender sender) {
+        return checkPermission(sender, "velto.tpa");
+    }
+
+    @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (!isPlayer(sender)) return true;
         if (!hasPermission(sender, "velto.tpa")) return true;
