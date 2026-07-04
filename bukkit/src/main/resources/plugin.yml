@@ -47,6 +47,7 @@ permissions:
       velto.gamemode.adventure.others: true
       velto.gamemode.spectator: true
       velto.gamemode.spectator.others: true
+      velto.afk: true
       velto.afk.list: true
       velto.afk.others: true
       velto.home: true
