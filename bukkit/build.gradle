@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
@@ -16,6 +17,7 @@ dependencies {
     // Spigot/PAPI as provided by server
     compileOnly 'org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.6'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
 }
 
 tasks {

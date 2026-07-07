@@ -1,6 +1,8 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.integrations.VaultHook;
 import com.aven0x.Velto.managers.AutoMsgManager;
+import com.aven0x.Velto.managers.EconomyManager;
 import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.managers.WarpManager;
 import com.aven0x.Velto.utils.CommandUtil;
@@ -67,6 +69,22 @@ public class ReloadCommand extends BaseCommand {
             Bukkit.getLogger().info("[Velto] warps.yml reloaded (" + WarpManager.getWarpNames().size() + " warp(s)).");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload warps.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            EconomyManager.load();
+            Bukkit.getLogger().info("[Velto] economy.yml reloaded.");
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to reload economy.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            VaultHook.refresh();
+            Bukkit.getLogger().info("[Velto] Vault economy hook refreshed.");
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to refresh Vault economy hook: " + t.getMessage());
             t.printStackTrace();
         }
 

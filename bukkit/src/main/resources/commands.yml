@@ -154,3 +154,12 @@ warp:
 setwarp:
   enabled: true
   aliases: []
+economy:
+  enabled: true
+  aliases: ["eco"]
+balance:
+  enabled: true
+  aliases: ["bal", "money"]
+pay:
+  enabled: true
+  aliases: []

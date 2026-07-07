@@ -69,4 +69,8 @@ Do NOT run `./gradlew build` at the root — it is intentionally blocked.
 
 ## What Velto Intentionally Excludes
 
-Do not add: economy, claims, towns, or minigame systems. These are left to dedicated plugins by design.
+Do not add: claims, towns, or minigame systems. These are left to dedicated plugins by design.
+
+Velto does ship a lightweight, single-currency economy module (`/economy`, `/balance`, `/pay`, with an
+optional Vault hook) — but it is fully toggleable via `economy.yml` (`enabled: false`) for server owners
+who prefer a dedicated economy plugin.

@@ -623,3 +623,75 @@ warp-no-warps:
 setwarp-usage:
   type: chat
   message: "&eUsage: &f/setwarp <name>"
+
+economy-disabled:
+  type: chat
+  message: "&cThe economy module is currently disabled."
+
+economy-usage:
+  type: chat
+  message: "&eUsage: &f/economy <give|take|set|reset> <player> [amount]"
+
+economy-invalid-amount:
+  type: chat
+  message: "&cInvalid amount. Must be a positive number."
+
+economy-give:
+  type: chat
+  message: "&aGave &f%amount%&a to &e%player%&a."
+
+economy-give-target:
+  type: chat
+  message: "&aYou received &f%amount%&a."
+
+economy-take:
+  type: chat
+  message: "&aTook &f%amount%&a from &e%player%&a."
+
+economy-take-target:
+  type: chat
+  message: "&cYou had &f%amount%&c taken from your balance."
+
+economy-set:
+  type: chat
+  message: "&aSet &e%player%'s&a balance to &f%amount%&a."
+
+economy-set-target:
+  type: chat
+  message: "&aYour balance was set to &f%amount%&a."
+
+economy-reset:
+  type: chat
+  message: "&aReset &e%player%'s&a balance to &f%amount%&a."
+
+economy-reset-target:
+  type: chat
+  message: "&aYour balance was reset to &f%amount%&a."
+
+balance-self:
+  type: chat
+  message: "&aYour balance: &f%balance%&a."
+
+balance-other:
+  type: chat
+  message: "&a%player%'s balance: &f%balance%&a."
+
+pay-usage:
+  type: chat
+  message: "&eUsage: &f/pay <player> <amount>"
+
+pay-self:
+  type: chat
+  message: "&cYou cannot pay yourself."
+
+pay-insufficient-funds:
+  type: chat
+  message: "&cYou do not have enough money to send that amount."
+
+pay-sent:
+  type: chat
+  message: "&aYou paid &f%amount%&a to &e%player%&a."
+
+pay-received:
+  type: chat
+  message: "&aYou received &f%amount%&a from &e%player%&a."
