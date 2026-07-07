@@ -12,6 +12,7 @@ import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.UserdataManager;
+import com.aven0x.Velto.managers.WarpManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -43,6 +44,7 @@ public class VeltoPaper extends JavaPlugin {
         LangUtil.load();
         CommandUtil.load();
         KitManager.load();
+        WarpManager.init(getDataFolder());
 
         // Setup managers
         new TeleportManager();

@@ -148,3 +148,9 @@ kit:
 kitreset:
   enabled: true
   aliases: []
+warp:
+  enabled: true
+  aliases: []
+setwarp:
+  enabled: true
+  aliases: []

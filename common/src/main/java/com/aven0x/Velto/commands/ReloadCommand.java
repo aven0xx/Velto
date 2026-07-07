@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.AutoMsgManager;
 import com.aven0x.Velto.managers.KitManager;
+import com.aven0x.Velto.managers.WarpManager;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
@@ -58,6 +59,14 @@ public class ReloadCommand extends BaseCommand {
                     + kitResult.itemsSkipped() + " item(s) skipped).");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to reload kits.yml: " + t.getMessage());
+            t.printStackTrace();
+        }
+
+        try {
+            WarpManager.reload();
+            Bukkit.getLogger().info("[Velto] warps.yml reloaded (" + WarpManager.getWarpNames().size() + " warp(s)).");
+        } catch (Throwable t) {
+            Bukkit.getLogger().severe("[Velto] Failed to reload warps.yml: " + t.getMessage());
             t.printStackTrace();
         }
 

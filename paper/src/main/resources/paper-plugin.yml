@@ -65,3 +65,5 @@ permissions:
       velto.kit.cooldown.bypass: true
       velto.kit.starter: true
       velto.kit.daily: true
+      velto.warp: true
+      velto.setwarp: true

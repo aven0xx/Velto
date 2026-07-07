@@ -57,6 +57,8 @@ public class CommandManager {
         register("homes", HomesCommand::new);
         register("kit", KitCommand::new);
         register("kitreset", KitResetCommand::new);
+        register("warp", WarpCommand::new);
+        register("setwarp", SetWarpCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {

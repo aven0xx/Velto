@@ -598,3 +598,28 @@ kitreset-usage:
 kit-reset-success:
   type: chat
   message: "&aReset kit &f%kit% &afor &e%player%&a."
+
+warp-teleported:
+  type: actionbar
+  message: "&aTeleported to warp &f%warp%&a."
+  duration: 60
+
+warp-set:
+  type: chat
+  message: "&aWarp &f%warp%&a set."
+
+warp-not-found:
+  type: chat
+  message: "&cWarp '%warp%' not found."
+
+warp-list:
+  type: chat
+  message: "&7Warps: &f%warps%"
+
+warp-no-warps:
+  type: chat
+  message: "&cThere are no warps set."
+
+setwarp-usage:
+  type: chat
+  message: "&eUsage: &f/setwarp <name>"
