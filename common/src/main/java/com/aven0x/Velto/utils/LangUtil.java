@@ -24,11 +24,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LangUtil {
 
     private static FileConfiguration lang;
     private static final Map<String, ParsedMessage> cache = new HashMap<>();
+
+    // Matches &#RRGGBB hex color codes (Minecraft 1.16+).
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     // One independently-styled, independently-clickable span of text.
     private static final class ParsedSegment {
@@ -45,7 +50,7 @@ public class LangUtil {
             Object textObj = map.get("text");
             rawText = textObj != null ? textObj.toString() : "";
             coloredText = rawText.contains("%") ? null
-                    : ChatColor.translateAlternateColorCodes('&', rawText);
+                    : colorize(rawText);
 
             Object clickObj = map.get("click");
             if (clickObj instanceof Map<?, ?> clickMap) {
@@ -63,7 +68,7 @@ public class LangUtil {
             Object hoverObj = map.get("hover");
             rawHover = hoverObj instanceof String s ? s : null;
             coloredHover = (rawHover != null && !rawHover.contains("%"))
-                    ? ChatColor.translateAlternateColorCodes('&', rawHover)
+                    ? colorize(rawHover)
                     : null;
 
             boolean fullyStatic = coloredText != null
@@ -98,9 +103,9 @@ public class LangUtil {
             rawSubtitle = sec.getString("subtitle", "");
 
             coloredMessage = rawMessage.contains("%") ? null
-                    : ChatColor.translateAlternateColorCodes('&', rawMessage);
+                    : colorize(rawMessage);
             coloredSubtitle = rawSubtitle.contains("%") ? null
-                    : ChatColor.translateAlternateColorCodes('&', rawSubtitle);
+                    : colorize(rawSubtitle);
 
             String colorName = sec.getString("color", "BLUE").toUpperCase();
             BarColor resolved = BarColor.BLUE;
@@ -125,7 +130,7 @@ public class LangUtil {
             String hover = sec.getString("hover", null);
             rawHover = hover;
             coloredHover = (hover != null && !hover.contains("%"))
-                    ? ChatColor.translateAlternateColorCodes('&', hover)
+                    ? colorize(hover)
                     : null;
 
             List<?> segList = sec.getList("segments");
@@ -269,7 +274,7 @@ public class LangUtil {
     }
 
     public static void sendGlobalRaw(String rawMessage, String type, int durationTicks) {
-        String colored = ChatColor.translateAlternateColorCodes('&', rawMessage);
+        String colored = colorize(rawMessage);
 
         switch (type.toLowerCase()) {
             case "chat" -> Bukkit.broadcastMessage(colored);
@@ -299,6 +304,20 @@ public class LangUtil {
 
     // ===== Helpers =====
 
+    // Translates &#RRGGBB hex codes (1.16+) to the legacy §x§R§G§B sequence first, then
+    // the classic &-codes. Mirrors ChatManager.CC so lang.yml supports full hex colors.
+    private static String colorize(String input) {
+        if (input == null) return "";
+        Matcher matcher = HEX_PATTERN.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = net.md_5.bungee.api.ChatColor.of("#" + matcher.group(1)).toString();
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(sb);
+        return ChatColor.translateAlternateColorCodes('&', sb.toString());
+    }
+
     private static ClickEvent.Action parseClickAction(String raw) {
         if (raw == null) return null;
         return switch (raw.toLowerCase()) {
@@ -312,9 +331,9 @@ public class LangUtil {
 
     private static String resolveColored(String raw, String preColored, Map<String, String> placeholders) {
         if (placeholders != null && !placeholders.isEmpty()) {
-            return ChatColor.translateAlternateColorCodes('&', applyPlaceholders(raw, placeholders));
+            return colorize(applyPlaceholders(raw, placeholders));
         }
-        return preColored != null ? preColored : ChatColor.translateAlternateColorCodes('&', raw);
+        return preColored != null ? preColored : colorize(raw);
     }
 
     private static BaseComponent[] resolveComponents(ParsedMessage msg, String colored, Map<String, String> placeholders) {
@@ -338,8 +357,8 @@ public class LangUtil {
                 all.addAll(Arrays.asList(seg.prebuiltComponents));
             } else {
                 String text = hasPlaceholders
-                        ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(seg.rawText, placeholders))
-                        : (seg.coloredText != null ? seg.coloredText : ChatColor.translateAlternateColorCodes('&', seg.rawText));
+                        ? colorize(applyPlaceholders(seg.rawText, placeholders))
+                        : (seg.coloredText != null ? seg.coloredText : colorize(seg.rawText));
                 all.addAll(Arrays.asList(buildSegmentComponents(seg, text, hasPlaceholders ? placeholders : null)));
             }
         }
@@ -361,8 +380,8 @@ public class LangUtil {
         HoverEvent hover = null;
         if (seg.rawHover != null) {
             String hoverColored = (placeholders != null && !placeholders.isEmpty())
-                    ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(seg.rawHover, placeholders))
-                    : (seg.coloredHover != null ? seg.coloredHover : ChatColor.translateAlternateColorCodes('&', seg.rawHover));
+                    ? colorize(applyPlaceholders(seg.rawHover, placeholders))
+                    : (seg.coloredHover != null ? seg.coloredHover : colorize(seg.rawHover));
             hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverColored)));
         }
 
@@ -388,9 +407,9 @@ public class LangUtil {
         HoverEvent hover = null;
         if (msg.rawHover != null) {
             String hoverColored = (placeholders != null && !placeholders.isEmpty())
-                    ? ChatColor.translateAlternateColorCodes('&', applyPlaceholders(msg.rawHover, placeholders))
+                    ? colorize(applyPlaceholders(msg.rawHover, placeholders))
                     : (msg.coloredHover != null ? msg.coloredHover
-                            : ChatColor.translateAlternateColorCodes('&', msg.rawHover));
+                            : colorize(msg.rawHover));
             hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverColored)));
         }
 
