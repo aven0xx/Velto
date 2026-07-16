@@ -1,0 +1,154 @@
+# Economy Module
+
+A single-currency economy: `/economy` (admin), `/balance`, `/pay`, plus an optional
+Vault hook — entirely toggleable, because `Guidelines.md` intentionally excludes
+economy/claims/towns/minigames from Velto's core scope *unless* fully opt-out-able.
+This module is the one exception, specifically because it can be switched off
+completely via `economy.yml`.
+
+## Config (`economy.yml`)
+
+```yaml
+enabled: true              # master switch for the whole module
+currency:
+  name-singular: "Dollar"
+  name-plural: "Dollars"
+  symbol: "$"
+  decimal-places: 2
+starting-balance: 0.0
+vault:
+  enabled: true             # only takes effect if the Vault plugin is actually installed
+```
+
+`EconomyManager.load()` reads this into `volatile` static fields (same pattern as
+`ConfigUtil`). `enabled` is checked **live**, in every economy command's `canUse()`
+*and* again at the top of `execute()` — so flipping it off and running
+`/veltoreload` hides and disables `/economy`, `/balance`, and `/pay` immediately,
+without a server restart (contrast with `commands.yml`'s per-command `enabled`, which
+only takes effect on the next restart — see [ARCHITECTURE.md](ARCHITECTURE.md#veltoreload)).
+
+## Balance storage
+
+Balances live in each player's userdata file, key `economy.balance` (a single
+`double`), read/written through `EconomyManager` exactly like every other
+`UserdataManager`-backed feature — see [DATA_STORAGE.md](DATA_STORAGE.md) for the full
+caching/save-timing model. There is **no separate economy database or cache**; every
+balance read anywhere in the codebase (a command, a placeholder, a Vault call from
+another plugin) goes through the same `EconomyManager.getBalance(uuid)` →
+`UserdataManager.getData(uuid)` path, so nothing can drift out of sync between, say, a
+Vault-driven change and what `/balance` reports.
+
+## `EconomyManager`'s mutation API — why there are three "subtract" shapes
+
+```java
+setBalance(uuid, amount)        // clamps to >= 0, saves immediately
+add(uuid, amount)                // deposit — /economy give, Vault depositPlayer
+subtract(uuid, amount)           // forced admin subtraction — clamps to 0, always succeeds
+withdraw(uuid, amount) -> bool   // strict — fails (no mutation) if balance < amount
+transfer(from, to, amount) -> bool  // withdraw(from) then add(to), atomic w.r.t. failure
+```
+
+This split exists because "remove money" means different things in different
+contexts:
+
+- **`/economy take`** is an admin override — it should always succeed and just floor
+  at zero, the same way EssentialsX-style admin commands behave. That's `subtract()`.
+- **`/pay` and Vault's `withdrawPlayer`** are player-initiated transactions that must
+  fail cleanly (no partial mutation, a clear "insufficient funds" response) rather
+  than silently clamping — that's `withdraw()`/`transfer()`.
+
+If you're adding a new caller, pick based on which of those two semantics it needs —
+don't reuse `subtract()` for something that should be able to fail.
+
+## Commands
+
+See [COMMANDS.md](COMMANDS.md) for the full permission table. Summary:
+
+- **`/economy give|take|set|reset <player> [amount]`** (`velto.economy.give/take/set/reset`,
+  alias `eco`) — console-usable, follows the `KitResetCommand`/`SudoCommand` pattern
+  (no `Player`-sender requirement, plain-text fallback messages for console).
+- **`/balance [player]`** (`velto.balance` / `velto.balance.others`, aliases `bal`/`money`).
+- **`/pay <player> <amount>`** (`velto.pay`) — player-only, blocks self-pay, uses
+  `transfer()` so insufficient funds leaves both balances untouched.
+
+## Vault integration
+
+### Why it's safe to compile against Vault without requiring it
+
+`VaultHook`/`VaultEconomyProvider` reference `net.milkbowl.vault.economy.Economy` (and
+related types), added as a `compileOnly` Gradle dependency (via JitPack,
+`com.github.MilkBowl:VaultAPI:1.7`) in all three modules. `compileOnly` means those
+classes exist at *compile* time but are not bundled into the shaded jar — at
+*runtime*, they only exist if the Vault plugin itself is installed on the server and
+provides them.
+
+The trick that makes this safe is the same one `PlaceholderManager` already uses for
+PlaceholderAPI: the JVM resolves a symbolic class reference lazily, at the point a
+piece of code actually executes that touches the class — not merely because some
+*other* class references it in a method body. `VaultHook.refresh()` checks
+`Bukkit.getPluginManager().isPluginEnabled("Vault")` **before** it ever does `new
+VaultEconomyProvider()` or touches `Economy.class`/`ServicePriority`:
+
+```java
+public static void refresh() {
+    boolean shouldRegister = EconomyManager.isEnabled()
+            && EconomyManager.isVaultEnabled()
+            && Bukkit.getPluginManager().isPluginEnabled("Vault");
+
+    if (shouldRegister && !registered) {
+        // only reached if Vault is actually present — safe to touch Vault classes here
+        Bukkit.getServicesManager().register(Economy.class, new VaultEconomyProvider(), ...);
+        ...
+```
+
+If Vault isn't installed, that branch never executes, so `VaultEconomyProvider` (which
+`implements Economy`) never gets loaded, and there's no `NoClassDefFoundError`. This is
+the pattern to copy for any future optional integration — see
+[EXTENDING.md](EXTENDING.md#adding-an-optional-soft-dependency).
+
+`Vault` is declared as a soft dependency (`softdepend` in `plugin.yml`,
+`dependencies.server.Vault { load: BEFORE, required: false }` in `paper-plugin.yml`)
+so that *if* it's present, it's already enabled by the time Velto's `onEnable` runs
+`VaultHook.refresh()`.
+
+### What happens when another plugin changes a balance through Vault
+
+`VaultEconomyProvider` implements all 43 methods of Vault's `Economy` interface —
+including the legacy `String`-name overloads (resolved via
+`Bukkit.getOfflinePlayer(name)`) and the per-world overloads (Velto has no per-world
+economy, so those just delegate to the global version) — and every balance-touching
+method routes straight into `EconomyManager`:
+
+```
+other plugin: economy.depositPlayer(offlinePlayer, 50.0)
+  → VaultEconomyProvider.depositPlayer(OfflinePlayer, double)
+    → EconomyManager.add(uuid, amount)
+      → setBalance(...) → UserdataManager.set(...) + UserdataManager.save(...)
+```
+
+That's identical to what `/economy give` does — there's no separate Vault-side ledger,
+so nothing needs to be "synced". The in-memory balance updates immediately; the disk
+write is queued async per the standard `UserdataManager` timing (see
+[DATA_STORAGE.md](DATA_STORAGE.md)). If the target player is offline,
+`UserdataManager.getData(uuid)` lazily loads their file from disk (creating one if
+needed) — same caveat as noted there about that cache entry staying resident until
+restart.
+
+Bank accounts are explicitly unsupported (`hasBankSupport()` returns `false`, every
+bank method returns `EconomyResponse.ResponseType.NOT_IMPLEMENTED`) — Velto has no
+concept of shared/bank balances, only per-player.
+
+### Reload behavior
+
+`/veltoreload` calls `EconomyManager.load()` then `VaultHook.refresh()`. `refresh()`
+is idempotent and bidirectional: flipping `vault.enabled` (or the whole module's
+`enabled`) off and reloading unregisters the provider from Vault's `ServicesManager`;
+flipping it back on and reloading re-registers it — no restart needed either way.
+
+### Disabling
+
+- **Whole module off:** `economy.yml: enabled: false` + `/veltoreload` (or restart) —
+  hides all three commands and unregisters the Vault provider.
+- **Just the Vault hook off** (keep Velto's own `/economy`/`/balance`/`/pay`, but let
+  another economy plugin be Vault's provider instead): `economy.yml: vault.enabled:
+  false` + `/veltoreload`.
