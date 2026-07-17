@@ -6,6 +6,10 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class TimeCommand extends BaseCommand {
     public TimeCommand() {
         super("time");
@@ -22,16 +26,22 @@ public class TimeCommand extends BaseCommand {
             return true;
         }
 
-        if (args.length < 1) {
+        // Accept both Velto's "/time <value> [world]" and vanilla's
+        // "/time set <value> [world]" by stripping an optional leading "set".
+        String[] a = (args.length >= 1 && args[0].equalsIgnoreCase("set"))
+                ? Arrays.copyOfRange(args, 1, args.length)
+                : args;
+
+        if (a.length < 1) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-usage");
             } else {
-                sender.sendMessage("§cUsage: /time <day|night|ticks> <world>");
+                sender.sendMessage("§cUsage: /time [set] <day|night|ticks> [world]");
             }
             return true;
         }
 
-        String timeArg = args[0].toLowerCase();
+        String timeArg = a[0].toLowerCase();
         long time;
 
         try {
@@ -51,8 +61,8 @@ public class TimeCommand extends BaseCommand {
 
         World world = null;
 
-        if (args.length >= 2) {
-            world = Bukkit.getWorld(args[1]);
+        if (a.length >= 2) {
+            world = Bukkit.getWorld(a[1]);
         } else if (sender instanceof Player player) {
             world = player.getWorld();
         }
@@ -61,7 +71,7 @@ public class TimeCommand extends BaseCommand {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-world");
             } else {
-                sender.sendMessage("§cWorld not found. Usage: /time <day|night|ticks> <world>");
+                sender.sendMessage("§cWorld not found. Usage: /time [set] <day|night|ticks> [world]");
             }
             return true;
         }
@@ -75,5 +85,44 @@ public class TimeCommand extends BaseCommand {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> complete(CommandSender sender, String label, String[] args) {
+        boolean hasSet = args.length >= 1 && args[0].equalsIgnoreCase("set");
+
+        // 1st arg: the "set" keyword plus the time presets.
+        if (args.length == 1) {
+            return filter(List.of("set", "day", "night"), args[0]);
+        }
+
+        // 2nd arg: presets after "set", otherwise the world for "/time <value> <world>".
+        if (args.length == 2) {
+            return hasSet ? filter(List.of("day", "night"), args[1]) : filter(worldNames(), args[1]);
+        }
+
+        // 3rd arg: only the world, reached via "/time set <value> <world>".
+        if (args.length == 3 && hasSet) {
+            return filter(worldNames(), args[2]);
+        }
+
+        return List.of();
+    }
+
+    private List<String> worldNames() {
+        List<String> names = new ArrayList<>();
+        for (World w : Bukkit.getWorlds()) {
+            names.add(w.getName());
+        }
+        return names;
+    }
+
+    private List<String> filter(List<String> options, String typed) {
+        String lower = typed.toLowerCase();
+        List<String> out = new ArrayList<>();
+        for (String option : options) {
+            if (option.toLowerCase().startsWith(lower)) out.add(option);
+        }
+        return out;
     }
 }
