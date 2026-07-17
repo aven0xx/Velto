@@ -138,6 +138,23 @@ Bank accounts are explicitly unsupported (`hasBankSupport()` returns `false`, ev
 bank method returns `EconomyResponse.ResponseType.NOT_IMPLEMENTED`) — Velto has no
 concept of shared/bank balances, only per-player.
 
+### Feedback & fallback when Vault is missing
+
+`VaultHook.refresh()` reports its outcome to the console so a misconfiguration isn't
+silent:
+
+- Vault present + `vault.enabled: true` → logs that it registered as the provider.
+- `vault.enabled: true` but the **Vault plugin isn't installed** → logs a `WARNING`
+  and falls back to disabled (the hook simply isn't registered — economy commands and
+  balances keep working, only the Vault bridge is off). This is the case that used to
+  be silent.
+- `vault.enabled: false` → no warning; unregisters if it was previously active.
+
+`VaultHook.isActive()` returns the real runtime state (true only when actually
+registered), independent of the `vault.enabled` config *intent* — `/veltoreload`
+prints it so you can confirm whether the bridge is live. `EconomyManager.load()` also
+logs the module's enabled/disabled state and whether Vault was requested at startup.
+
 ### Reload behavior
 
 `/veltoreload` calls `EconomyManager.load()` then `VaultHook.refresh()`. `refresh()`

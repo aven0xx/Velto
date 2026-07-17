@@ -33,6 +33,13 @@ public final class EconomyManager {
         decimalPlaces = Math.max(0, c.getInt("currency.decimal-places", 2));
         startingBalance = Math.max(0.0, c.getDouble("starting-balance", 0.0));
         vaultEnabled = c.getBoolean("vault.enabled", true);
+
+        if (enabled) {
+            VeltoPlugin.get().getLogger().info("Economy module enabled (currency: " + currencyNamePlural
+                    + ", Vault integration requested: " + vaultEnabled + ").");
+        } else {
+            VeltoPlugin.get().getLogger().info("Economy module disabled in economy.yml.");
+        }
     }
 
     public static boolean isEnabled() {

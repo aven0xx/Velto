@@ -12,32 +12,58 @@ public final class VaultHook {
 
     private static boolean registered = false;
 
-    // Registers or unregisters Velto as the server's Vault economy provider to
-    // match the current economy.yml settings. Safe to call repeatedly (e.g. on
-    // every /veltoreload) — only touches Vault classes when actually needed, so
-    // servers without Vault installed never load them.
-    public static void refresh() {
-        boolean shouldRegister = EconomyManager.isEnabled()
-                && EconomyManager.isVaultEnabled()
-                && Bukkit.getPluginManager().isPluginEnabled("Vault");
+    // Whether Velto is currently registered as the Vault economy provider. Reflects the
+    // real runtime state — false whenever Vault is missing, disabled, or registration failed.
+    public static boolean isActive() {
+        return registered;
+    }
 
-        if (shouldRegister && !registered) {
-            try {
-                Bukkit.getServicesManager().register(
-                        Economy.class,
-                        new VaultEconomyProvider(),
-                        VeltoPlugin.get(),
-                        ServicePriority.Normal
-                );
-                registered = true;
-                Bukkit.getLogger().info("[Velto] Registered as the server's Vault economy provider.");
-            } catch (Throwable t) {
-                Bukkit.getLogger().severe("[Velto] Failed to register Vault economy provider: " + t.getMessage());
+    // Registers or unregisters Velto as the server's Vault economy provider to match the
+    // current economy.yml settings. Safe to call repeatedly (e.g. on every /veltoreload).
+    //
+    // Vault classes (Economy, VaultEconomyProvider, ServicePriority) are only referenced
+    // inside the registration branch, which is reached only when the Vault plugin is
+    // actually present — so servers without Vault never load those classes.
+    public static void refresh() {
+        boolean economyEnabled = EconomyManager.isEnabled();
+        boolean vaultRequested = EconomyManager.isVaultEnabled();
+        boolean vaultPresent = Bukkit.getPluginManager().isPluginEnabled("Vault");
+        boolean shouldRegister = economyEnabled && vaultRequested && vaultPresent;
+
+        if (shouldRegister) {
+            if (!registered) {
+                try {
+                    Bukkit.getServicesManager().register(
+                            Economy.class,
+                            new VaultEconomyProvider(),
+                            VeltoPlugin.get(),
+                            ServicePriority.Normal
+                    );
+                    registered = true;
+                    Bukkit.getLogger().info("[Velto] Vault found — registered Velto as the economy provider.");
+                } catch (Throwable t) {
+                    // Registration failed — stay unregistered (fall back to disabled) and report it.
+                    registered = false;
+                    Bukkit.getLogger().severe("[Velto] Failed to register the Vault economy provider: " + t.getMessage());
+                }
             }
-        } else if (!shouldRegister && registered) {
+            return;
+        }
+
+        // Not registering. Tear down any previous registration first...
+        if (registered) {
             Bukkit.getServicesManager().unregisterAll(VeltoPlugin.get());
             registered = false;
-            Bukkit.getLogger().info("[Velto] Unregistered Vault economy provider.");
+            Bukkit.getLogger().info("[Velto] Vault economy integration disabled — unregistered the economy provider.");
+        }
+
+        // ...then give the admin feedback for the easy-to-miss case: they asked for Vault in
+        // economy.yml, but it isn't installed. Fall back to disabled and say so out loud
+        // instead of failing silently.
+        if (economyEnabled && vaultRequested && !vaultPresent) {
+            Bukkit.getLogger().warning("[Velto] economy.yml has vault.enabled: true, but the Vault plugin was "
+                    + "not found on this server — the Vault integration has been disabled. Install Vault to "
+                    + "enable it, or set vault.enabled: false in economy.yml to hide this warning.");
         }
     }
 }

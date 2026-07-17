@@ -82,7 +82,7 @@ public class ReloadCommand extends BaseCommand {
 
         try {
             VaultHook.refresh();
-            Bukkit.getLogger().info("[Velto] Vault economy hook refreshed.");
+            Bukkit.getLogger().info("[Velto] Vault economy hook refreshed (active: " + VaultHook.isActive() + ").");
         } catch (Throwable t) {
             Bukkit.getLogger().severe("[Velto] Failed to refresh Vault economy hook: " + t.getMessage());
             t.printStackTrace();
