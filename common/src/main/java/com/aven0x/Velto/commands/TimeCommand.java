@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TimeCommand extends BaseCommand {
+
+    private static final List<String> PRESETS = List.of("day", "night", "noon", "midnight");
+
     public TimeCommand() {
         super("time");
     }
@@ -32,25 +35,22 @@ public class TimeCommand extends BaseCommand {
                 ? Arrays.copyOfRange(args, 1, args.length)
                 : args;
 
+        // Merge a separate am/pm token onto the number: "/time set 6 pm" -> "6pm".
+        if (a.length >= 2 && a[0].matches("\\d+")
+                && (a[1].equalsIgnoreCase("am") || a[1].equalsIgnoreCase("pm"))) {
+            String[] rebuilt = new String[a.length - 1];
+            rebuilt[0] = a[0] + a[1];
+            System.arraycopy(a, 2, rebuilt, 1, a.length - 2);
+            a = rebuilt;
+        }
+
         if (a.length < 1) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "invalid-usage");
-            } else {
-                sender.sendMessage("§cUsage: /time [set] <day|night|ticks> [world]");
-            }
+            sendUsage(sender);
             return true;
         }
 
-        String timeArg = a[0].toLowerCase();
-        long time;
-
-        try {
-            time = switch (timeArg) {
-                case "day" -> 1000L;
-                case "night" -> 13000L;
-                default -> Long.parseLong(timeArg);
-            };
-        } catch (NumberFormatException e) {
+        Long time = parseTicks(a[0]);
+        if (time == null) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-time");
             } else {
@@ -60,7 +60,6 @@ public class TimeCommand extends BaseCommand {
         }
 
         World world = null;
-
         if (a.length >= 2) {
             world = Bukkit.getWorld(a[1]);
         } else if (sender instanceof Player player) {
@@ -71,7 +70,7 @@ public class TimeCommand extends BaseCommand {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-world");
             } else {
-                sender.sendMessage("§cWorld not found. Usage: /time [set] <day|night|ticks> [world]");
+                sendUsage(sender);
             }
             return true;
         }
@@ -87,18 +86,81 @@ public class TimeCommand extends BaseCommand {
         return true;
     }
 
+    // Resolves a time token to a tick value, or null if it can't be parsed.
+    // Accepts: presets (day/night/noon/midnight); a 24-hour hour 0-24; a 12-hour
+    // hour with am/pm (e.g. 6am, 12pm); or a raw tick count (25-24000+).
+    private static Long parseTicks(String token) {
+        String t = token.toLowerCase();
+
+        switch (t) {
+            case "day":      return 1000L;
+            case "noon":     return 6000L;
+            case "night":    return 13000L;
+            case "midnight": return 18000L;
+            default:         break;
+        }
+
+        // 12-hour clock: "<1-12>am" or "<1-12>pm"
+        if (t.endsWith("am") || t.endsWith("pm")) {
+            boolean pm = t.endsWith("pm");
+            Integer h = parseIntOrNull(t.substring(0, t.length() - 2));
+            if (h == null || h < 1 || h > 12) return null;
+            int hour24 = pm ? (h == 12 ? 12 : h + 12) : (h == 12 ? 0 : h);
+            return hourToTicks(hour24);
+        }
+
+        Long n = parseLongOrNull(t);
+        if (n == null || n < 0) return null;
+
+        // 0-24 = real hour on a 24h clock (0 and 24 both mean midnight); larger = raw ticks.
+        if (n <= 24) return hourToTicks((int) (n % 24));
+        return n;
+    }
+
+    // Minecraft tick 0 is 06:00; each real hour is 1000 ticks.
+    private static long hourToTicks(int hour24) {
+        return (((hour24 - 6) * 1000) + 24000) % 24000;
+    }
+
+    private static Integer parseIntOrNull(String s) {
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static Long parseLongOrNull(String s) {
+        try {
+            return Long.parseLong(s.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private void sendUsage(CommandSender sender) {
+        if (sender instanceof Player player) {
+            LangUtil.send(player, "invalid-usage");
+        } else {
+            sender.sendMessage("§cUsage: /time [set] <day|night|noon|midnight|0-24|1-12am/pm|ticks> [world]");
+        }
+    }
+
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
         boolean hasSet = args.length >= 1 && args[0].equalsIgnoreCase("set");
 
         // 1st arg: the "set" keyword plus the time presets.
         if (args.length == 1) {
-            return filter(List.of("set", "day", "night"), args[0]);
+            List<String> options = new ArrayList<>();
+            options.add("set");
+            options.addAll(PRESETS);
+            return filter(options, args[0]);
         }
 
         // 2nd arg: presets after "set", otherwise the world for "/time <value> <world>".
         if (args.length == 2) {
-            return hasSet ? filter(List.of("day", "night"), args[1]) : filter(worldNames(), args[1]);
+            return hasSet ? filter(PRESETS, args[1]) : filter(worldNames(), args[1]);
         }
 
         // 3rd arg: only the world, reached via "/time set <value> <world>".

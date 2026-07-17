@@ -96,7 +96,7 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 |---|---|---|---|---|
 | `/spawn` | — | `velto.spawn` | ❌ | Teleports to the configured spawn (`config.yml: spawn`). |
 | `/setspawn` | — | `velto.setspawn` | ❌ | Sets spawn to your current location. |
-| `/time <day\|night\|ticks> [world]` | — | `velto.timeset` | ✅ | |
+| `/time [set] <day\|night\|noon\|midnight\|0-24\|1-12am/pm\|ticks> [world]` | — | `velto.timeset` | ✅ | Optional `set` keyword; a bare `0-24` is a real hour, `25+` is raw ticks. |
 | `/day [world]` | `setday` | `velto.timeset` | ✅ | |
 | `/night [world]` | `setnight` | `velto.timeset` | ✅ | |
 | `/weather <clear\|sun\|rain\|thunder> [world]` | — | `velto.weather` | ✅ | |
