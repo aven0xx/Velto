@@ -87,8 +87,8 @@ public class TimeCommand extends BaseCommand {
     }
 
     // Resolves a time token to a tick value, or null if it can't be parsed.
-    // Accepts: presets (day/night/noon/midnight); a 24-hour hour 0-24; a 12-hour
-    // hour with am/pm (e.g. 6am, 12pm); or a raw tick count (25-24000+).
+    // Accepts: presets (day/night/noon/midnight); a 24-hour hour as "<0-24>h"
+    // (e.g. 8h, 18h); a 12-hour hour with am/pm (e.g. 6am, 12pm); or a raw tick count.
     private static Long parseTicks(String token) {
         String t = token.toLowerCase();
 
@@ -100,6 +100,13 @@ public class TimeCommand extends BaseCommand {
             default:         break;
         }
 
+        // 24-hour clock: "<0-24>h" (e.g. 8h, 18h; 0h and 24h both mean midnight)
+        if (t.endsWith("h")) {
+            Integer h = parseIntOrNull(t.substring(0, t.length() - 1));
+            if (h == null || h < 0 || h > 24) return null;
+            return hourToTicks(h % 24);
+        }
+
         // 12-hour clock: "<1-12>am" or "<1-12>pm"
         if (t.endsWith("am") || t.endsWith("pm")) {
             boolean pm = t.endsWith("pm");
@@ -109,11 +116,9 @@ public class TimeCommand extends BaseCommand {
             return hourToTicks(hour24);
         }
 
+        // Raw tick count (bare numbers are always ticks now — no hour ambiguity).
         Long n = parseLongOrNull(t);
         if (n == null || n < 0) return null;
-
-        // 0-24 = real hour on a 24h clock (0 and 24 both mean midnight); larger = raw ticks.
-        if (n <= 24) return hourToTicks((int) (n % 24));
         return n;
     }
 
@@ -142,7 +147,7 @@ public class TimeCommand extends BaseCommand {
         if (sender instanceof Player player) {
             LangUtil.send(player, "invalid-usage");
         } else {
-            sender.sendMessage("§cUsage: /time [set] <day|night|noon|midnight|0-24|1-12am/pm|ticks> [world]");
+            sender.sendMessage("§cUsage: /time [set] <day|night|noon|midnight|0-24h|1-12am/pm|ticks> [world]");
         }
     }
 
