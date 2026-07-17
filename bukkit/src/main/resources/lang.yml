@@ -158,13 +158,37 @@ invalid-gamemode:
   type: chat
   message: "&#FF7070Invalid gamemode. Use &#F1F1F10-3&#FF7070 or survival, creative, adventure, spectator."
 
-gamemode-set-self:
+gamemode-creative:
   type: chat
-  message: "&#57E39AYour gamemode is now &#F1F1F1%mode%&#57E39A."
+  message: "&#57E39AYour gamemode is now &#F1F1F1Creative&#57E39A."
 
-gamemode-set-other:
+gamemode-survival:
   type: chat
-  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1%mode%&#57E39A."
+  message: "&#57E39AYour gamemode is now &#F1F1F1Survival&#57E39A."
+
+gamemode-adventure:
+  type: chat
+  message: "&#57E39AYour gamemode is now &#F1F1F1Adventure&#57E39A."
+
+gamemode-spectator:
+  type: chat
+  message: "&#57E39AYour gamemode is now &#F1F1F1Spectator&#57E39A."
+
+gamemode-creative-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Creative&#57E39A."
+
+gamemode-survival-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Survival&#57E39A."
+
+gamemode-adventure-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Adventure&#57E39A."
+
+gamemode-spectator-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Spectator&#57E39A."
 
 list-command:
   type: chat
