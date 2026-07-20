@@ -422,6 +422,10 @@ home-set:
     action: run_command
     value: "/home %home%"
 
+home-limit-reached:
+  type: chat
+  message: "&#FF7070You've reached your home limit &#8A94A6(&#F1F1F1%max%&#8A94A6)&#FF7070. Delete a home first."
+
 home-deleted:
   type: chat
   message: "&#57E39AHome &#F1F1F1%home% &#57E39Adeleted."

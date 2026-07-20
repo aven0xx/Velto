@@ -104,6 +104,17 @@ public final class PlaceholderManager {
         // %velto_homes_list% -> comma-separated list of the player's home names
         registerPlaceholder("homes_list",
                 player -> String.join(", ", HomeManager.getHomeNames(player.getUniqueId())));
+        // %velto_homes_max% -> the player's home cap ("unlimited" with velto.homes.unlimited)
+        registerPlaceholder("homes_max", player ->
+                HomeManager.hasUnlimitedHomes(player) ? "unlimited"
+                        : String.valueOf(HomeManager.getMaxHomes(player)));
+        // %velto_homes_remaining% -> homes the player can still set ("unlimited" if uncapped)
+        registerPlaceholder("homes_remaining", player -> {
+            if (HomeManager.hasUnlimitedHomes(player)) return "unlimited";
+            int remaining = HomeManager.getMaxHomes(player)
+                    - HomeManager.getHomeNames(player.getUniqueId()).size();
+            return String.valueOf(Math.max(0, remaining));
+        });
 
         // === Economy ===
         // All economy placeholders resolve to "" while the economy module is disabled,

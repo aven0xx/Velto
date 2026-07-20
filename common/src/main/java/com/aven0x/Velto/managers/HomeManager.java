@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,50 @@ public final class HomeManager {
     private HomeManager() {}
 
     public static final String DEFAULT_HOME = "home";
+
+    /** Homes a player may set without any {@code velto.homes.<n>} permission. */
+    public static final int DEFAULT_MAX_HOMES = 3;
+
+    /** Grant {@code velto.homes.<n>} to raise a player's cap to {@code n}; the highest granted wins. */
+    public static final String HOME_LIMIT_PERMISSION_PREFIX = "velto.homes.";
+
+    /** Grant {@code velto.homes.unlimited} to remove the cap entirely. */
+    public static final String UNLIMITED_HOMES_PERMISSION = "velto.homes.unlimited";
+
+    /**
+     * True if the player may set an unbounded number of homes
+     * ({@code velto.homes.unlimited}).
+     */
+    public static boolean hasUnlimitedHomes(Player player) {
+        return player.hasPermission(UNLIMITED_HOMES_PERMISSION);
+    }
+
+    /**
+     * The maximum number of homes this player may have.
+     *
+     * Starts from {@link #DEFAULT_MAX_HOMES} and takes the highest numeric
+     * {@code velto.homes.<n>} permission the player holds; returns
+     * {@link Integer#MAX_VALUE} when {@code velto.homes.unlimited} is granted.
+     */
+    public static int getMaxHomes(Player player) {
+        if (hasUnlimitedHomes(player)) return Integer.MAX_VALUE;
+
+        int max = DEFAULT_MAX_HOMES;
+        for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
+            if (!info.getValue()) continue;
+            String perm = info.getPermission();
+            if (!perm.regionMatches(true, 0, HOME_LIMIT_PERMISSION_PREFIX, 0, HOME_LIMIT_PERMISSION_PREFIX.length())) {
+                continue;
+            }
+            String suffix = perm.substring(HOME_LIMIT_PERMISSION_PREFIX.length()).trim();
+            try {
+                max = Math.max(max, Integer.parseInt(suffix));
+            } catch (NumberFormatException ignored) {
+                // Non-numeric sub-node (e.g. "unlimited") — not a limit grant, skip it.
+            }
+        }
+        return max;
+    }
 
     private static Logger logger() {
         return VeltoPlugin.get().getLogger();

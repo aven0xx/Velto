@@ -27,6 +27,8 @@ an empty string. An unknown identifier returns `null` (PlaceholderAPI leaves the
 | `%velto_god%` | `true` / `false` | Whether the player currently has god mode on ([`GodManager`](MANAGERS.md)). |
 | `%velto_homes_count%` | integer | Number of homes the player has set. |
 | `%velto_homes_list%` | comma-separated names | The player's home names, e.g. `home, base, mine`. Empty string if none. |
+| `%velto_homes_max%` | integer / `unlimited` | The player's home cap (see [Home limits](#home-limits)). `unlimited` with `velto.homes.unlimited`. |
+| `%velto_homes_remaining%` | integer / `unlimited` | Homes the player can still set (`max − used`, floored at 0). `unlimited` if uncapped. |
 | `%velto_balance%` | raw number | Balance formatted to `economy.yml`'s `currency.decimal-places`, no symbol or separators (e.g. `1234.50`). |
 | `%velto_balance_formatted%` | formatted amount | Balance via `EconomyManager.format()` — currency symbol + thousands separators (e.g. `$1,234.50`). |
 | `%velto_currency_symbol%` | string | The configured currency symbol (`currency.symbol`). |
@@ -49,6 +51,21 @@ Every economy placeholder (`balance`, `balance_formatted`, `currency_*`) resolve
 **empty string** while the economy module is disabled (`economy.yml: enabled: false`).
 Because the check happens inside the resolver at request time, this responds live to
 `/veltoreload` — no restart needed. See [ECONOMY.md](ECONOMY.md).
+
+### Home limits
+
+`%velto_homes_max%` / `%velto_homes_remaining%` reflect a **permission-based** cap on how
+many homes a player may set (`HomeManager.getMaxHomes`), enforced by `/sethome`:
+
+- No relevant permission → the default of **`HomeManager.DEFAULT_MAX_HOMES`** (currently `3`).
+- `velto.homes.<n>` → raises the cap to `n`; the **highest** granted value wins (e.g.
+  `velto.homes.10` → 10).
+- `velto.homes.unlimited` → no cap; the placeholders read `unlimited`.
+
+Overwriting an existing home is always allowed (it doesn't increase the count); only
+creating a *new* home past the cap is blocked (with the `home-limit-reached` message).
+The numeric `velto.homes.<n>` nodes are open-ended and aren't declared in the plugin
+manifests — grant them from your permissions plugin.
 
 ## Adding more placeholders
 

@@ -62,6 +62,7 @@ permissions:
       velto.sethome: true
       velto.delhome: true
       velto.homes: true
+      velto.homes.unlimited: true
       velto.kit: true
       velto.kit.others: true
       velto.kit.reset: true
