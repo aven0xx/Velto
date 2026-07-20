@@ -127,7 +127,7 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/reply <message...>` | `r` | `velto.msg` | ❌ | Replies to `MsgManager`'s last-messenger record. |
 | `/afk` / `/afk <player>` / `/afk list` | `away` | `velto.afk` / `velto.afk.others` / `velto.afk.list` | ❌ | Toggle; auto-triggers after `config.yml: afk-timeout-seconds` of inactivity. |
 | `/home [name]` | — | `velto.home` | ❌ | Default name `"home"`. |
-| `/sethome [name]` | — | `velto.sethome` (+ `velto.homes.<n>` / `velto.homes.unlimited` for the cap) | ❌ | Capped per-player; default `3`, raised by `velto.homes.<n>` (highest wins) or removed by `velto.homes.unlimited`. See [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
+| `/sethome [name]` | — | `velto.sethome` (+ `velto.homes.<n>` / `velto.homes.unlimited` for the cap) | ❌ | Capped per-player; default from `config.yml: homes.default-limit` (3), raised by `velto.homes.<n>` (highest wins) or removed by `velto.homes.unlimited`. See [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
 | `/delhome [name]` | — | `velto.delhome` | ❌ | |
 | `/homes` | — | `velto.homes` | ❌ | Lists your own homes. |
 | `/warp [name]` | — | `velto.warp` | ❌ | No args lists all warps (global, not per-player). |

@@ -1,6 +1,7 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.utils.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,9 +21,6 @@ public final class HomeManager {
 
     public static final String DEFAULT_HOME = "home";
 
-    /** Homes a player may set without any {@code velto.homes.<n>} permission. */
-    public static final int DEFAULT_MAX_HOMES = 3;
-
     /** Grant {@code velto.homes.<n>} to raise a player's cap to {@code n}; the highest granted wins. */
     public static final String HOME_LIMIT_PERMISSION_PREFIX = "velto.homes.";
 
@@ -40,14 +38,14 @@ public final class HomeManager {
     /**
      * The maximum number of homes this player may have.
      *
-     * Starts from {@link #DEFAULT_MAX_HOMES} and takes the highest numeric
-     * {@code velto.homes.<n>} permission the player holds; returns
+     * Starts from the configured default ({@code homes.default-limit}) and takes the
+     * highest numeric {@code velto.homes.<n>} permission the player holds; returns
      * {@link Integer#MAX_VALUE} when {@code velto.homes.unlimited} is granted.
      */
     public static int getMaxHomes(Player player) {
         if (hasUnlimitedHomes(player)) return Integer.MAX_VALUE;
 
-        int max = DEFAULT_MAX_HOMES;
+        int max = ConfigUtil.getHomesDefaultLimit();
         for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
             if (!info.getValue()) continue;
             String perm = info.getPermission();

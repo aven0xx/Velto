@@ -45,6 +45,13 @@ back:
     - world_the_end
 #
 #
+# Homes
+# default-limit: how many homes a player may set without a specific permission.
+# Grant velto.homes.<n> to raise the cap (highest wins), or velto.homes.unlimited to remove it.
+homes:
+  default-limit: 3
+#
+#
 # Userdata
 # How often player data is flushed to disk (in seconds). Default: 300 (5 minutes)
 userdata:

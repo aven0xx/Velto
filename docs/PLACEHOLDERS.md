@@ -57,7 +57,7 @@ Because the check happens inside the resolver at request time, this responds liv
 `%velto_homes_max%` / `%velto_homes_remaining%` reflect a **permission-based** cap on how
 many homes a player may set (`HomeManager.getMaxHomes`), enforced by `/sethome`:
 
-- No relevant permission → the default of **`HomeManager.DEFAULT_MAX_HOMES`** (currently `3`).
+- No relevant permission → the configured default (`config.yml: homes.default-limit`, default `3`).
 - `velto.homes.<n>` → raises the cap to `n`; the **highest** granted value wins (e.g.
   `velto.homes.10` → 10).
 - `velto.homes.unlimited` → no cap; the placeholders read `unlimited`.
