@@ -155,10 +155,6 @@ public final class PlaceholderManager {
         // %velto_kit_cooldown_<kit>% -> remaining cooldown, formatted (e.g. "1h 30m", or "0s" if ready)
         registerPrefixPlaceholder("kit_cooldown_", (player, kit) ->
                 KitManager.formatCooldown(KitManager.getCooldownRemaining(player.getUniqueId(), kit)));
-
-        // %velto_has_home_<name>% -> true/false whether the player has a home by that name
-        registerPrefixPlaceholder("has_home_", (player, name) ->
-                HomeManager.hasHome(player.getUniqueId(), name) ? "true" : "false");
     }
 
     /**

@@ -42,7 +42,6 @@ noted below.
 | Placeholder | Value | Notes |
 |---|---|---|
 | `%velto_kit_cooldown_<kit>%` | formatted duration | Remaining cooldown for that kit (e.g. `1h 30m`), or `0s` if ready / no cooldown ([`KitManager`](MANAGERS.md)). |
-| `%velto_has_home_<name>%` | `true` / `false` | Whether the player has a home by that name. |
 
 ### Economy module toggle
 
