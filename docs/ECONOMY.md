@@ -66,10 +66,16 @@ See [COMMANDS.md](COMMANDS.md) for the full permission table. Summary:
 
 - **`/economy give|take|set|reset <player> [amount]`** (`velto.economy.give/take/set/reset`,
   alias `eco`) — console-usable, follows the `KitResetCommand`/`SudoCommand` pattern
-  (no `Player`-sender requirement, plain-text fallback messages for console).
-- **`/balance [player]`** (`velto.balance` / `velto.balance.others`, aliases `bal`/`money`).
+  (no `Player`-sender requirement, plain-text fallback messages for console). The target
+  is resolved via `BaseCommand.resolveTarget`, so it may be **offline** (balances are
+  UUID-keyed and loaded from disk on demand); the target-facing message is only sent when
+  they happen to be online.
+- **`/balance [player]`** (`velto.balance` / `velto.balance.others`, aliases `bal`/`money`) —
+  `/balance <player>` is console-usable and resolves offline players too; bare `/balance`
+  (self) stays player-only since the console has no balance.
 - **`/pay <player> <amount>`** (`velto.pay`) — player-only, blocks self-pay, uses
-  `transfer()` so insufficient funds leaves both balances untouched.
+  `transfer()` so insufficient funds leaves both balances untouched. Kept player-only by
+  design — it debits the sender, which the console can't be.
 
 ## Vault integration
 

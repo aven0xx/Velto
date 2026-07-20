@@ -2,6 +2,8 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.LangUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -46,6 +48,26 @@ public abstract class BaseCommand {
 
     protected boolean checkPermission(CommandSender sender, String perm) {
         return sender.hasPermission(CommandUtil.getPermission(this.name, perm));
+    }
+
+    /**
+     * Resolves a player name to an online player, or a previously-seen offline player —
+     * so console/admin commands can target players who aren't currently online.
+     *
+     * Returns {@code null} if nobody online matches and no cached offline player matches.
+     * Deliberately avoids {@code Bukkit.getOfflinePlayer(String)}: that can block on a
+     * Mojang web lookup and fabricate an entry for a name that has never joined. Matching
+     * against {@link Bukkit#getOfflinePlayers()} stays local and only ever returns players
+     * the server has actually seen.
+     */
+    protected static OfflinePlayer resolveTarget(String name) {
+        Player online = Bukkit.getPlayerExact(name);
+        if (online != null) return online;
+
+        for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+            if (name.equalsIgnoreCase(offline.getName())) return offline;
+        }
+        return null;
     }
 
     protected boolean hasPermission(CommandSender sender, String perm) {
