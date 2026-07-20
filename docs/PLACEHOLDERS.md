@@ -43,14 +43,6 @@ noted below.
 |---|---|---|
 | `%velto_kit_cooldown_<kit>%` | formatted duration | Remaining cooldown for that kit (e.g. `1h 30m`), or `0s` if ready / no cooldown ([`KitManager`](MANAGERS.md)). |
 | `%velto_has_home_<name>%` | `true` / `false` | Whether the player has a home by that name. |
-| `%velto_home_world_<name>%` | string | The home's world name, or `""` if the home doesn't exist. |
-| `%velto_home_x_<name>%` | integer | Home X, rounded to a block coordinate. `""` if the home doesn't exist. |
-| `%velto_home_y_<name>%` | integer | Home Y, rounded. `""` if the home doesn't exist. |
-| `%velto_home_z_<name>%` | integer | Home Z, rounded. `""` if the home doesn't exist. |
-
-> Home coordinate/world placeholders read the stored data directly (via
-> `HomeManager.getHomeData`), so they don't resolve or validate the world and never log —
-> safe to resolve every scoreboard tick even when the home's world is unloaded.
 
 ### Economy module toggle
 

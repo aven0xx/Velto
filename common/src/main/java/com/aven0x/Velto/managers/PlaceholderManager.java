@@ -2,7 +2,6 @@ package com.aven0x.Velto.managers;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -160,22 +159,6 @@ public final class PlaceholderManager {
         // %velto_has_home_<name>% -> true/false whether the player has a home by that name
         registerPrefixPlaceholder("has_home_", (player, name) ->
                 HomeManager.hasHome(player.getUniqueId(), name) ? "true" : "false");
-
-        // %velto_home_world_<name>% -> the home's world name, or "" if the home doesn't exist
-        registerPrefixPlaceholder("home_world_", (player, name) -> {
-            ConfigurationSection sec = HomeManager.getHomeData(player.getUniqueId(), name);
-            return (sec == null) ? "" : sec.getString("world", "");
-        });
-        // %velto_home_x_<name>% / _y_ / _z_ -> block coordinates (rounded), or "" if the home doesn't exist
-        registerPrefixPlaceholder("home_x_", (player, name) -> homeCoord(player, name, "x"));
-        registerPrefixPlaceholder("home_y_", (player, name) -> homeCoord(player, name, "y"));
-        registerPrefixPlaceholder("home_z_", (player, name) -> homeCoord(player, name, "z"));
-    }
-
-    private static String homeCoord(Player player, String name, String axis) {
-        ConfigurationSection sec = HomeManager.getHomeData(player.getUniqueId(), name);
-        if (sec == null || !sec.contains(axis)) return "";
-        return String.valueOf(Math.round(sec.getDouble(axis)));
     }
 
     /**
