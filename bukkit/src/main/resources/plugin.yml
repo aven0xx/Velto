@@ -3,7 +3,7 @@ version: ${version}
 main: com.aven0x.VeltoBukkit.VeltoBukkit
 api-version: 1.21.4
 
-softdepend: ["PlaceholderAPI"]
+softdepend: ["PlaceholderAPI", "Vault"]
 
 permissions:
   velto.*:
@@ -60,3 +60,12 @@ permissions:
       velto.kit.cooldown.bypass: true
       velto.kit.starter: true
       velto.kit.daily: true
+      velto.warp: true
+      velto.setwarp: true
+      velto.economy.give: true
+      velto.economy.take: true
+      velto.economy.set: true
+      velto.economy.reset: true
+      velto.balance: true
+      velto.balance.others: true
+      velto.pay: true

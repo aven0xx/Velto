@@ -148,3 +148,18 @@ kit:
 kitreset:
   enabled: true
   aliases: []
+warp:
+  enabled: true
+  aliases: []
+setwarp:
+  enabled: true
+  aliases: []
+economy:
+  enabled: true
+  aliases: ["eco"]
+balance:
+  enabled: true
+  aliases: ["bal", "money"]
+pay:
+  enabled: true
+  aliases: []

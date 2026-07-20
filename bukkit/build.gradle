@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
@@ -16,6 +17,11 @@ dependencies {
     // Spigot/PAPI as provided by server
     compileOnly 'org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.6'
+    // Exclude VaultAPI's ancient transitive org.bukkit:bukkit — spigot-api already
+    // provides the Bukkit API, and both conflict on the same capability.
+    compileOnly('com.github.MilkBowl:VaultAPI:1.7') {
+        exclude group: 'org.bukkit', module: 'bukkit'
+    }
 }
 
 tasks {

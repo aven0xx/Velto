@@ -6,12 +6,15 @@ import com.aven0x.Velto.listeners.ChatListener;
 import com.aven0x.Velto.listeners.GodListener;
 import com.aven0x.Velto.listeners.KitPreviewListener;
 import com.aven0x.Velto.listeners.UserdataListener;
+import com.aven0x.Velto.integrations.VaultHook;
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.AutoMsgManager;
+import com.aven0x.Velto.managers.EconomyManager;
 import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.UserdataManager;
+import com.aven0x.Velto.managers.WarpManager;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -47,6 +50,9 @@ public class VeltoBukkit extends JavaPlugin {
         LangUtil.load();
         CommandUtil.load();
         KitManager.load();
+        WarpManager.init(getDataFolder());
+        EconomyManager.load();
+        VaultHook.refresh();
 
         // Setup managers
         new TeleportManager();

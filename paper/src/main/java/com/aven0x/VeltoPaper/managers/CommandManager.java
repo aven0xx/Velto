@@ -57,6 +57,11 @@ public class CommandManager {
         register("homes", HomesCommand::new);
         register("kit", KitCommand::new);
         register("kitreset", KitResetCommand::new);
+        register("warp", WarpCommand::new);
+        register("setwarp", SetWarpCommand::new);
+        register("economy", EconomyCommand::new);
+        register("balance", BalanceCommand::new);
+        register("pay", PayCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {
