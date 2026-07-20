@@ -58,6 +58,10 @@ public final class EconomyManager {
         return currencyNamePlural;
     }
 
+    public static String getCurrencySymbol() {
+        return currencySymbol;
+    }
+
     public static int getDecimalPlaces() {
         return decimalPlaces;
     }

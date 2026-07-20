@@ -63,6 +63,38 @@ public final class PlaceholderManager {
     private static void registerDefaultPlaceholders() {
         // %velto_afk%
         registerPlaceholder("afk", player -> AfkManager.isAfk(player) ? "true" : "false");
+
+        // === Homes ===
+        // %velto_homes_count% -> number of homes the player has set
+        registerPlaceholder("homes_count",
+                player -> String.valueOf(HomeManager.getHomeNames(player.getUniqueId()).size()));
+        // %velto_homes_list% -> comma-separated list of the player's home names
+        registerPlaceholder("homes_list",
+                player -> String.join(", ", HomeManager.getHomeNames(player.getUniqueId())));
+
+        // === Economy ===
+        // All economy placeholders resolve to "" while the economy module is disabled,
+        // so they respond live to /veltoreload toggling economy.yml's `enabled`.
+        // %velto_balance% -> raw numeric balance, formatted to the configured decimal places
+        registerPlaceholder("balance", player -> {
+            if (!EconomyManager.isEnabled()) return "";
+            return String.format("%." + EconomyManager.getDecimalPlaces() + "f",
+                    EconomyManager.getBalance(player.getUniqueId()));
+        });
+        // %velto_balance_formatted% -> balance with currency symbol and thousands separators
+        registerPlaceholder("balance_formatted", player -> {
+            if (!EconomyManager.isEnabled()) return "";
+            return EconomyManager.format(EconomyManager.getBalance(player.getUniqueId()));
+        });
+        // %velto_currency_symbol%
+        registerPlaceholder("currency_symbol",
+                player -> EconomyManager.isEnabled() ? EconomyManager.getCurrencySymbol() : "");
+        // %velto_currency_name% -> plural currency name
+        registerPlaceholder("currency_name",
+                player -> EconomyManager.isEnabled() ? EconomyManager.getCurrencyNamePlural() : "");
+        // %velto_currency_name_singular%
+        registerPlaceholder("currency_name_singular",
+                player -> EconomyManager.isEnabled() ? EconomyManager.getCurrencyNameSingular() : "");
     }
 
     /**
