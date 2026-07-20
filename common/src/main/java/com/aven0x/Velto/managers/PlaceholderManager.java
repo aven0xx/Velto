@@ -2,18 +2,24 @@ package com.aven0x.Velto.managers;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class PlaceholderManager {
 
     // identifier -> resolver(player) => string output
     private static final Map<String, Function<Player, String>> PLACEHOLDERS = new ConcurrentHashMap<>();
+
+    // prefix -> resolver(player, argument) => string output; argument is whatever follows the prefix.
+    // Used for parameterized placeholders like %velto_kit_cooldown_<name>%.
+    private static final Map<String, BiFunction<Player, String, String>> PREFIX_PLACEHOLDERS = new ConcurrentHashMap<>();
 
     private static boolean expansionRegistered = false;
 
@@ -43,10 +49,38 @@ public final class PlaceholderManager {
     }
 
     /**
+     * Register/override a parameterized placeholder matched by prefix.
+     *
+     * When an incoming identifier isn't an exact match, it's tested against every
+     * registered prefix; the first match invokes the resolver with the remainder of the
+     * identifier (after the prefix) as its argument.
+     *
+     * Example:
+     * PlaceholderManager.registerPrefixPlaceholder("kit_cooldown_",
+     *         (p, kit) -> KitManager.formatCooldown(KitManager.getCooldownRemaining(p.getUniqueId(), kit)));
+     *
+     * Placeholder becomes: %velto_kit_cooldown_daily% -> resolver(player, "daily")
+     *
+     * Keep prefixes non-overlapping: if one prefix is itself a prefix of another, which one
+     * wins is undefined (registry iteration order).
+     */
+    public static void registerPrefixPlaceholder(@NotNull String prefix,
+                                                 @NotNull BiFunction<Player, String, String> resolver) {
+        PREFIX_PLACEHOLDERS.put(normalize(prefix), resolver);
+    }
+
+    /**
      * Remove a placeholder.
      */
     public static void unregisterPlaceholder(@NotNull String identifier) {
         PLACEHOLDERS.remove(normalize(identifier));
+    }
+
+    /**
+     * Remove a parameterized (prefix) placeholder.
+     */
+    public static void unregisterPrefixPlaceholder(@NotNull String prefix) {
+        PREFIX_PLACEHOLDERS.remove(normalize(prefix));
     }
 
     /**
@@ -95,6 +129,53 @@ public final class PlaceholderManager {
         // %velto_currency_name_singular%
         registerPlaceholder("currency_name_singular",
                 player -> EconomyManager.isEnabled() ? EconomyManager.getCurrencyNameSingular() : "");
+
+        // === God mode ===
+        // %velto_god% -> whether the player currently has god mode on
+        registerPlaceholder("god", player -> GodManager.isGod(player) ? "true" : "false");
+
+        // === AFK stats ===
+        // %velto_afk_time% -> whole seconds since the player's last activity
+        registerPlaceholder("afk_time",
+                player -> String.valueOf(AfkManager.getTimeSinceLastActivity(player) / 1000L));
+        // %velto_afk_timeout% -> configured AFK timeout, in seconds
+        registerPlaceholder("afk_timeout",
+                player -> String.valueOf(AfkManager.getAfkTimeoutSeconds()));
+        // %velto_afk_count% -> number of players currently AFK server-wide
+        registerPlaceholder("afk_count",
+                player -> String.valueOf(AfkManager.getAfkPlayers().size()));
+
+        registerParameterizedPlaceholders();
+    }
+
+    /**
+     * Parameterized (prefix-matched) placeholders, where the text after the prefix is an
+     * argument such as a kit name or a home name.
+     */
+    private static void registerParameterizedPlaceholders() {
+        // %velto_kit_cooldown_<kit>% -> remaining cooldown, formatted (e.g. "1h 30m", or "0s" if ready)
+        registerPrefixPlaceholder("kit_cooldown_", (player, kit) ->
+                KitManager.formatCooldown(KitManager.getCooldownRemaining(player.getUniqueId(), kit)));
+
+        // %velto_has_home_<name>% -> true/false whether the player has a home by that name
+        registerPrefixPlaceholder("has_home_", (player, name) ->
+                HomeManager.hasHome(player.getUniqueId(), name) ? "true" : "false");
+
+        // %velto_home_world_<name>% -> the home's world name, or "" if the home doesn't exist
+        registerPrefixPlaceholder("home_world_", (player, name) -> {
+            ConfigurationSection sec = HomeManager.getHomeData(player.getUniqueId(), name);
+            return (sec == null) ? "" : sec.getString("world", "");
+        });
+        // %velto_home_x_<name>% / _y_ / _z_ -> block coordinates (rounded), or "" if the home doesn't exist
+        registerPrefixPlaceholder("home_x_", (player, name) -> homeCoord(player, name, "x"));
+        registerPrefixPlaceholder("home_y_", (player, name) -> homeCoord(player, name, "y"));
+        registerPrefixPlaceholder("home_z_", (player, name) -> homeCoord(player, name, "z"));
+    }
+
+    private static String homeCoord(Player player, String name, String axis) {
+        ConfigurationSection sec = HomeManager.getHomeData(player.getUniqueId(), name);
+        if (sec == null || !sec.contains(axis)) return "";
+        return String.valueOf(Math.round(sec.getDouble(axis)));
     }
 
     /**
@@ -144,11 +225,31 @@ public final class PlaceholderManager {
         public @Nullable String onPlaceholderRequest(Player player, @NotNull String identifier) {
             if (player == null) return "";
 
-            Function<Player, String> resolver = PLACEHOLDERS.get(normalize(identifier));
-            if (resolver == null) return null;
+            String key = normalize(identifier);
 
+            // Exact match first.
+            Function<Player, String> resolver = PLACEHOLDERS.get(key);
+            if (resolver != null) {
+                return safeResolve(identifier, () -> resolver.apply(player));
+            }
+
+            // Then parameterized prefix matches (e.g. kit_cooldown_<name>).
+            for (Map.Entry<String, BiFunction<Player, String, String>> entry : PREFIX_PLACEHOLDERS.entrySet()) {
+                String prefix = entry.getKey();
+                if (key.startsWith(prefix) && key.length() > prefix.length()) {
+                    // Argument preserves the original case (home/kit names may be case-sensitive).
+                    String arg = identifier.trim().substring(prefix.length());
+                    BiFunction<Player, String, String> pResolver = entry.getValue();
+                    return safeResolve(identifier, () -> pResolver.apply(player, arg));
+                }
+            }
+
+            return null;
+        }
+
+        private static String safeResolve(String identifier, java.util.function.Supplier<String> resolver) {
             try {
-                String out = resolver.apply(player);
+                String out = resolver.get();
                 return (out == null) ? "" : out;
             } catch (Throwable t) {
                 Bukkit.getLogger().severe("[Velto] Placeholder error: %velto_" + identifier + "%");

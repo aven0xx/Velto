@@ -67,6 +67,17 @@ public final class HomeManager {
         return UserdataManager.getData(uuid).getConfigurationSection("homes." + name) != null;
     }
 
+    /**
+     * Raw stored data for a home, or null if it doesn't exist.
+     *
+     * Unlike {@link #getHome}, this does not resolve or validate the world and never logs,
+     * so it's safe to call frequently (e.g. from a placeholder resolved every scoreboard
+     * tick) even when the home's world is unloaded.
+     */
+    public static ConfigurationSection getHomeData(UUID uuid, String name) {
+        return UserdataManager.getData(uuid).getConfigurationSection("homes." + name);
+    }
+
     public static void deleteHome(UUID uuid, String name) {
         UserdataManager.set(uuid, "homes." + name, null);
         UserdataManager.save(uuid);
