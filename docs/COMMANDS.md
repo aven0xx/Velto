@@ -96,9 +96,9 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 |---|---|---|---|---|
 | `/spawn` | — | `velto.spawn` | ❌ | Teleports to the configured spawn (`config.yml: spawn`). |
 | `/setspawn` | — | `velto.setspawn` | ❌ | Sets spawn to your current location. |
-| `/time [set] <day\|night\|noon\|midnight\|0-24h\|1-12am/pm\|ticks> [world]` | — | `velto.timeset` | ✅ | Optional `set` keyword. Real hours use an `h` suffix (`8h`, `18h`) or am/pm (`6pm`); a bare number is raw ticks. |
-| `/day [world]` | `setday` | `velto.timeset` | ✅ | |
-| `/night [world]` | `setnight` | `velto.timeset` | ✅ | |
+| `/time [set] <day\|night\|noon\|midnight\|0-24h\|1-12am/pm\|ticks> [world]` | — | `velto.timeset` | ✅* | Optional `set` keyword. Real hours use an `h` suffix (`8h`, `18h`) or am/pm (`6pm`); a bare number is raw ticks. *Console must name a world. |
+| `/day [world]` | `setday` | `velto.timeset` | ✅* | *Console must name a world. |
+| `/night [world]` | `setnight` | `velto.timeset` | ✅* | *Console must name a world. |
 | `/weather <clear\|sun\|rain\|thunder> [world]` | — | `velto.weather` | ✅ | |
 | `/sun`, `/rain`, `/thunder` `[world]` | — | `velto.weather` | ✅ | Shortcut wrappers that re-dispatch through `/weather`. |
 | `/craft` | `workbench` | `velto.craft` | ❌ | Opens a virtual crafting table. |
