@@ -34,7 +34,7 @@ All five below are pure `ConcurrentHashMap`/`Set`-backed, not persisted (see
 
 | Class | Storage | Role |
 |---|---|---|
-| `HomeManager` | `UserdataManager` (`homes.<name>`) | Set/get/delete/list a player's named homes. Also computes the per-player home cap from `velto.homes.<n>` / `velto.homes.unlimited` permissions (`getMaxHomes`, default from `config.yml: homes.default-limit`), enforced by `/sethome` — see [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
+| `HomeManager` | `UserdataManager` (`homes.<name>`) | Set/get/delete/list a player's named homes. Also computes the per-player home cap (`getMaxHomes`) as `config.yml: homes.default-limit` plus each additive `velto.homes.bonus.<name>.<amount>` permission (or unlimited via `velto.homes.unlimited`), enforced by `/sethome` — see [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
 | `WarpManager` | own file, `warps.yml` | Global named warps — see [DATA_STORAGE.md](DATA_STORAGE.md#warpmanager--warpsyml). |
 | `KitManager` | `kits.yml` (definitions, read-only) + `UserdataManager` (cooldowns/claims) | Parses kit definitions at load time (skipping invalid materials/enchantments with a warning rather than failing the whole file); builds `ItemStack`s and preview inventories; tracks per-player cooldown/one-time-claim state. |
 | `KitPreviewHolder` | — | Marker `InventoryHolder` so `KitPreviewListener` can identify (and lock) a preview GUI without comparing titles. |

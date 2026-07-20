@@ -57,14 +57,20 @@ Because the check happens inside the resolver at request time, this responds liv
 `%velto_homes_max%` / `%velto_homes_remaining%` reflect a **permission-based** cap on how
 many homes a player may set (`HomeManager.getMaxHomes`), enforced by `/sethome`:
 
-- No relevant permission → the configured default (`config.yml: homes.default-limit`, default `3`).
-- `velto.homes.<n>` → raises the cap to `n`; the **highest** granted value wins (e.g.
-  `velto.homes.10` → 10).
+The cap is **additive**: a configured floor plus every home-bonus permission the player holds.
+
+- Floor → `config.yml: homes.default-limit` (default `3`).
+- `velto.homes.bonus.<name>.<amount>` → adds `<amount>` to the cap. `<name>` is any label
+  that makes the node unique, so bonuses **stack** across ranks — e.g. a VIP rank granting
+  `velto.homes.bonus.vip.3` and an MVP rank granting `velto.homes.bonus.mvp.3` give
+  `3 (floor) + 3 + 3 = 9`. (Two ranks granting the *same* node — same `<name>` and
+  `<amount>` — would collapse to one, since Minecraft permissions are a set; distinct names
+  avoid that.)
 - `velto.homes.unlimited` → no cap; the placeholders read `unlimited`.
 
 Overwriting an existing home is always allowed (it doesn't increase the count); only
 creating a *new* home past the cap is blocked (with the `home-limit-reached` message).
-The numeric `velto.homes.<n>` nodes are open-ended and aren't declared in the plugin
+The `velto.homes.bonus.*` nodes are open-ended and aren't declared in the plugin
 manifests — grant them from your permissions plugin.
 
 ## Adding more placeholders
