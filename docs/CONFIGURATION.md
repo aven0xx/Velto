@@ -37,6 +37,7 @@ ship-and-edit config, see [DATA_STORAGE.md](DATA_STORAGE.md) instead.
 | `teleport` | `cancel-on-move` (true), `countdown.default` (5), `countdown.permissions` | `TeleportManager`'s player-initiated teleport countdown (see below); first matching permission in the map wins over the default. |
 | `tpa` | `expire-seconds` (60) | How long an unanswered `/tpa` request lives. |
 | `back` | `blacklisted-worlds` | Worlds `/back` refuses to return you to. |
+| `homes` | `default-limit` (3) | Floor for the per-player home cap; `HomeManager.getMaxHomes` adds each `velto.homes.bonus.<name>.<amount>` permission on top (they stack), or `velto.homes.unlimited` removes the cap. Enforced by `/sethome`. |
 | `userdata` | `autosave-interval-seconds` (300) | Periodic full-flush interval for `UserdataManager` — see [DATA_STORAGE.md](DATA_STORAGE.md), this is a safety net, not the primary save path. |
 | `auto-messages` | `enabled`, `interval-seconds`, `random`, `messages` (list of `lang.yml` keys) | `AutoMsgManager`'s periodic broadcast rotation. |
 | `messages` | `chat`, `join`, `quit`, `reload`, `chat-priority`, `chat-groups.<name>.{permission,format}` | Chat formatting — consumed by the platform-specific `ChatManager`, not `LangUtil`. `chat-priority` lists group names in priority order; the first group whose `permission` the sender has wins; `chat` is the required fallback format. |

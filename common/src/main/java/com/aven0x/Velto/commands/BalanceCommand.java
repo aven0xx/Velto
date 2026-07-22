@@ -3,6 +3,7 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.EconomyManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -42,18 +43,19 @@ public class BalanceCommand extends BaseCommand {
 
         if (!hasPermission(sender, "velto.balance.others")) return true;
 
-        Player target = Bukkit.getPlayer(args[0]);
+        OfflinePlayer target = resolveTarget(args[0]);
         if (target == null) {
             if (sender instanceof Player player) LangUtil.send(player, "invalid-player");
             else sender.sendMessage("Player not found.");
             return true;
         }
 
+        String targetName = target.getName() != null ? target.getName() : args[0];
         String formatted = EconomyManager.format(EconomyManager.getBalance(target.getUniqueId()));
         if (sender instanceof Player player) {
-            LangUtil.send(player, "balance-other", Map.of("%player%", target.getName(), "%balance%", formatted));
+            LangUtil.send(player, "balance-other", Map.of("%player%", targetName, "%balance%", formatted));
         } else {
-            sender.sendMessage(target.getName() + "'s balance: " + formatted);
+            sender.sendMessage(targetName + "'s balance: " + formatted);
         }
         return true;
     }

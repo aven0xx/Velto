@@ -16,6 +16,7 @@ read these docs to understand *how* the code works.
 | [CONFIGURATION.md](CONFIGURATION.md) | Every shipped YAML file (`config.yml`, `lang.yml`, `commands.yml`, `kits.yml`, `economy.yml`, `plugin.yml`) explained field by field |
 | [DATA_STORAGE.md](DATA_STORAGE.md) | Runtime/generated data: per-player userdata, warps, AFK positions — caching, save timing, persistence guarantees |
 | [MANAGERS.md](MANAGERS.md) | Catalog of every manager/util/listener class: what it owns, its public API, whether it's persisted |
+| [PLACEHOLDERS.md](PLACEHOLDERS.md) | The full `%velto_*%` PlaceholderAPI catalog and how to add more |
 | [ECONOMY.md](ECONOMY.md) | Deep dive on the economy module and its optional Vault integration |
 | [EXTENDING.md](EXTENDING.md) | Practical how-to guides: add a command, add a manager/module, add an optional soft-dependency, add a config file |
 

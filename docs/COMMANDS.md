@@ -96,9 +96,9 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 |---|---|---|---|---|
 | `/spawn` | — | `velto.spawn` | ❌ | Teleports to the configured spawn (`config.yml: spawn`). |
 | `/setspawn` | — | `velto.setspawn` | ❌ | Sets spawn to your current location. |
-| `/time [set] <day\|night\|noon\|midnight\|0-24h\|1-12am/pm\|ticks> [world]` | — | `velto.timeset` | ✅ | Optional `set` keyword. Real hours use an `h` suffix (`8h`, `18h`) or am/pm (`6pm`); a bare number is raw ticks. |
-| `/day [world]` | `setday` | `velto.timeset` | ✅ | |
-| `/night [world]` | `setnight` | `velto.timeset` | ✅ | |
+| `/time [set] <day\|night\|noon\|midnight\|0-24h\|1-12am/pm\|ticks> [world]` | — | `velto.timeset` | ✅* | Optional `set` keyword. Real hours use an `h` suffix (`8h`, `18h`) or am/pm (`6pm`); a bare number is raw ticks. *Console must name a world. |
+| `/day [world]` | `setday` | `velto.timeset` | ✅* | *Console must name a world. |
+| `/night [world]` | `setnight` | `velto.timeset` | ✅* | *Console must name a world. |
 | `/weather <clear\|sun\|rain\|thunder> [world]` | — | `velto.weather` | ✅ | |
 | `/sun`, `/rain`, `/thunder` `[world]` | — | `velto.weather` | ✅ | Shortcut wrappers that re-dispatch through `/weather`. |
 | `/craft` | `workbench` | `velto.craft` | ❌ | Opens a virtual crafting table. |
@@ -127,15 +127,15 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/reply <message...>` | `r` | `velto.msg` | ❌ | Replies to `MsgManager`'s last-messenger record. |
 | `/afk` / `/afk <player>` / `/afk list` | `away` | `velto.afk` / `velto.afk.others` / `velto.afk.list` | ❌ | Toggle; auto-triggers after `config.yml: afk-timeout-seconds` of inactivity. |
 | `/home [name]` | — | `velto.home` | ❌ | Default name `"home"`. |
-| `/sethome [name]` | — | `velto.sethome` | ❌ | |
+| `/sethome [name]` | — | `velto.sethome` (+ `velto.homes.bonus.<name>.<amount>` / `velto.homes.unlimited` for the cap) | ❌ | Capped per-player: `config.yml: homes.default-limit` (3) plus each additive `velto.homes.bonus.<name>.<amount>`, or uncapped via `velto.homes.unlimited`. See [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
 | `/delhome [name]` | — | `velto.delhome` | ❌ | |
 | `/homes` | — | `velto.homes` | ❌ | Lists your own homes. |
 | `/warp [name]` | — | `velto.warp` | ❌ | No args lists all warps (global, not per-player). |
 | `/setwarp <name>` | — | `velto.setwarp` | ❌ | Name is required (warps are shared/named, unlike `/sethome`). |
 | `/kit` / `/kit <name> [player]` / `/kit preview <name>` | — | `velto.kit` (+`.others`, `.<kitname>`, `.cooldown.bypass`) | ✅* | See `kits.yml`; `preview` opens a locked read-only inventory. |
 | `/kitreset <player> <kit>` | — | `velto.kit.reset` | ✅ | Clears cooldown + one-time-claim flag. |
-| `/economy give\|take\|set\|reset <player> [amount]` | `eco` | `velto.economy.give`/`take`/`set`/`reset` | ✅ | Gated live by `economy.yml: enabled`. See [ECONOMY.md](ECONOMY.md). |
-| `/balance [player]` | `bal`, `money` | `velto.balance` / `velto.balance.others` | ❌ | Self/others. |
+| `/economy give\|take\|set\|reset <player> [amount]` | `eco` | `velto.economy.give`/`take`/`set`/`reset` | ✅ | Gated live by `economy.yml: enabled`. Target may be offline (resolved from cached players). See [ECONOMY.md](ECONOMY.md). |
+| `/balance [player]` | `bal`, `money` | `velto.balance` / `velto.balance.others` | ✅* | Self/others; target may be offline. *Console has no balance of its own, so it must name a player. |
 | `/pay <player> <amount>` | — | `velto.pay` | ❌ | Blocks self-pay and insufficient funds. |
 | `/alert <chat\|actionbar\|bossbar\|title> <ticks> <message...>` | `broadcast`, `bc` | `velto.alert` | ✅ | Broadcasts a one-off raw message, bypassing `lang.yml`. |
 | `/veltoreload` | — | `velto.reload` | ✅ | Reloads every config file — see [ARCHITECTURE.md](ARCHITECTURE.md#veltoreload). |

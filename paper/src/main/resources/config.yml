@@ -45,6 +45,14 @@ back:
     - world_the_end
 #
 #
+# Homes
+# default-limit: floor for how many homes a player may set (with no bonus permission).
+# Add velto.homes.bonus.<name>.<amount> permissions to stack extra homes on top
+# (e.g. velto.homes.bonus.vip.3 adds 3), or velto.homes.unlimited to remove the cap.
+homes:
+  default-limit: 3
+#
+#
 # Userdata
 # How often player data is flushed to disk (in seconds). Default: 300 (5 minutes)
 userdata:

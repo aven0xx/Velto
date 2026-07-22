@@ -34,7 +34,7 @@ All five below are pure `ConcurrentHashMap`/`Set`-backed, not persisted (see
 
 | Class | Storage | Role |
 |---|---|---|
-| `HomeManager` | `UserdataManager` (`homes.<name>`) | Set/get/delete/list a player's named homes. |
+| `HomeManager` | `UserdataManager` (`homes.<name>`) | Set/get/delete/list a player's named homes. Also computes the per-player home cap (`getMaxHomes`) as `config.yml: homes.default-limit` plus each additive `velto.homes.bonus.<name>.<amount>` permission (or unlimited via `velto.homes.unlimited`), enforced by `/sethome` — see [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
 | `WarpManager` | own file, `warps.yml` | Global named warps — see [DATA_STORAGE.md](DATA_STORAGE.md#warpmanager--warpsyml). |
 | `KitManager` | `kits.yml` (definitions, read-only) + `UserdataManager` (cooldowns/claims) | Parses kit definitions at load time (skipping invalid materials/enchantments with a warning rather than failing the whole file); builds `ItemStack`s and preview inventories; tracks per-player cooldown/one-time-claim state. |
 | `KitPreviewHolder` | — | Marker `InventoryHolder` so `KitPreviewListener` can identify (and lock) a preview GUI without comparing titles. |
@@ -46,7 +46,7 @@ All five below are pure `ConcurrentHashMap`/`Set`-backed, not persisted (see
 | Class | Role |
 |---|---|
 | `AutoMsgManager` | Periodic broadcast rotation (random or sequential) from `config.yml: auto-messages`, driven by a repeating `BukkitTask`. Instance-based (not static) so `/veltoreload` can `restart()` it cleanly. |
-| `PlaceholderManager` | Registers `%velto_*%` placeholders with PlaceholderAPI *if installed* (`registerExpansion()` checks `isPluginEnabled("PlaceholderAPI")` before ever touching a PAPI class — see [EXTENDING.md](EXTENDING.md#adding-an-optional-soft-dependency) for why this ordering matters). Holds its own registry (`registerPlaceholder`/`unregisterPlaceholder`) so other managers can contribute placeholders without depending on PAPI directly. |
+| `PlaceholderManager` | Registers `%velto_*%` placeholders with PlaceholderAPI *if installed* (`registerExpansion()` checks `isPluginEnabled("PlaceholderAPI")` before ever touching a PAPI class — see [EXTENDING.md](EXTENDING.md#adding-an-optional-soft-dependency) for why this ordering matters). Holds its own registry (`registerPlaceholder`/`unregisterPlaceholder`) so other managers can contribute placeholders without depending on PAPI directly. See [PLACEHOLDERS.md](PLACEHOLDERS.md) for the full `%velto_*%` catalog. |
 | `AtMentionHandler` | Parses `@player message` chat input into a private message; shared by both platforms' `ChatManager`s and by `MsgCommand`'s underlying logic. |
 | `ChatManager` (platform-specific: `paper`/`bukkit`) | Chat formatting, join/quit messages, PlaceholderAPI resolution. Duplicated per-platform because Paper's `AsyncChatEvent`/Adventure `Component` and Bukkit's `AsyncPlayerChatEvent`/plain `String` aren't interchangeable — see [ARCHITECTURE.md](ARCHITECTURE.md). |
 

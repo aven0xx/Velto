@@ -3,6 +3,7 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.EconomyManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,22 +45,27 @@ public class EconomyCommand extends BaseCommand {
 
         if (!hasPermission(sender, "velto.economy." + sub)) return true;
 
-        Player target = Bukkit.getPlayer(args[1]);
+        OfflinePlayer target = resolveTarget(args[1]);
         if (target == null) {
             if (sender instanceof Player player) LangUtil.send(player, "invalid-player");
             else sender.sendMessage("Player not found.");
             return true;
         }
 
+        // Display name (may be null for a cached offline player) and the online handle, if any —
+        // target-facing messages only go out when the target is actually online to see them.
+        String targetName = target.getName() != null ? target.getName() : args[1];
+        Player targetOnline = target.getPlayer();
+
         if (sub.equals("reset")) {
             EconomyManager.resetBalance(target.getUniqueId());
             String formatted = EconomyManager.format(EconomyManager.getStartingBalance());
             if (sender instanceof Player player) {
-                LangUtil.send(player, "economy-reset", Map.of("%player%", target.getName(), "%amount%", formatted));
+                LangUtil.send(player, "economy-reset", Map.of("%player%", targetName, "%amount%", formatted));
             } else {
-                sender.sendMessage("Reset " + target.getName() + "'s balance to " + formatted + ".");
+                sender.sendMessage("Reset " + targetName + "'s balance to " + formatted + ".");
             }
-            LangUtil.send(target, "economy-reset-target", Map.of("%amount%", formatted));
+            if (targetOnline != null) LangUtil.send(targetOnline, "economy-reset-target", Map.of("%amount%", formatted));
             return true;
         }
 
@@ -85,27 +91,27 @@ public class EconomyCommand extends BaseCommand {
         }
 
         String formatted = EconomyManager.format(amount);
-        Map<String, String> senderPlaceholders = Map.of("%player%", target.getName(), "%amount%", formatted);
+        Map<String, String> senderPlaceholders = Map.of("%player%", targetName, "%amount%", formatted);
         Map<String, String> targetPlaceholders = Map.of("%amount%", formatted);
 
         switch (sub) {
             case "give" -> {
                 EconomyManager.add(target.getUniqueId(), amount);
                 if (sender instanceof Player player) LangUtil.send(player, "economy-give", senderPlaceholders);
-                else sender.sendMessage("Gave " + formatted + " to " + target.getName() + ".");
-                LangUtil.send(target, "economy-give-target", targetPlaceholders);
+                else sender.sendMessage("Gave " + formatted + " to " + targetName + ".");
+                if (targetOnline != null) LangUtil.send(targetOnline, "economy-give-target", targetPlaceholders);
             }
             case "take" -> {
                 EconomyManager.subtract(target.getUniqueId(), amount);
                 if (sender instanceof Player player) LangUtil.send(player, "economy-take", senderPlaceholders);
-                else sender.sendMessage("Took " + formatted + " from " + target.getName() + ".");
-                LangUtil.send(target, "economy-take-target", targetPlaceholders);
+                else sender.sendMessage("Took " + formatted + " from " + targetName + ".");
+                if (targetOnline != null) LangUtil.send(targetOnline, "economy-take-target", targetPlaceholders);
             }
             case "set" -> {
                 EconomyManager.setBalance(target.getUniqueId(), amount);
                 if (sender instanceof Player player) LangUtil.send(player, "economy-set", senderPlaceholders);
-                else sender.sendMessage("Set " + target.getName() + "'s balance to " + formatted + ".");
-                LangUtil.send(target, "economy-set-target", targetPlaceholders);
+                else sender.sendMessage("Set " + targetName + "'s balance to " + formatted + ".");
+                if (targetOnline != null) LangUtil.send(targetOnline, "economy-set-target", targetPlaceholders);
             }
         }
 
