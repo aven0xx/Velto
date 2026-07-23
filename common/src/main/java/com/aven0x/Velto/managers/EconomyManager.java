@@ -5,6 +5,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class EconomyManager {
@@ -113,5 +118,32 @@ public final class EconomyManager {
 
     public static void resetBalance(UUID uuid) {
         setBalance(uuid, startingBalance);
+    }
+
+    /**
+     * Every known player's balance, highest first — the backing data for {@code /baltop}.
+     *
+     * Merges the union of currently-loaded players and every on-disk userdata file, preferring a
+     * loaded player's live in-memory balance (so unsaved changes count) and falling back to a
+     * direct, non-caching disk read for offline players. Because the offline reads never populate
+     * {@link UserdataManager}'s cache, scanning the whole player base here doesn't leak cache
+     * entries (see DATA_STORAGE.md). All the reads it performs are thread-safe, so callers should
+     * run this off the main thread and only touch Bukkit/messaging back on the main thread.
+     */
+    public static List<Map.Entry<UUID, Double>> getSortedBalances() {
+        Set<UUID> all = new HashSet<>(UserdataManager.listStoredUuids());
+        all.addAll(UserdataManager.getCachedUuids());
+
+        List<Map.Entry<UUID, Double>> balances = new ArrayList<>(all.size());
+        for (UUID uuid : all) {
+            Double live = UserdataManager.getLoadedDouble(uuid, "economy.balance");
+            double balance = (live != null)
+                    ? live
+                    : UserdataManager.readDoubleFromDisk(uuid, "economy.balance", startingBalance);
+            balances.add(Map.entry(uuid, balance));
+        }
+
+        balances.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+        return balances;
     }
 }

@@ -76,6 +76,37 @@ See [COMMANDS.md](COMMANDS.md) for the full permission table. Summary:
 - **`/pay <player> <amount>`** (`velto.pay`) — player-only, blocks self-pay, uses
   `transfer()` so insufficient funds leaves both balances untouched. Kept player-only by
   design — it debits the sender, which the console can't be.
+- **`/baltop [page]`** (`velto.baltop`, aliases `balancetop`/`moneytop`) — see
+  [`/baltop`](#baltop) below.
+
+## `/baltop`
+
+A paginated, highest-first balance leaderboard (10 entries per page), gated live by
+`economy.yml: enabled` exactly like the other economy commands. Console-usable (it's a
+read-only listing) with a plain-text fallback for each line, following the same
+player-vs-console messaging split as `/balance`.
+
+The interesting part is **how it reads balances without wrecking the userdata cache**.
+`EconomyManager.getSortedBalances()` takes the union of currently-loaded players
+(`UserdataManager.getCachedUuids()`) and every on-disk userdata file
+(`UserdataManager.listStoredUuids()`), then for each UUID:
+
+- prefers the **loaded** in-memory balance when present (`getLoadedDouble`, a cache-only
+  read that returns `null` rather than lazily loading — so it reflects unsaved changes
+  without re-creating a cache entry for anyone), and
+- otherwise reads the balance **straight from disk** (`readDoubleFromDisk`), which never
+  populates the cache.
+
+This matters because [DATA_STORAGE.md](DATA_STORAGE.md#per-player-data-userdatamanager)
+warns that a naive scan through `UserdataManager.getData(uuid)` for every player would
+lazily load each offline player into the cache and leave them resident until restart —
+exactly the "shop plugin scanning balances" footgun called out there. `/baltop` sidesteps
+it entirely.
+
+Every read `getSortedBalances()` performs is thread-safe, so `BalTopCommand` runs the
+whole scan+sort on an async task and only hops back to the main thread to resolve player
+names (`Bukkit.getOfflinePlayer(uuid)`) and send the messages. Requested pages past the
+end clamp to the last page; a non-numeric page argument falls back to page 1.
 
 ## Vault integration
 

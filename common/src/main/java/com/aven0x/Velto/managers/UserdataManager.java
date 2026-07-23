@@ -7,7 +7,10 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -103,6 +106,13 @@ public final class UserdataManager {
         }
     }
 
+    public static List<String> getStringList(UUID uuid, String key) {
+        YamlConfiguration yaml = getData(uuid);
+        synchronized (yaml) {
+            return yaml.getStringList(key);
+        }
+    }
+
     public static void set(UUID uuid, String key, Object value) {
         YamlConfiguration yaml = getData(uuid);
         synchronized (yaml) {
@@ -165,6 +175,60 @@ public final class UserdataManager {
                 logger.log(Level.SEVERE, "[Velto] Failed to flush pending userdata for " + entry.getKey() + " on shutdown", e);
             }
         }
+    }
+
+    // === Bulk / offline reads (for leaderboard-style scans) ===
+
+    /** Snapshot of every currently-loaded player's UUID. */
+    public static Set<UUID> getCachedUuids() {
+        return new HashSet<>(cache.keySet());
+    }
+
+    /**
+     * Reads a double from a player's in-memory data <em>only if they're currently loaded</em>,
+     * returning {@code null} otherwise. Unlike {@link #getData(UUID)} this never loads (or
+     * re-creates) a cache entry, so it's safe to call while iterating many players without
+     * leaking cache entries for offline ones — see DATA_STORAGE.md.
+     */
+    public static Double getLoadedDouble(UUID uuid, String key) {
+        YamlConfiguration yaml = cache.get(uuid);
+        if (yaml == null) return null;
+        synchronized (yaml) {
+            return yaml.contains(key) ? yaml.getDouble(key) : null;
+        }
+    }
+
+    /**
+     * Every UUID that has an on-disk userdata file. Reads the userdata directory directly, so it
+     * also sees players who aren't currently online. Safe to call off the main thread.
+     */
+    public static Set<UUID> listStoredUuids() {
+        Set<UUID> uuids = new HashSet<>();
+        if (userdataFolder == null) return uuids;
+
+        File[] files = userdataFolder.listFiles((dir, fileName) -> fileName.endsWith(".yml"));
+        if (files == null) return uuids;
+
+        for (File file : files) {
+            String fileName = file.getName();
+            String raw = fileName.substring(0, fileName.length() - ".yml".length());
+            try {
+                uuids.add(UUID.fromString(raw));
+            } catch (IllegalArgumentException ignored) {
+                // Not a UUID-named file — skip it.
+            }
+        }
+        return uuids;
+    }
+
+    /**
+     * Reads a double straight from a player's file on disk without touching the in-memory cache.
+     * Intended for offline players in a bulk scan; prefer {@link #getLoadedDouble(UUID, String)}
+     * first for loaded players so their unsaved changes are reflected. Safe off the main thread.
+     */
+    public static double readDoubleFromDisk(UUID uuid, String key, double def) {
+        if (userdataFolder == null) return def;
+        return YamlConfiguration.loadConfiguration(fileFor(uuid)).getDouble(key, def);
     }
 
     // === Helpers ===

@@ -100,6 +100,14 @@ opened-craft:
   type: actionbar
   message: "&#57E39AOpened crafting table"
 
+opened-enderchest:
+  type: actionbar
+  message: "&#57E39AOpened ender chest"
+
+opened-enderchest-other:
+  type: actionbar
+  message: "&#57E39AOpened &#F1F1F1%target%&#57E39A's ender chest"
+
 opened-anvil:
   type: actionbar
   message: "&#57E39AOpened anvil"
@@ -511,6 +519,50 @@ msg-self:
   type: chat
   message: "&#FF7070You can't message yourself."
 
+msg-ignored:
+  type: chat
+  message: "&#FF7070%player% is ignoring you."
+
+ignore-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/ignore <player>"
+      hover: "&#8A94A6Click to ignore a player"
+      click:
+        action: suggest_command
+        value: "/ignore "
+
+ignore-self:
+  type: chat
+  message: "&#FF7070You can't ignore yourself."
+
+ignore-already:
+  type: chat
+  message: "&#FF7070You're already ignoring &#F1F1F1%player%&#FF7070."
+
+ignore-success:
+  type: chat
+  message: "&#57E39ANow ignoring &#F1F1F1%player%&#57E39A. You won't see their chat or messages."
+
+unignore-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/unignore <player>"
+      hover: "&#8A94A6Click to stop ignoring a player"
+      click:
+        action: suggest_command
+        value: "/unignore "
+
+unignore-not:
+  type: chat
+  message: "&#FF7070You're not ignoring &#F1F1F1%player%&#FF7070."
+
+unignore-success:
+  type: chat
+  message: "&#57E39ANo longer ignoring &#F1F1F1%player%&#57E39A."
+
 msg-sent:
   type: chat
   segments:
@@ -879,6 +931,22 @@ balance-self:
 balance-other:
   type: chat
   message: "&#F1F1F1%player%&#57E39A's balance &#8A94A6» &#FFD64A%balance%"
+
+baltop-header:
+  type: chat
+  message: "&#8A94A6» &#57E39ATop Balances &#8A94A6(page &#FFD64A%page%&#8A94A6/&#FFD64A%pages%&#8A94A6)"
+
+baltop-entry:
+  type: chat
+  message: "&#8A94A6#&#FFD64A%rank% &#F1F1F1%player% &#8A94A6» &#FFD64A%balance%"
+
+baltop-footer:
+  type: chat
+  message: "&#8A94A6Page &#FFD64A%page%&#8A94A6/&#FFD64A%pages% &#8A94A6— &#5AC8FA/baltop <page>"
+
+baltop-empty:
+  type: chat
+  message: "&#FF7070No balances to show yet."
 
 pay-usage:
   type: chat

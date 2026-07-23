@@ -30,10 +30,10 @@
 | **Teleportation** | `/spawn`, `/home`, `/warp`, `/tp`, `/tpa`, `/tpall`, `/back` — with a configurable teleport countdown and cancel-on-move. |
 | **Homes & Warps** | Per-player homes (`/home`, `/sethome`, `/delhome`, `/homes`) and shared, admin-set warps (`/warp`, `/setwarp`). |
 | **Kits** | Admin-defined kits (`kits.yml`) with cooldowns, one-time claims, and a locked preview GUI. |
-| **Economy** *(optional)* | A single-currency economy — `/economy`, `/balance`, `/pay` — backed by per-player balances, with an optional [Vault](https://github.com/MilkBowl/Vault) hook. Fully toggleable; see [below](#-economy-optional). |
-| **Player utilities** | `/heal`, `/feed`, `/speed`, `/fly`, `/god`, `/gamemode`, `/kill`, `/killall`, item renaming & lore editing. |
+| **Economy** *(optional)* | A single-currency economy — `/economy`, `/balance`, `/pay`, `/baltop` — backed by per-player balances, with an optional [Vault](https://github.com/MilkBowl/Vault) hook. Fully toggleable; see [below](#-economy-optional). |
+| **Player utilities** | `/heal`, `/feed`, `/speed`, `/fly`, `/god`, `/gamemode`, `/kill`, `/killall`, `/enderchest` (yours or another player's), item renaming & lore editing. |
 | **World tools** | `/time`, `/day`/`/night`, `/weather` (+ `/sun`/`/rain`/`/thunder`), `/craft`, `/anvil` *(Paper-only)*. |
-| **Communication** | `/msg`/`/reply`/`@player` mentions, server-wide `/alert`, per-group chat formats, PlaceholderAPI support. |
+| **Communication** | `/msg`/`/reply`/`@player` mentions, `/ignore`/`/unignore`, server-wide `/alert`, per-group chat formats, PlaceholderAPI support. |
 | **AFK system** | Auto-detects inactivity, optional AFK teleport zone, survives a quit-while-AFK/rejoin cycle. |
 | **Configurable notifications** | Every message can render as chat, an action bar, a title, or a boss bar — see [Configurable Messages](#-configurable-messages). |
 
@@ -50,19 +50,19 @@ aliases are in **[`docs/COMMANDS.md`](docs/COMMANDS.md)**.
 
 **Player utilities**
 `/heal` `/feed` `/speed` `/fly` `/god` `/gamemode` (`/gmc` `/gms` `/gma` `/gmsp`)
-`/kill` `/killall` `/rename` `/itemlore`
+`/kill` `/killall` `/enderchest` `/rename` `/itemlore`
 
 **World & environment**
 `/time` `/day` `/night` `/weather` (`/sun` `/rain` `/thunder`) `/craft` `/anvil`*
 
 **Communication**
-`/msg` `/reply` `@player <message>` `/alert`
+`/msg` `/reply` `@player <message>` `/ignore` `/unignore` `/alert`
 
 **Kits**
 `/kit` `/kitreset`
 
 **Economy** *(optional — see below)*
-`/economy` `/balance` `/pay`
+`/economy` `/balance` `/pay` `/baltop`
 
 **Admin & misc**
 `/afk` `/sudo` `/list` `/veltoreload` `/notiftest`
@@ -81,6 +81,7 @@ toggleable** in `economy.yml`:
 
 - `/economy give|take|set|reset <player> [amount]` — admin balance management.
 - `/balance [player]` and `/pay <player> <amount>` — for players.
+- `/baltop [page]` — a paginated, highest-first balance leaderboard.
 - Configurable currency name/symbol/decimal places.
 - Balances are stored per-player and update live, whether the change came from
   Velto's own commands or from another plugin.
