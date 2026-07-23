@@ -73,10 +73,14 @@ public class AlertCommand extends BaseCommand {
     @Override
     public List<String> complete(CommandSender sender, String label, String[] args) {
         // /alert <type> <ticks> <message...>
-        if (args.length == 1) {
-            String typed = args[0].toLowerCase();
+        // First arg (type): use <= 1 with the empty-token fallback, matching the other
+        // first-argument completers (FeedCommand/MsgCommand/BalanceCommand) so TAB on a bare
+        // "/alert " still lists the types regardless of how the platform splits a trailing space.
+        if (args.length <= 1) {
+            String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             return TYPES.stream().filter(t -> t.startsWith(typed)).toList();
         }
+        // Second arg (ticks): == 2 matches KitCommand's second-argument completion.
         if (args.length == 2) {
             String typed = args[1];
             return COMMON_DURATIONS.stream().filter(d -> d.startsWith(typed)).toList();
