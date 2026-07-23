@@ -5,7 +5,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class AlertCommand extends BaseCommand {
+
+    // The notification types LangUtil.sendGlobalRaw understands — single source of truth for
+    // both validation and tab-completion.
+    private static final List<String> TYPES = List.of("chat", "actionbar", "bossbar", "title");
+
+    // Suggested durations (in ticks; 20 ticks = 1 second) — just hints, any positive int works.
+    private static final List<String> COMMON_DURATIONS = List.of("40", "60", "100", "200");
 
     public AlertCommand() {
         super("alert");
@@ -61,11 +70,23 @@ public class AlertCommand extends BaseCommand {
         return true;
     }
 
+    @Override
+    public List<String> complete(CommandSender sender, String label, String[] args) {
+        // /alert <type> <ticks> <message...>
+        if (args.length == 1) {
+            String typed = args[0].toLowerCase();
+            return TYPES.stream().filter(t -> t.startsWith(typed)).toList();
+        }
+        if (args.length == 2) {
+            String typed = args[1];
+            return COMMON_DURATIONS.stream().filter(d -> d.startsWith(typed)).toList();
+        }
+        // Third argument onward is the free-text message — nothing to suggest.
+        return List.of();
+    }
+
     private static boolean isValidType(String type) {
-        return switch (type) {
-            case "chat", "actionbar", "bossbar", "title" -> true;
-            default -> false;
-        };
+        return TYPES.contains(type);
     }
 
     private static String joinFrom(String[] args, int startIndex) {
