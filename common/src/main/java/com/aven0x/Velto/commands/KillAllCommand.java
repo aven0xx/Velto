@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.ServerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -64,17 +65,36 @@ public class KillAllCommand extends BaseCommand {
         }
 
         int removed = 0;
-        for (Entity e : targetWorld.getEntities()) {
-            if (e.getType() == EntityType.PLAYER) continue;
-            if (killAll || e.getType() == targetType) {
-                e.remove();
-                removed++;
+        String scope;
+        if (ServerUtil.isFolia()) {
+            // Folia has no consistent world-wide entity list, so clear the area this region owns
+            // around the player (~8 chunks). getNearbyEntities is safe here: /killall runs on the
+            // region that owns the player, which owns roughly that radius around them. The [world]
+            // argument can't be honoured across regions, so it's ignored on Folia.
+            final int radius = 8 * 16;
+            for (Entity e : player.getNearbyEntities(radius, 512, radius)) {
+                if (e instanceof Player) continue;
+                if (killAll || e.getType() == targetType) {
+                    e.remove();
+                    removed++;
+                }
             }
+            scope = "near you";
+        } else {
+            // Spigot / non-Folia Paper: a single main thread, so a whole-world scan is safe.
+            for (Entity e : targetWorld.getEntities()) {
+                if (e.getType() == EntityType.PLAYER) continue;
+                if (killAll || e.getType() == targetType) {
+                    e.remove();
+                    removed++;
+                }
+            }
+            scope = "in world " + targetWorld.getName();
         }
 
         LangUtil.send(player, "killall-done");
         player.sendMessage("§aRemoved §f" + removed + " §aentities of type §f" +
-                (killAll ? "ALL" : targetType) + " §ain world §f" + targetWorld.getName() + "§a.");
+                (killAll ? "ALL" : targetType) + " §a" + scope + "§a.");
 
         return true;
     }
