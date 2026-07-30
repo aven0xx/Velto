@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -39,7 +40,8 @@ public class DayCommand extends BaseCommand {
             return true;
         }
 
-        world.setTime(1000);
+        // World time belongs to the global region on Folia; the message stays on this region.
+        Schedulers.get().global(() -> world.setTime(1000));
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "time-set-day");

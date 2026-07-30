@@ -1,6 +1,7 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -134,8 +135,10 @@ public final class KitManager {
     }
 
     // Builds the actual items + runs any configured commands. Returns ERROR (and gives
-    // nothing further) if delivery fails partway, so the caller can skip setting the
-    // cooldown/claim instead of burning it on a botched delivery.
+    // nothing further) if the item delivery fails, so the caller can skip setting the
+    // cooldown/claim instead of burning it on a botched delivery. Reward commands are now
+    // dispatched on the global region (fire-and-forget), so a command that fails later no
+    // longer forces ERROR — only item-delivery failures do.
     public static GiveResult giveKit(Player player, Kit kit) {
         boolean overflowed = false;
         try {
@@ -151,7 +154,9 @@ public final class KitManager {
             }
             for (String command : kit.commands()) {
                 String parsed = command.replace("%player%", player.getName());
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed);
+                // Console commands run on the global region; dispatching there makes them
+                // fire-and-forget relative to giveKit (see the method note above).
+                Schedulers.get().global(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed));
             }
         } catch (Exception e) {
             logger.warning("[Velto] Failed to fully deliver kit '" + kit.name() + "' to " + player.getName() + ": " + e.getMessage());

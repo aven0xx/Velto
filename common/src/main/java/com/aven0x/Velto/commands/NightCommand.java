@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -37,7 +38,8 @@ public class NightCommand extends BaseCommand {
             return true;
         }
 
-        world.setTime(13000);
+        // World time belongs to the global region on Folia; the message stays on this region.
+        Schedulers.get().global(() -> world.setTime(13000));
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "time-set-night");

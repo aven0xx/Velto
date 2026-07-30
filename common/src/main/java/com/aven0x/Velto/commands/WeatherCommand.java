@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -49,28 +50,18 @@ public class WeatherCommand extends BaseCommand {
             return true;
         }
 
-        switch (mode) {
-            case "clear", "sun" -> {
-                world.setStorm(false);
-                world.setThundering(false);
+        if (!isValidMode(mode)) {
+            if (sender instanceof Player player) {
+                LangUtil.send(player, "invalid-usage");
+            } else {
+                sender.sendMessage("§cUsage: /weather <clear|sun|rain|thunder> <world>");
             }
-            case "rain" -> {
-                world.setStorm(true);
-                world.setThundering(false);
-            }
-            case "thunder" -> {
-                world.setStorm(true);
-                world.setThundering(true);
-            }
-            default -> {
-                if (sender instanceof Player player) {
-                    LangUtil.send(player, "invalid-usage");
-                } else {
-                    sender.sendMessage("§cUsage: /weather <clear|sun|rain|thunder> <world>");
-                }
-                return true;
-            }
+            return true;
         }
+
+        // Weather is global-region state on Folia; only the mutation hops, the message stays here.
+        final World targetWorld = world;
+        Schedulers.get().global(() -> applyWeather(targetWorld, mode));
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "weather-updated");
@@ -81,23 +72,52 @@ public class WeatherCommand extends BaseCommand {
         return true;
     }
 
+    // Backs /sun /rain /thunder. Applies the weather directly instead of re-dispatching the
+    // vanilla /weather command — that re-entered command handling (which must run on the global
+    // region on Folia) and depended on the sender holding minecraft:weather; velto.weather now
+    // suffices, and feedback is Velto's own message rather than the doubled vanilla one.
     static boolean dispatchWeather(CommandSender sender, String mode, String[] args) {
-        if (sender instanceof Player) {
-            return Bukkit.dispatchCommand(sender, "weather " + mode);
-        }
-
-        String worldName;
-        if (args.length >= 1) {
-            worldName = args[0];
+        World world;
+        if (sender instanceof Player player) {
+            world = player.getWorld();
+        } else if (args.length >= 1) {
+            world = Bukkit.getWorld(args[0]);
+        } else if (!Bukkit.getWorlds().isEmpty()) {
+            world = Bukkit.getWorlds().get(0);
         } else {
-            if (Bukkit.getWorlds().isEmpty()) {
-                sender.sendMessage("§cNo worlds are loaded.");
-                return true;
-            }
-            worldName = Bukkit.getWorlds().get(0).getName();
+            sender.sendMessage("§cNo worlds are loaded.");
+            return true;
         }
 
-        return Bukkit.dispatchCommand(sender, "weather " + mode + " " + worldName);
+        if (world == null) {
+            sender.sendMessage("§cWorld not found.");
+            return true;
+        }
+
+        final World targetWorld = world;
+        Schedulers.get().global(() -> applyWeather(targetWorld, mode));
+
+        if (sender instanceof Player player) {
+            LangUtil.send(player, "weather-updated");
+        } else {
+            sender.sendMessage("§aWeather updated in world §f" + targetWorld.getName() + "§a.");
+        }
+        return true;
+    }
+
+    private static boolean isValidMode(String mode) {
+        return switch (mode) {
+            case "clear", "sun", "rain", "thunder" -> true;
+            default -> false;
+        };
+    }
+
+    private static void applyWeather(World world, String mode) {
+        switch (mode) {
+            case "clear", "sun" -> { world.setStorm(false); world.setThundering(false); }
+            case "rain"         -> { world.setStorm(true);  world.setThundering(false); }
+            case "thunder"      -> { world.setStorm(true);  world.setThundering(true);  }
+        }
     }
 
     public static class SunCommand extends BaseCommand {
