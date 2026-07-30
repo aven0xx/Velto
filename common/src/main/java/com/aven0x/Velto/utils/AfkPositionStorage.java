@@ -1,6 +1,7 @@
 package com.aven0x.Velto.utils;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -118,7 +119,7 @@ public final class AfkPositionStorage {
 
         Map<UUID, Location> snapshot = new HashMap<>(pendingReturns);
 
-        VeltoPlugin.get().getServer().getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
+        Schedulers.get().async(() -> {
             YamlConfiguration fresh = new YamlConfiguration();
             for (Map.Entry<UUID, Location> entry : snapshot.entrySet()) {
                 fresh.set("pending." + entry.getKey().toString(), entry.getValue());

@@ -1,6 +1,8 @@
 package com.aven0x.Velto.utils;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -16,7 +18,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -257,7 +258,7 @@ public class LangUtil {
                 bar.setVisible(true);
                 for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
                 int dur = msg.duration;
-                Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+                Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
                     bar.setVisible(false);
                 }, Math.max(1L, dur));
@@ -292,7 +293,7 @@ public class LangUtil {
                 bar.setProgress(1.0);
                 bar.setVisible(true);
                 for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
-                Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+                Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
                     bar.setVisible(false);
                 }, Math.max(1L, durationTicks));
@@ -422,28 +423,30 @@ public class LangUtil {
 
     private static void sendActionBar(Player player, BaseComponent[] components, int durationTicks) {
         int repetitions = Math.max(1, durationTicks / 20);
-        new BukkitRunnable() {
-            int count = 0;
-            @Override
-            public void run() {
-                if (count++ >= repetitions || !player.isOnline()) { cancel(); return; }
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+        int[] count = { 0 };
+        VeltoTask[] handle = new VeltoTask[1];
+        handle[0] = Schedulers.get().entityTimer(player, () -> {
+            if (count[0]++ >= repetitions || !player.isOnline()) {
+                if (handle[0] != null) handle[0].cancel();
+                return;
             }
-        }.runTaskTimer(VeltoPlugin.get(), 0L, 20L);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+        }, null, 1L, 20L);
     }
 
     private static void sendGlobalActionBar(BaseComponent[] components, int durationTicks) {
         int repetitions = Math.max(1, durationTicks / 20);
-        new BukkitRunnable() {
-            int count = 0;
-            @Override
-            public void run() {
-                if (count++ >= repetitions) { cancel(); return; }
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
-                }
+        int[] count = { 0 };
+        VeltoTask[] handle = new VeltoTask[1];
+        handle[0] = Schedulers.get().globalTimer(() -> {
+            if (count[0]++ >= repetitions) {
+                if (handle[0] != null) handle[0].cancel();
+                return;
             }
-        }.runTaskTimer(VeltoPlugin.get(), 0L, 20L);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+            }
+        }, 1L, 20L);
     }
 
     private static void sendBossBar(Player player, String title, BarColor color, int durationTicks) {
@@ -451,8 +454,12 @@ public class LangUtil {
         bar.setProgress(1.0);
         bar.addPlayer(player);
         bar.setVisible(true);
-        Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+        // retired: tear the bar down if the player disconnects before the timer fires.
+        Schedulers.get().entityDelayed(player, () -> {
             bar.removePlayer(player);
+            bar.setVisible(false);
+        }, () -> {
+            bar.removeAll();
             bar.setVisible(false);
         }, Math.max(1L, durationTicks));
     }

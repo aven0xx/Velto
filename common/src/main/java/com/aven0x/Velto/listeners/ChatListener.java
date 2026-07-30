@@ -1,6 +1,6 @@
 package com.aven0x.Velto.listeners;
 
-import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +18,7 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player joined = event.getPlayer();
-        Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> {
+        Schedulers.get().entityDelayed(joined, () -> {
             if (!joined.isOnline()) return;
             String atJoined = "@" + joined.getName();
 
@@ -33,7 +33,7 @@ public class ChatListener implements Listener {
             if (!othersAtNames.isEmpty()) {
                 joined.addCustomChatCompletions(othersAtNames);
             }
-        });
+        }, null, 1L);
     }
 
     @EventHandler

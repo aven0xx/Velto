@@ -1,7 +1,7 @@
 package com.aven0x.Velto.commands;
 
-import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.managers.EconomyManager;
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -48,9 +48,9 @@ public class BalTopCommand extends BaseCommand {
 
         // Scanning every player's balance can hit disk for offline players, so build the ranking
         // off the main thread and only come back to it for name resolution + messaging.
-        Bukkit.getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
+        Schedulers.get().async(() -> {
             List<Map.Entry<UUID, Double>> sorted = EconomyManager.getSortedBalances();
-            Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> render(sender, sorted, page));
+            Schedulers.get().global(() -> render(sender, sorted, page));
         });
         return true;
     }
