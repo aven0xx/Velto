@@ -1,7 +1,7 @@
 package com.aven0x.Velto.listeners;
 
 import com.aven0x.Velto.platform.Schedulers;
-import org.bukkit.Bukkit;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,12 +22,12 @@ public class ChatListener implements Listener {
             if (!joined.isOnline()) return;
             String atJoined = "@" + joined.getName();
 
-            List<String> othersAtNames = Bukkit.getOnlinePlayers().stream()
+            List<String> othersAtNames = PlayerUtil.onlineSnapshot().stream()
                     .filter(p -> !p.equals(joined))
                     .map(p -> "@" + p.getName())
                     .collect(Collectors.toList());
 
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 p.addCustomChatCompletions(List.of(atJoined));
             }
             if (!othersAtNames.isEmpty()) {
@@ -44,7 +44,7 @@ public class ChatListener implements Listener {
         String partial = buffer.substring(1).toLowerCase();
         Player sender = event.getSender() instanceof Player p ? p : null;
 
-        List<String> completions = Bukkit.getOnlinePlayers().stream()
+        List<String> completions = PlayerUtil.onlineSnapshot().stream()
                 .map(Player::getName)
                 .filter(n -> n.toLowerCase().startsWith(partial))
                 .map(n -> "@" + n + " ")
@@ -56,7 +56,7 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         String atName = "@" + event.getPlayer().getName();
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (Player p : PlayerUtil.onlineSnapshot()) {
             if (!p.equals(event.getPlayer())) {
                 p.removeCustomChatCompletions(List.of(atName));
             }

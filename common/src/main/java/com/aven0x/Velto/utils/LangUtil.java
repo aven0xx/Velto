@@ -3,6 +3,7 @@ package com.aven0x.Velto.utils;
 import com.aven0x.Velto.VeltoPlugin;
 import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.platform.VeltoTask;
+import com.aven0x.Velto.utils.PlayerUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -231,12 +232,12 @@ public class LangUtil {
             case "chat" -> {
                 if (msg.segments != null) {
                     BaseComponent[] components = buildSegmentedComponents(msg, placeholders);
-                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                    for (Player p : PlayerUtil.onlineSnapshot()) p.spigot().sendMessage(components);
                 } else if (msg.clickAction != null || msg.rawHover != null) {
                     BaseComponent[] components = buildInteractive(msg, colored, placeholders);
-                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                    for (Player p : PlayerUtil.onlineSnapshot()) p.spigot().sendMessage(components);
                 } else {
-                    Bukkit.broadcastMessage(colored);
+                    broadcast(colored);
                 }
             }
 
@@ -247,7 +248,7 @@ public class LangUtil {
 
             case "title" -> {
                 String subtitle = resolveColored(msg.rawSubtitle, msg.coloredSubtitle, placeholders);
-                for (Player p : Bukkit.getOnlinePlayers()) {
+                for (Player p : PlayerUtil.onlineSnapshot()) {
                     p.sendTitle(colored, subtitle, 10, Math.max(1, msg.duration), 10);
                 }
             }
@@ -256,7 +257,7 @@ public class LangUtil {
                 BossBar bar = Bukkit.createBossBar(colored, msg.barColor, BarStyle.SOLID);
                 bar.setProgress(1.0);
                 bar.setVisible(true);
-                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
+                for (Player p : PlayerUtil.onlineSnapshot()) bar.addPlayer(p);
                 int dur = msg.duration;
                 Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
@@ -278,12 +279,12 @@ public class LangUtil {
         String colored = colorize(rawMessage);
 
         switch (type.toLowerCase()) {
-            case "chat" -> Bukkit.broadcastMessage(colored);
+            case "chat" -> broadcast(colored);
 
             case "actionbar" -> sendGlobalActionBar(TextComponent.fromLegacyText(colored), durationTicks);
 
             case "title" -> {
-                for (Player p : Bukkit.getOnlinePlayers()) {
+                for (Player p : PlayerUtil.onlineSnapshot()) {
                     p.sendTitle(colored, "", 10, Math.max(1, durationTicks), 10);
                 }
             }
@@ -292,7 +293,7 @@ public class LangUtil {
                 BossBar bar = Bukkit.createBossBar(colored, BarColor.BLUE, BarStyle.SOLID);
                 bar.setProgress(1.0);
                 bar.setVisible(true);
-                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
+                for (Player p : PlayerUtil.onlineSnapshot()) bar.addPlayer(p);
                 Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
                     bar.setVisible(false);
@@ -301,6 +302,14 @@ public class LangUtil {
 
             default -> Bukkit.getLogger().warning("Invalid global raw notification type: " + type);
         }
+    }
+
+    // Broadcasts a plain string to all online players and the console. Snapshots the player view
+    // so we never iterate the live collection off the owning thread — Bukkit.broadcastMessage
+    // iterates it internally, which is unsafe from a region thread on Folia.
+    private static void broadcast(String message) {
+        for (Player p : PlayerUtil.onlineSnapshot()) p.sendMessage(message);
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
     // ===== Helpers =====
@@ -443,7 +452,7 @@ public class LangUtil {
                 if (handle[0] != null) handle[0].cancel();
                 return;
             }
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
             }
         }, 1L, 20L);

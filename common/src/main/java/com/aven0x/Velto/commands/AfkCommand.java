@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -97,7 +98,7 @@ public class AfkCommand extends BaseCommand {
             }
 
             if (sender.hasPermission("velto.afk.others")) {
-                completions.addAll(Bukkit.getOnlinePlayers().stream()
+                completions.addAll(PlayerUtil.onlineSnapshot().stream()
                         .map(Player::getName)
                         .filter(name -> name.toLowerCase().startsWith(arg))
                         .collect(Collectors.toList()));

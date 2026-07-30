@@ -52,7 +52,7 @@ public class EnderChestCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length <= 1 && sender.hasPermission("velto.enderchest.others")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
+            return PlayerUtil.onlineSnapshot().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(typed))

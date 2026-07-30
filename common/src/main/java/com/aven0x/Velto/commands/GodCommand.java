@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.GodManager;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -58,7 +59,7 @@ public class GodCommand extends BaseCommand {
         if (args.length <= 1 && sender.hasPermission("velto.god.others")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }

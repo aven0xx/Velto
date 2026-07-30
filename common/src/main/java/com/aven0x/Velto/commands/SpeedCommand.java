@@ -93,7 +93,7 @@ public class SpeedCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length == 2 && sender.hasPermission("velto.speed.others")) {
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
                     names.add(p.getName());
                 }

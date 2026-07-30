@@ -1,5 +1,6 @@
 package com.aven0x.VeltoPaper.managers;
 
+import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.AtMentionHandler;
@@ -45,6 +46,7 @@ public class ChatManager implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
+        AfkManager.updateActivity(player);   // chat counts as activity; AfkManager can't see this event itself
         String rawMessage = LegacyComponentSerializer.legacySection().serialize(event.message());
 
         if (isAtMentionMessage(rawMessage)) {

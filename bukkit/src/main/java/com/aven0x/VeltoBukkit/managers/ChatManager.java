@@ -1,5 +1,6 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.AtMentionHandler;
@@ -41,6 +42,7 @@ public class ChatManager implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
+        AfkManager.updateActivity(player);   // keep chat-as-activity consistent with the Paper path
         String rawMessage = event.getMessage();
 
         if (isAtMentionMessage(rawMessage)) {

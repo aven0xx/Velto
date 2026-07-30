@@ -170,7 +170,7 @@ public class GamemodeCommands {
                 String typed = args[1].toLowerCase();
                 List<String> names = new ArrayList<>();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : PlayerUtil.onlineSnapshot()) {
                     if (player.getName()
                             .toLowerCase()
                             .startsWith(typed)) {
@@ -330,7 +330,7 @@ public class GamemodeCommands {
 
                 List<String> names = new ArrayList<>();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : PlayerUtil.onlineSnapshot()) {
                     if (player.getName()
                             .toLowerCase()
                             .startsWith(typed)) {

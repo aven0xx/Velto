@@ -137,7 +137,7 @@ public class TpCommand extends BaseCommand {
     private List<String> onlineNames(String typed) {
         String lower = typed.toLowerCase();
         List<String> result = new ArrayList<>();
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (Player p : PlayerUtil.onlineSnapshot()) {
             if (p.getName().toLowerCase().startsWith(lower)) result.add(p.getName());
         }
         return result;

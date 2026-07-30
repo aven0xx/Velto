@@ -253,7 +253,7 @@ public class KitCommand extends BaseCommand {
         if (args.length == 2 && sender.hasPermission("velto.kit.others")) {
             String typed = args[1].toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) names.add(p.getName());
             }
             return names;

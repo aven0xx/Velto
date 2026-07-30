@@ -1,9 +1,22 @@
 package com.aven0x.Velto.utils;
 
 import com.aven0x.Velto.platform.Schedulers;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerUtil {
+
+    /**
+     * A stable snapshot of the currently online players, safe to iterate from any region.
+     * {@code Bukkit.getOnlinePlayers()} returns a live view whose iteration is undefined off the
+     * thread mutating it — which on Folia is every region thread but the one owning the list.
+     */
+    public static List<Player> onlineSnapshot() {
+        return new ArrayList<>(Bukkit.getOnlinePlayers());
+    }
 
     /**
      * Checks if the player is vanished.

@@ -67,7 +67,7 @@ public class SudoCommand extends BaseCommand {
         if (args.length <= 1 && sender.hasPermission("velto.sudo")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }

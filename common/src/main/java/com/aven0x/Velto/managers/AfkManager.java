@@ -15,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -63,7 +62,7 @@ public class AfkManager implements Listener {
         afkChecker = Schedulers.get().globalTimer(() -> {
             long currentTime = System.currentTimeMillis();
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : PlayerUtil.onlineSnapshot()) {
                 UUID uuid = player.getUniqueId();
                 long lastActivityTime = lastActivity.getOrDefault(uuid, currentTime);
 
@@ -99,14 +98,15 @@ public class AfkManager implements Listener {
 
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
+        Long last = lastActivity.get(uuid);
+        boolean afk = afkPlayers.contains(uuid);
 
-        if (now - lastActivity.getOrDefault(uuid, 0L) < 1000L && !afkPlayers.contains(uuid)) return;
+        // Common case (recent activity, not AFK) is a single read of each map.
+        if (!afk && last != null && now - last < 1000L) return;
 
         lastActivity.put(uuid, now);
 
-        if (afkPlayers.contains(uuid)) {
-            setAfk(player, false);
-        }
+        if (afk) setAfk(player, false);
     }
 
     public static boolean isAfk(Player player) {
@@ -244,14 +244,9 @@ public class AfkManager implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (event.isCancelled()) return;
-
-        // updateActivity only touches concurrent maps; the setAfk half it may call
-        // routes itself onto the player's region, so no scheduler hop is needed here.
-        updateActivity(event.getPlayer());
-    }
+    // Chat activity is fed in from the platform chat listeners (paper/bukkit ChatManager):
+    // Paper routes chat through AsyncChatEvent, which AfkManager (common, Spigot API) can't name,
+    // and the legacy AsyncPlayerChatEvent doesn't fire there — so a common-side handler missed it.
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
