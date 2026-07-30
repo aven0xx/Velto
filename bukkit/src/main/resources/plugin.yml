@@ -14,11 +14,15 @@ permissions:
       velto.kill: true
       velto.killall: true
       velto.msg: true
+      velto.ignore: true
+      velto.ignore.exempt: true
       velto.reload: true
       velto.setspawn: true
       velto.spawn: true
       velto.back: true
       velto.craft: true
+      velto.enderchest: true
+      velto.enderchest.others: true
       velto.lore: true
       velto.alert: true
       velto.tp: true
@@ -69,4 +73,5 @@ permissions:
       velto.economy.reset: true
       velto.balance: true
       velto.balance.others: true
+      velto.baltop: true
       velto.pay: true

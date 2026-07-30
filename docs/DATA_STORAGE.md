@@ -67,6 +67,7 @@ collides because each feature owns its own top-level key):
 | `economy.balance` | `EconomyManager` | single `double` |
 | `kit-cooldowns.<kitname>` | `KitManager` | last-claimed timestamp (ms) |
 | `kit-claimed.<kitname>` | `KitManager` | boolean, for `one-time` kits |
+| `ignored` | `IgnoreManager` | list of ignored-player UUID strings |
 
 If you're adding a new **per-player** feature, this is the store to use — see
 [EXTENDING.md](EXTENDING.md).

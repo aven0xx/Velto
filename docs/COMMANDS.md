@@ -103,6 +103,7 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/sun`, `/rain`, `/thunder` `[world]` | — | `velto.weather` | ✅ | Shortcut wrappers that re-dispatch through `/weather`. |
 | `/craft` | `workbench` | `velto.craft` | ❌ | Opens a virtual crafting table. |
 | `/anvil` | `repair` | `velto.anvil` | ❌ | **Paper only** — uses `Player#openAnvil`, unavailable on Spigot API. |
+| `/enderchest [player]` | `ec` | `velto.enderchest` / `velto.enderchest.others` | ❌ | Opens your own ender chest, or another **online** player's (`.others`). Player-only on the sender side — opening a GUI needs a physical viewer, even for `/ec <player>`. |
 | `/list` | — | `velto.list` | ❌ | Lists online players. |
 | `/notiftest <lang-key>` | — | `velto.notiftest` | ❌ | Debug command: sends yourself a raw `lang.yml` message by key. |
 | `/rename <name...>` / `/rename reset` | — | `velto.rename` | ❌ | Renames the item in your main hand. |
@@ -125,6 +126,8 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/sudo <player> <command...>` | — | `velto.sudo` | ✅ | Forces the target to run a command. |
 | `/msg <player> <message...>` | `tell`, `w`, `whisper` | `velto.msg` | ❌ | Also reachable via `@player message` in chat (`AtMentionHandler`). |
 | `/reply <message...>` | `r` | `velto.msg` | ❌ | Replies to `MsgManager`'s last-messenger record. |
+| `/ignore <player>` | — | `velto.ignore` | ❌ | Hides a player's public chat and blocks their private messages (`/msg`, `/reply`, `@mention`) to you. Target may be offline. Senders with `velto.ignore.exempt` can't be ignored. |
+| `/unignore <player>` | — | `velto.ignore` | ❌ | Stops ignoring a player. Shares the `velto.ignore` node with `/ignore` (same pattern as `/msg`+`/reply`). |
 | `/afk` / `/afk <player>` / `/afk list` | `away` | `velto.afk` / `velto.afk.others` / `velto.afk.list` | ❌ | Toggle; auto-triggers after `config.yml: afk-timeout-seconds` of inactivity. |
 | `/home [name]` | — | `velto.home` | ❌ | Default name `"home"`. |
 | `/sethome [name]` | — | `velto.sethome` (+ `velto.homes.bonus.<name>.<amount>` / `velto.homes.unlimited` for the cap) | ❌ | Capped per-player: `config.yml: homes.default-limit` (3) plus each additive `velto.homes.bonus.<name>.<amount>`, or uncapped via `velto.homes.unlimited`. See [PLACEHOLDERS.md](PLACEHOLDERS.md#home-limits). |
@@ -136,6 +139,7 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/kitreset <player> <kit>` | — | `velto.kit.reset` | ✅ | Clears cooldown + one-time-claim flag. |
 | `/economy give\|take\|set\|reset <player> [amount]` | `eco` | `velto.economy.give`/`take`/`set`/`reset` | ✅ | Gated live by `economy.yml: enabled`. Target may be offline (resolved from cached players). See [ECONOMY.md](ECONOMY.md). |
 | `/balance [player]` | `bal`, `money` | `velto.balance` / `velto.balance.others` | ✅* | Self/others; target may be offline. *Console has no balance of its own, so it must name a player. |
+| `/baltop [page]` | `balancetop`, `moneytop` | `velto.baltop` | ✅ | Paginated balance leaderboard (10/page). Gated live by `economy.yml: enabled`. Builds the ranking off the main thread (it can read every player's file), then messages back on it — see [ECONOMY.md](ECONOMY.md#baltop). |
 | `/pay <player> <amount>` | — | `velto.pay` | ❌ | Blocks self-pay and insufficient funds. |
 | `/alert <chat\|actionbar\|bossbar\|title> <ticks> <message...>` | `broadcast`, `bc` | `velto.alert` | ✅ | Broadcasts a one-off raw message, bypassing `lang.yml`. |
 | `/veltoreload` | — | `velto.reload` | ✅ | Reloads every config file — see [ARCHITECTURE.md](ARCHITECTURE.md#veltoreload). |

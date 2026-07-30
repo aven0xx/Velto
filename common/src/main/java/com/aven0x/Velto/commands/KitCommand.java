@@ -3,7 +3,6 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -168,39 +167,51 @@ public class KitCommand extends BaseCommand {
             }
         }
 
+        boolean isPlayer = sender instanceof Player;
+        Player player = isPlayer ? (Player) sender : null;
+
         if (accessible.isEmpty()) {
-            if (sender instanceof Player player) LangUtil.send(player, "kit-list-empty");
+            if (isPlayer) LangUtil.send(player, "kit-list-empty");
             else sender.sendMessage("No kits available.");
             return;
         }
 
-        if (sender instanceof Player player) LangUtil.send(player, "kit-list-header");
+        if (isPlayer) LangUtil.send(player, "kit-list-header");
         else sender.sendMessage("Available kits:");
 
         for (KitManager.Kit kit : accessible) {
+            // Player-facing cooldown states carry hex colours so they compose into the lang
+            // segment; the console gets the same words uncoloured.
             String cooldownStr;
             if (kit.oneTime()) {
-                if (sender instanceof Player player) {
+                if (isPlayer) {
                     cooldownStr = KitManager.hasClaimedOnce(player.getUniqueId(), kit.name())
-                            ? ChatColor.RED + "Claimed"
-                            : ChatColor.GREEN + "One-time";
+                            ? "&#FF7070Claimed"
+                            : "&#57E39AOne-time";
                 } else {
                     cooldownStr = "One-time";
                 }
             } else if (kit.cooldownSeconds() <= 0) {
-                cooldownStr = ChatColor.GREEN + "No cooldown";
-            } else if (sender instanceof Player player) {
+                cooldownStr = isPlayer ? "&#57E39ANo cooldown" : "No cooldown";
+            } else if (isPlayer) {
                 long remaining = KitManager.getCooldownRemaining(player.getUniqueId(), kit.name());
                 cooldownStr = remaining > 0
-                        ? ChatColor.RED + KitManager.formatCooldown(remaining)
-                        : ChatColor.GREEN + "Ready";
+                        ? "&#FF7070" + KitManager.formatCooldown(remaining)
+                        : "&#57E39AReady";
             } else {
                 cooldownStr = KitManager.formatCooldown(kit.cooldownSeconds());
             }
 
-            sender.sendMessage(ChatColor.GOLD + " - " + ChatColor.YELLOW + kit.name()
-                    + ChatColor.GRAY + " (" + cooldownStr + ChatColor.GRAY + ")"
-                    + ChatColor.DARK_GRAY + " [" + kit.items().size() + " items]");
+            if (isPlayer) {
+                // Rendered via lang.yml so the kit name is a run_command click → /kit <name>.
+                LangUtil.send(player, "kit-list-entry", Map.of(
+                        "%kit%", kit.name(),
+                        "%cooldown%", cooldownStr,
+                        "%items%", String.valueOf(kit.items().size())));
+            } else {
+                sender.sendMessage(" - " + kit.name() + " (" + cooldownStr + ") ["
+                        + kit.items().size() + " items]");
+            }
         }
     }
 
