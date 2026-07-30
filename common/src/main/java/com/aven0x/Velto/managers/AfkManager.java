@@ -127,12 +127,12 @@ public class AfkManager implements Listener {
         }
 
         UUID uuid = player.getUniqueId();
-        boolean wasAfk = afkPlayers.contains(uuid);
 
-        if (afk && !wasAfk) {
+        if (afk) {
+            // Atomically claim AFK; a false return means another caller already set it.
+            if (!afkPlayers.add(uuid)) return;
+
             // Becoming AFK
-            afkPlayers.add(uuid);
-
             boolean afkzoneEnabled = ConfigUtil.isAfkzoneOn();
 
             if (afkzoneEnabled) {
@@ -159,9 +159,11 @@ public class AfkManager implements Listener {
                 LangUtil.sendGlobal("afk-player", placeholders);
             }
 
-        } else if (!afk && wasAfk) {
+        } else {
+            // Atomically release AFK; a false return means another caller already cleared it.
+            if (!afkPlayers.remove(uuid)) return;
+
             // Leaving AFK
-            afkPlayers.remove(uuid);
             lastActivity.put(uuid, System.currentTimeMillis());
 
             if (ConfigUtil.isAfkzoneOn()) {

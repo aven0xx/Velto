@@ -8,7 +8,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public final class VeltoPlugin {
 
-    private static JavaPlugin instance;
+    // volatile: written once in onEnable, then read from every region thread on Folia.
+    private static volatile JavaPlugin instance;
 
     private VeltoPlugin() {}
 

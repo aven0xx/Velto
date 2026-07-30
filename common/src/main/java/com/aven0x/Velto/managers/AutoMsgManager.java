@@ -13,8 +13,9 @@ public class AutoMsgManager {
 
     private static AutoMsgManager instance;
 
-    private int index = 0;
-    private String lastKey = null;
+    // volatile: written from the broadcast timer thread, read/reset from /veltoreload on another region.
+    private volatile int index = 0;
+    private volatile String lastKey = null;
     private final Random rng = new Random();
     private VeltoTask task;
 

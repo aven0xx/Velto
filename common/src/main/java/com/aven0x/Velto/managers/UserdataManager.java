@@ -151,9 +151,11 @@ public final class UserdataManager {
         }
     }
 
-    // Synchronous — call only from onDisable where async tasks won't run.
+    // Synchronous final flush; call from onDisable after cancelling the async writers. Flips
+    // initialized off so any save()/enqueueSave that races this flush becomes a no-op.
     public static void saveAll() {
         if (!initialized) return;
+        initialized = false;
         for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
             try {
                 entry.getValue().save(fileFor(entry.getKey()));
