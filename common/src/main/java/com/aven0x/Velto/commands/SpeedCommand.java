@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -73,8 +74,12 @@ public class SpeedCommand extends BaseCommand {
             finalFlySpeed = 0.1f * speedLevel;
         }
 
-        target.setWalkSpeed(Math.min(finalWalkSpeed, 1.0f));
-        target.setFlySpeed(Math.min(finalFlySpeed, 1.0f));
+        final float walkSpeed = Math.min(finalWalkSpeed, 1.0f);
+        final float flySpeed = Math.min(finalFlySpeed, 1.0f);
+        PlayerUtil.onOwningRegion(target, () -> {
+            target.setWalkSpeed(walkSpeed);
+            target.setFlySpeed(flySpeed);
+        });
 
         if (sender instanceof Player player) {
             String messageKey = (speedLevel <= 1) ? "speed-reset" : "speed-updated";

@@ -38,7 +38,7 @@ public class KillCommand extends BaseCommand {
             return true;
         }
 
-        target.setHealth(0);
+        PlayerUtil.onOwningRegion(target, () -> target.setHealth(0));
 
         if (sender instanceof Player playerSender) {
             LangUtil.send(playerSender, "player-killed");

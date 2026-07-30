@@ -37,18 +37,18 @@ public class FeedCommand extends BaseCommand {
             return true;
         }
 
-        target.setFoodLevel(20);
-        target.setSaturation(20f);
-
-        if (self) {
+        PlayerUtil.onOwningRegion(target, () -> {
+            target.setFoodLevel(20);
+            target.setSaturation(20f);
             LangUtil.send(target, "fed-self");
-        } else {
+        });
+
+        if (!self) {
             if (sender instanceof Player playerSender) {
                 LangUtil.send(playerSender, "fed-other", Map.of("%target%", target.getName()));
             } else {
                 sender.sendMessage("§aFed: " + target.getName());
             }
-            LangUtil.send(target, "fed-self");
         }
 
         return true;
