@@ -19,9 +19,12 @@ public class ConfigUtil {
 
     private static volatile long cachedAfkTimeoutMillis = 300_000L;
     private static volatile boolean cachedAfkzoneEnabled = false;
-    private static volatile String cachedAfkzoneWorld = null;
-    private static volatile double cachedAfkzoneX = 0, cachedAfkzoneY = 0, cachedAfkzoneZ = 0;
-    private static volatile float cachedAfkzoneYaw = 0, cachedAfkzonePitch = 0;
+    // The location's fields are read together by getAfkzone(); hold them in one immutable object
+    // behind a single volatile reference so a reader never mixes a new world with old coordinates
+    // while /veltoreload rewrites them. (The other cached* fields are single-value reads, and were
+    // already volatile, so they publish correctly on their own.)
+    private record AfkZone(String world, double x, double y, double z, float yaw, float pitch) {}
+    private static volatile AfkZone cachedAfkzone = null;
     private static volatile boolean cachedAutoMessagesEnabled = true;
     private static volatile int cachedAutoMessagesIntervalTicks = 2400;
     private static volatile boolean cachedAutoMessagesRandom = true;
@@ -74,23 +77,23 @@ public class ConfigUtil {
     private static void buildAfkzone(FileConfiguration c) {
         ConfigurationSection section = c.getConfigurationSection("afkzone.location");
         if (section == null) {
-            cachedAfkzoneWorld = null;
+            cachedAfkzone = null;
             return;
         }
 
         String worldName = section.getString("world");
         if (worldName == null || worldName.isBlank()) {
             VeltoPlugin.get().getLogger().warning("[Velto] AFK zone world name is not set in config.yml.");
-            cachedAfkzoneWorld = null;
+            cachedAfkzone = null;
             return;
         }
 
-        cachedAfkzoneWorld = worldName;
-        cachedAfkzoneX = section.getDouble("x", 0);
-        cachedAfkzoneY = section.getDouble("y", 0);
-        cachedAfkzoneZ = section.getDouble("z", 0);
-        cachedAfkzoneYaw = (float) section.getDouble("yaw", 0);
-        cachedAfkzonePitch = (float) section.getDouble("pitch", 0);
+        cachedAfkzone = new AfkZone(worldName,
+                section.getDouble("x", 0),
+                section.getDouble("y", 0),
+                section.getDouble("z", 0),
+                (float) section.getDouble("yaw", 0),
+                (float) section.getDouble("pitch", 0));
     }
 
     private static List<String> buildAutoMessageKeys(FileConfiguration c) {
@@ -154,25 +157,22 @@ public class ConfigUtil {
     }
 
     public static Location getAfkzone() {
-        String worldName = cachedAfkzoneWorld;
-        if (worldName == null) return null;
-        World world = Bukkit.getWorld(worldName);
+        AfkZone zone = cachedAfkzone;
+        if (zone == null) return null;
+        World world = Bukkit.getWorld(zone.world());
         if (world == null) return null;
-        return new Location(world, cachedAfkzoneX, cachedAfkzoneY, cachedAfkzoneZ, cachedAfkzoneYaw, cachedAfkzonePitch);
+        return new Location(world, zone.x(), zone.y(), zone.z(), zone.yaw(), zone.pitch());
     }
 
     public static void setAfkzone(Location location) {
         getConfig().set("afkzone.location", location);
         VeltoPlugin.get().saveConfig();
         if (location == null || location.getWorld() == null) {
-            cachedAfkzoneWorld = null;
+            cachedAfkzone = null;
         } else {
-            cachedAfkzoneWorld = location.getWorld().getName();
-            cachedAfkzoneX = location.getX();
-            cachedAfkzoneY = location.getY();
-            cachedAfkzoneZ = location.getZ();
-            cachedAfkzoneYaw = location.getYaw();
-            cachedAfkzonePitch = location.getPitch();
+            cachedAfkzone = new AfkZone(location.getWorld().getName(),
+                    location.getX(), location.getY(), location.getZ(),
+                    location.getYaw(), location.getPitch());
         }
     }
 

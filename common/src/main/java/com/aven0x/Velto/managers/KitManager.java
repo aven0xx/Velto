@@ -45,7 +45,9 @@ public final class KitManager {
 
     private record ParsedItems(List<KitItem> items, int skipped) {}
 
-    private static final LinkedHashMap<String, Kit> kits = new LinkedHashMap<>();
+    // volatile + rebuilt-then-swapped on reload, so a reader during /veltoreload never sees a
+    // half-refilled map (an empty or partial kit list).
+    private static volatile Map<String, Kit> kits = new LinkedHashMap<>();
     private static Logger logger;
 
     public static LoadResult load() {
@@ -56,11 +58,12 @@ public final class KitManager {
             VeltoPlugin.get().saveResource("kits.yml", false);
         }
 
-        kits.clear();
+        LinkedHashMap<String, Kit> fresh = new LinkedHashMap<>();
         YamlConfiguration config = YamlConfiguration.loadConfiguration(kitsFile);
         ConfigurationSection kitsSection = config.getConfigurationSection("kits");
         if (kitsSection == null) {
             logger.warning("[Velto] kits.yml has no 'kits' section — no kits loaded.");
+            kits = fresh;
             return new LoadResult(0, 0);
         }
 
@@ -74,9 +77,10 @@ public final class KitManager {
             List<String> commands = kitSec.getStringList("commands");
             ParsedItems parsed = parseItems(kitSec.getMapList("items"), kitName);
             totalSkipped += parsed.skipped();
-            kits.put(kitName.toLowerCase(), new Kit(kitName, cooldown, oneTime, commands, parsed.items()));
+            fresh.put(kitName.toLowerCase(), new Kit(kitName, cooldown, oneTime, commands, parsed.items()));
         }
 
+        kits = fresh;   // publish the fully-built map in one volatile write
         logger.info("[Velto] Loaded " + kits.size() + " kit(s)"
                 + (totalSkipped > 0 ? " (" + totalSkipped + " item(s) skipped due to invalid material/enchantment)" : "")
                 + ".");

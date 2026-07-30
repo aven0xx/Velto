@@ -31,8 +31,10 @@ import java.util.regex.Pattern;
 
 public class LangUtil {
 
-    private static FileConfiguration lang;
-    private static final Map<String, ParsedMessage> cache = new HashMap<>();
+    private static volatile FileConfiguration lang;
+    // volatile + rebuilt-then-swapped in buildCache(), so a reader mid-reload never sees a
+    // half-refilled message map (which would flash "missing message").
+    private static volatile Map<String, ParsedMessage> cache = new HashMap<>();
 
     // Matches &#RRGGBB hex color codes (Minecraft 1.16+).
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
@@ -160,11 +162,12 @@ public class LangUtil {
     }
 
     private static void buildCache() {
-        cache.clear();
+        Map<String, ParsedMessage> fresh = new HashMap<>();
         for (String key : lang.getKeys(false)) {
             ConfigurationSection sec = lang.getConfigurationSection(key);
-            if (sec != null) cache.put(key, new ParsedMessage(sec));
+            if (sec != null) fresh.put(key, new ParsedMessage(sec));
         }
+        cache = fresh;   // publish the fully-built map in one volatile write
     }
 
     // ===== Per-player send =====

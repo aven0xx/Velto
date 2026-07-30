@@ -19,7 +19,8 @@ public final class WarpManager {
     private WarpManager() {}
 
     private static File file;
-    private static YamlConfiguration data;
+    // volatile: reload() swaps this whole object; readers on other regions must see the new one.
+    private static volatile YamlConfiguration data;
     private static volatile boolean initialized = false;
 
     private static Logger logger() {
