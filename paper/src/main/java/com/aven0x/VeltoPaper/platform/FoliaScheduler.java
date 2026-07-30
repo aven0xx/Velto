@@ -6,8 +6,10 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -104,6 +106,25 @@ public final class FoliaScheduler implements VeltoScheduler {
     public VeltoTask asyncTimer(Runnable task, long delayMillis, long periodMillis) {
         return wrap(Bukkit.getAsyncScheduler().runAtFixedRate(plugin, t -> task.run(),
                 Math.max(1L, delayMillis), Math.max(1L, periodMillis), TimeUnit.MILLISECONDS));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> teleport(Entity entity, Location location) {
+        // teleportAsync must be invoked from the region that owns the entity.
+        if (Bukkit.isOwnedByCurrentRegion(entity)) {
+            return entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        }
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        boolean scheduled = entity.getScheduler().execute(plugin,
+                () -> entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN)
+                        .whenComplete((ok, err) -> {
+                            if (err != null) future.completeExceptionally(err);
+                            else future.complete(Boolean.TRUE.equals(ok));
+                        }),
+                () -> future.complete(false),   // retired: entity gone before the hop ran
+                1L);
+        if (!scheduled) future.complete(false);
+        return future;
     }
 
     @Override

@@ -8,6 +8,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * {@link VeltoScheduler} backed by the classic single-threaded
  * {@code BukkitScheduler}, for the Spigot/Bukkit module.
@@ -91,6 +93,17 @@ public final class BukkitSchedulerAdapter implements VeltoScheduler {
     public VeltoTask asyncTimer(Runnable task, long delayMillis, long periodMillis) {
         return wrap(Bukkit.getScheduler()
                 .runTaskTimerAsynchronously(plugin, task, toTicks(delayMillis), toTicks(periodMillis)));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> teleport(Entity entity, Location location) {
+        // Spigot has no async teleport; load the destination chunk, then teleport synchronously.
+        // This is the classic path Velto used before the SPI existed.
+        if (location.getWorld() == null) {
+            return CompletableFuture.completedFuture(false);
+        }
+        location.getWorld().getChunkAt(location);
+        return CompletableFuture.completedFuture(entity.teleport(location));
     }
 
     @Override

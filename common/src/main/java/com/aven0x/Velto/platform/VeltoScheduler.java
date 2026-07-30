@@ -3,6 +3,8 @@ package com.aven0x.Velto.platform;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Platform-neutral scheduling contract.
  *
@@ -68,6 +70,14 @@ public interface VeltoScheduler {
 
     /** Repeating off-tick work, expressed in milliseconds. */
     VeltoTask asyncTimer(Runnable task, long delayMillis, long periodMillis);
+
+    /**
+     * Teleports an entity on the region that owns it, completing when the teleport resolves.
+     * On Folia this is the only supported teleport path (a synchronous teleport throws); on
+     * Spigot it is the classic chunk-load-then-teleport. The returned future may complete on
+     * any thread, so re-check ownership before touching the entity in a continuation.
+     */
+    CompletableFuture<Boolean> teleport(Entity entity, Location location);
 
     /** True when the caller may safely touch this entity right now (its region is the current thread). */
     boolean owns(Entity entity);

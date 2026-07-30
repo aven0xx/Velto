@@ -4,12 +4,9 @@ import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.platform.VeltoTask;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
-import com.aven0x.Velto.utils.ServerUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -85,21 +82,14 @@ public class TeleportManager {
         if (previous != null) previous.cancel();
     }
 
-    // System/admin teleport: bypasses countdown entirely (AFK zone, /tpall, etc.)
+    // System/admin teleport: bypasses countdown entirely (AFK zone, /tpall, etc.).
+    // Delegates to the platform scheduler, which teleports on the region owning the player —
+    // Folia's async teleport on Paper/Folia, the classic chunk-load-then-teleport on Spigot.
     public CompletableFuture<Boolean> teleportAsync(Player player, Location location) {
-        if (ServerUtil.isPaper()) {
-            try {
-                Method method = player.getClass().getMethod("teleportAsync", Location.class);
-                Object result = method.invoke(player, location);
-                if (result instanceof CompletableFuture<?> future) {
-                    return future.thenApply(Boolean.class::cast);
-                }
-            } catch (Exception e) {
-                Bukkit.getLogger().warning("[Velto] teleportAsync failed on Paper, falling back to sync chunk load: " + e.getMessage());
-            }
+        if (location == null || location.getWorld() == null) {
+            return CompletableFuture.completedFuture(false);
         }
-
-        return CompletableFuture.completedFuture(bukkitTeleport(player, location));
+        return Schedulers.get().teleport(player, location);
     }
 
     // Cancels any pending countdown for the given player.
@@ -123,12 +113,6 @@ public class TeleportManager {
         if (task == null) return;
         pendingTeleports.remove(uuid, task);
         task.cancel();
-    }
-
-    private boolean bukkitTeleport(Player player, Location location) {
-        if (location.getWorld() == null) return false;
-        location.getWorld().getChunkAt(location);
-        return player.teleport(location);
     }
 
     private void runCompletion(Player player, boolean success, Runnable onComplete) {

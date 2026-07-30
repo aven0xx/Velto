@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -32,7 +33,9 @@ public class TpCommand extends BaseCommand {
             if (!hasPermission(sender, "velto.tp")) return true;
             Player target = Bukkit.getPlayerExact(args[0]);
             if (target == null) { LangUtil.send(player, "invalid-player"); return true; }
-            TeleportManager.getInstance().teleportAsync(player, target.getLocation());
+            // Read the target's location on the region that owns it, then teleport ourselves there.
+            PlayerUtil.onOwningRegion(target, () ->
+                    TeleportManager.getInstance().teleportAsync(player, target.getLocation()));
             LangUtil.send(player, "tp-self-player", Map.of("%target%", target.getName()));
             return true;
         }
@@ -56,7 +59,9 @@ public class TpCommand extends BaseCommand {
             Player from = Bukkit.getPlayerExact(args[0]);
             Player to   = Bukkit.getPlayerExact(args[1]);
             if (from == null || to == null) { LangUtil.send(player, "invalid-player"); return true; }
-            TeleportManager.getInstance().teleportAsync(from, to.getLocation());
+            // Read the destination player's location on its own region, then teleport 'from' there.
+            PlayerUtil.onOwningRegion(to, () ->
+                    TeleportManager.getInstance().teleportAsync(from, to.getLocation()));
             LangUtil.send(player, "tp-other-success",
                     Map.of("%from%", from.getName(), "%to%", to.getName()));
             return true;
@@ -67,12 +72,16 @@ public class TpCommand extends BaseCommand {
             if (!hasPermission(sender, "velto.tp.others")) return true;
             Player target = Bukkit.getPlayerExact(args[0]);
             if (target == null) { LangUtil.send(player, "invalid-player"); return true; }
-            Location dest = resolveCoords(target.getLocation(), args[1], args[2], args[3]);
-            if (dest == null) { LangUtil.send(player, "tp-usage"); return true; }
-            TeleportManager.getInstance().teleportAsync(target, dest);
-            LangUtil.send(player, "tp-other-success",
-                    Map.of("%from%", target.getName(),
-                           "%to%", dest.getBlockX() + ", " + dest.getBlockY() + ", " + dest.getBlockZ()));
+            // Coordinates may be relative (~) to the target, so resolve them and teleport on the
+            // target's own region. Sender feedback is a packet send, safe from there too.
+            PlayerUtil.onOwningRegion(target, () -> {
+                Location dest = resolveCoords(target.getLocation(), args[1], args[2], args[3]);
+                if (dest == null) { LangUtil.send(player, "tp-usage"); return; }
+                TeleportManager.getInstance().teleportAsync(target, dest);
+                LangUtil.send(player, "tp-other-success",
+                        Map.of("%from%", target.getName(),
+                               "%to%", dest.getBlockX() + ", " + dest.getBlockY() + ", " + dest.getBlockZ()));
+            });
             return true;
         }
 

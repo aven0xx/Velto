@@ -4,7 +4,9 @@ import com.aven0x.Velto.managers.TpaManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.TpaManager.TpaRequest;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -62,8 +64,12 @@ public class TpaAcceptCommand extends BaseCommand {
         LangUtil.send(target, "tpa-accepted-target", Map.of("%requester%", requester.getName()));
         LangUtil.send(requester, "tpa-accepted-requester", Map.of("%target%", target.getName()));
         final String targetName = target.getName();
-        TeleportManager.getInstance().teleport(requester, target.getLocation(),
-                () -> LangUtil.send(requester, "tpa-teleported", Map.of("%target%", targetName)));
+        // target is the accepter (this sender) and owns itself, so read its location here; then
+        // run the countdown teleport on the requester's own region.
+        Location dest = target.getLocation().clone();
+        PlayerUtil.onOwningRegion(requester, () ->
+                TeleportManager.getInstance().teleport(requester, dest,
+                        () -> LangUtil.send(requester, "tpa-teleported", Map.of("%target%", targetName))));
         return true;
     }
 
