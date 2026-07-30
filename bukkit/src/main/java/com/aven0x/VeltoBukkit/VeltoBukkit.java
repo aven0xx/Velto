@@ -15,6 +15,7 @@ import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.UserdataManager;
 import com.aven0x.Velto.managers.WarpManager;
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -22,6 +23,7 @@ import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
 import com.aven0x.VeltoBukkit.managers.ChatManager;
 import com.aven0x.VeltoBukkit.managers.CommandManager;
+import com.aven0x.VeltoBukkit.platform.BukkitSchedulerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,6 +34,7 @@ public class VeltoBukkit extends JavaPlugin {
     @Override
     public void onEnable() {
         VeltoPlugin.set(this);
+        Schedulers.set(new BukkitSchedulerAdapter(this));
 
         // Detect server type (Spigot vs Paper)
         if (ServerUtil.isPaper()) {
@@ -88,6 +91,7 @@ public class VeltoBukkit extends JavaPlugin {
         }
         UserdataManager.stopAutosave();
         UserdataManager.saveAll();
+        Schedulers.get().cancelAll();
     }
 
     public static VeltoBukkit getInstance() {
