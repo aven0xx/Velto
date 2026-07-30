@@ -1,0 +1,26 @@
+# Velto Economy Configuration
+#
+# The entire economy module (commands, balance storage, Vault hook) can be
+# switched off if you'd rather use a dedicated economy plugin instead.
+enabled: true
+#
+#
+# Currency display settings
+currency:
+  name-singular: "Dollar"
+  name-plural: "Dollars"
+  symbol: "$"
+  decimal-places: 2
+#
+#
+# Balance every player starts with
+starting-balance: 0.0
+#
+#
+# Vault integration
+# When enabled (and the Vault plugin is installed), Velto registers itself
+# as the server's Vault economy provider so other plugins can read/modify
+# player balances through Vault. Disable this if you're running a dedicated
+# economy plugin through Vault to avoid conflicts.
+vault:
+  enabled: true

@@ -34,6 +34,9 @@ craft:
 anvil:
   enabled: true
   aliases: ["repair"]
+enderchest:
+  enabled: true
+  aliases: ["ec"]
 feed:
   enabled: true
   aliases: []
@@ -112,6 +115,12 @@ msg:
 reply:
   enabled: true
   aliases: ["r"]
+ignore:
+  enabled: true
+  aliases: []
+unignore:
+  enabled: true
+  aliases: []
 tp:
   enabled: true
   aliases: []
@@ -146,5 +155,23 @@ kit:
   enabled: true
   aliases: []
 kitreset:
+  enabled: true
+  aliases: []
+warp:
+  enabled: true
+  aliases: []
+setwarp:
+  enabled: true
+  aliases: []
+economy:
+  enabled: true
+  aliases: ["eco"]
+balance:
+  enabled: true
+  aliases: ["bal", "money"]
+baltop:
+  enabled: true
+  aliases: ["balancetop", "moneytop"]
+pay:
   enabled: true
   aliases: []

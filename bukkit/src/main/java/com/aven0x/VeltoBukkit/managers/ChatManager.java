@@ -1,5 +1,6 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
@@ -55,7 +56,8 @@ public class ChatManager implements Listener {
 
             String format = buildChatFormat(player, rawMessage);
             for (Player recipient : recipients) {
-                if (recipient.isOnline()) {
+                // Hide this player's chat from anyone who's ignoring them.
+                if (recipient.isOnline() && !IgnoreManager.isBlocked(player, recipient)) {
                     recipient.sendMessage(format);
                 }
             }

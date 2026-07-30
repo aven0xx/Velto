@@ -38,6 +38,7 @@ public class ConfigUtil {
     private static volatile int cachedTeleportCountdownDefault = 5;
     private static volatile LinkedHashMap<String, Integer> cachedTeleportCountdownPermissions = new LinkedHashMap<>();
     private static volatile int cachedTpaExpireSeconds = 60;
+    private static volatile int cachedHomesDefaultLimit = 3;
 
     private static FileConfiguration getConfig() {
         return VeltoPlugin.get().getConfig();
@@ -67,6 +68,7 @@ public class ConfigUtil {
         cachedTeleportCountdownDefault = c.getInt("teleport.countdown.default", 5);
         cachedTeleportCountdownPermissions = buildTeleportCountdownPermissions(c);
         cachedTpaExpireSeconds = c.getInt("tpa.expire-seconds", 60);
+        cachedHomesDefaultLimit = Math.max(0, c.getInt("homes.default-limit", 3));
     }
 
     private static void buildAfkzone(FileConfiguration c) {
@@ -104,8 +106,15 @@ public class ConfigUtil {
         ConfigurationSection sec = c.getConfigurationSection("teleport.countdown.permissions");
         LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
         if (sec == null) return map;
-        for (String key : sec.getKeys(false)) {
-            map.put(key, sec.getInt(key, 0));
+        // Permission nodes contain dots (e.g. velto.teleport.instant), which Bukkit treats
+        // as path separators — so they load as nested sections, not one literal key. A
+        // shallow getKeys(false) would only see "velto" and read its value as 0. Walk the
+        // full (deep) key set instead and keep the leaves that actually hold a number,
+        // using each leaf's full dotted path as the permission node.
+        for (String key : sec.getKeys(true)) {
+            if (sec.isInt(key)) {
+                map.put(key, sec.getInt(key));
+            }
         }
         return map;
     }
@@ -240,6 +249,10 @@ public class ConfigUtil {
 
     public static int getTpaExpireSeconds() {
         return cachedTpaExpireSeconds;
+    }
+
+    public static int getHomesDefaultLimit() {
+        return cachedHomesDefaultLimit;
     }
 
     // === RAW + UTILITIES ===

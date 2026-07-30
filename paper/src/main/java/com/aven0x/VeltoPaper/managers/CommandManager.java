@@ -18,6 +18,7 @@ public class CommandManager {
         register("day", DayCommand::new);
         register("night", NightCommand::new);
         register("craft", CraftCommand::new);
+        register("enderchest", EnderChestCommand::new);
         register("list", ListCommand::new);
         register("notiftest", NotifTestCommand::new);
         register("rename", RenameCommand::new);
@@ -45,6 +46,8 @@ public class CommandManager {
         register("fly", FlyCommand::new);
         register("msg", MsgCommand::new);
         register("reply", ReplyCommand::new);
+        register("ignore", IgnoreCommand::new);
+        register("unignore", UnignoreCommand::new);
         register("tp", TpCommand::new);
         register("tpall", TpAllCommand::new);
         register("tpa", TpaCommand::new);
@@ -57,6 +60,12 @@ public class CommandManager {
         register("homes", HomesCommand::new);
         register("kit", KitCommand::new);
         register("kitreset", KitResetCommand::new);
+        register("warp", WarpCommand::new);
+        register("setwarp", SetWarpCommand::new);
+        register("economy", EconomyCommand::new);
+        register("balance", BalanceCommand::new);
+        register("baltop", BalTopCommand::new);
+        register("pay", PayCommand::new);
     }
 
     private static void register(String name, Supplier<? extends BaseCommand> factory) {

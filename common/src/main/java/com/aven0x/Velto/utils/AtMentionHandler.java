@@ -1,5 +1,6 @@
 package com.aven0x.Velto.utils;
 
+import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.managers.MsgManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,6 +34,11 @@ public final class AtMentionHandler {
 
         if (target.equals(sender)) {
             LangUtil.send(sender, "msg-self");
+            return true;
+        }
+
+        if (IgnoreManager.isBlocked(sender, target)) {
+            LangUtil.send(sender, "msg-ignored", Map.of("%player%", target.getName()));
             return true;
         }
 

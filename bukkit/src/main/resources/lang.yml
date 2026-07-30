@@ -1,600 +1,998 @@
+# ============================================================================
+#  Velto — Language / Messages
+# ============================================================================
+#  Message types:  chat · actionbar · title · bossbar
+#
+#  Colors:  legacy &-codes (&a, &c, …) AND hex &#RRGGBB (1.16+) both work.
+#  Interactivity (chat type only):
+#    hover: "..."                         tooltip shown on mouse-over
+#    click: { action, value }             action: run_command | suggest_command
+#                                                  | open_url | copy_to_clipboard
+#    segments: [...]                      multiple independently styled/clickable spans
+#
+#  Placeholders (e.g. %player%, %amount%, %home%) are filled in by the plugin —
+#  keep them exactly as they appear. Message keys must not be renamed.
+#
+#  Palette used below (change these hex values to re-theme the whole plugin):
+#    Brand / syntax   &#5AC8FA        Success   &#57E39A        Error   &#FF7070
+#    Warning / prompt &#FFC857        Value     &#F1F1F1        Muted   &#8A94A6
+#    Money            &#FFD64A
+# ============================================================================
+
 only-player:
   type: chat
-  message: "&cOnly players can use this command."
+  message: "&#FF7070Only players can use this command."
 
 no-permission:
   type: chat
-  message: "&cYou do not have permission."
+  message: "&#FF7070You don't have permission to do that."
 
 spawn-not-set:
   type: chat
-  message: "&cSpawn point not set."
+  message: "&#FF7070No spawn point has been set yet."
 
 teleporting-spawn:
   type: bossbar
-  message: "&aTeleporting to spawn..."
+  message: "&#57E39ATeleporting to spawn…"
   color: GREEN
 
 spawn-set:
   type: chat
-  message: "&aSpawn point set!"
+  message: "&#57E39ASpawn point set to your location."
+  hover: "&#8A94A6Click to teleport to spawn"
+  click:
+    action: run_command
+    value: "/spawn"
 
 invalid-usage:
   type: chat
-  message: "&cInvalid command usage."
+  message: "&#FF7070Invalid command usage."
 
 invalid-usage-gamemode:
   type: chat
-  message: "&cUsage: /gamemode <mode> [player]"
+  segments:
+    - text: "&#8A94A6Usage: &#5AC8FA/gamemode "
+    - text: "&#F1F1F1survival"
+      hover: "&#8A94A6Click to set survival mode"
+      click:
+        action: suggest_command
+        value: "/gamemode survival "
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1creative"
+      hover: "&#8A94A6Click to set creative mode"
+      click:
+        action: suggest_command
+        value: "/gamemode creative "
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1adventure"
+      hover: "&#8A94A6Click to set adventure mode"
+      click:
+        action: suggest_command
+        value: "/gamemode adventure "
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1spectator"
+      hover: "&#8A94A6Click to set spectator mode"
+      click:
+        action: suggest_command
+        value: "/gamemode spectator "
 
 invalid-time:
   type: chat
-  message: "&cInvalid time specified."
+  message: "&#FF7070Invalid time. Use &#F1F1F1day&#FF7070, &#F1F1F1night&#FF7070, or a number of ticks."
 
 invalid-world:
   type: chat
-  message: "&cWorld not found."
+  message: "&#FF7070World not found."
 
 time-set:
   type: chat
-  message: "&aTime set!"
+  message: "&#57E39ATime updated."
 
 time-set-day:
   type: chat
-  message: "&aDaytime set!"
+  message: "&#57E39ASet the time to day."
 
 time-set-night:
   type: chat
-  message: "&aNighttime set!"
+  message: "&#57E39ASet the time to night."
 
 opened-craft:
   type: actionbar
-  message: "&aOpened crafting table."
+  message: "&#57E39AOpened crafting table"
+
+opened-enderchest:
+  type: actionbar
+  message: "&#57E39AOpened ender chest"
+
+opened-enderchest-other:
+  type: actionbar
+  message: "&#57E39AOpened &#F1F1F1%target%&#57E39A's ender chest"
 
 opened-anvil:
   type: actionbar
-  message: "&aOpened anvil."
+  message: "&#57E39AOpened anvil"
 
 invalid-player:
   type: chat
-  message: "&cPlayer not found."
+  message: "&#FF7070Player not found."
 
 fed-self:
   type: chat
-  message: "&aYou have been fed."
+  message: "&#57E39AYou've been fed."
 
 fed-other:
   type: chat
-  message: "&aYou have fed &e%target%&a."
+  message: "&#57E39AFed &#F1F1F1%target%&#57E39A."
 
 healed-self:
   type: chat
-  message: "&aYou have been healed."
+  message: "&#57E39AYou've been healed."
 
 healed-other:
   type: chat
-  message: "&aYou have healed &e%target%&a."
+  message: "&#57E39AHealed &#F1F1F1%target%&#57E39A."
 
 player-killed:
   type: chat
-  message: "&cPlayer has been killed."
+  message: "&#57E39APlayer killed."
 
 speed-updated:
   type: actionbar
-  message: "&aYour speed has been updated."
+  message: "&#57E39ASpeed updated"
 
 speed-reset:
   type: actionbar
-  message: "&aYour speed has been set to default."
+  message: "&#57E39ASpeed reset to default"
 
 invalid-speed:
   type: chat
-  message: "&cInvalid speed. Use a number between 1 and 10."
+  message: "&#FF7070Invalid speed. Use a number between &#F1F1F11&#FF7070 and &#F1F1F110&#FF7070."
 
 weather-updated:
   type: chat
-  message: "&aWeather has been updated."
+  message: "&#57E39AWeather updated."
 
 god-enabled:
   type: actionbar
-  message: "&aGod mode enabled."
+  message: "&#57E39AGod mode enabled"
   duration: 60
 
 god-disabled:
   type: actionbar
-  message: "&cGod mode disabled."
+  message: "&#FF7070God mode disabled"
   duration: 60
 
 invalid-gamemode:
   type: chat
-  message: "&cInvalid gamemode. Use 0-3 or survival, creative, adventure, spectator."
+  message: "&#FF7070Invalid gamemode. Use &#F1F1F10-3&#FF7070 or survival, creative, adventure, spectator."
 
-gamemode-set-self:
+gamemode-creative:
   type: chat
-  message: "&aYour gamemode has been set to &f%mode%&a."
+  message: "&#57E39AYour gamemode is now &#F1F1F1Creative&#57E39A."
 
-gamemode-set-other:
+gamemode-survival:
   type: chat
-  message: "&aSet &f%target%'s &agamemode to &f%mode%&a."
+  message: "&#57E39AYour gamemode is now &#F1F1F1Survival&#57E39A."
+
+gamemode-adventure:
+  type: chat
+  message: "&#57E39AYour gamemode is now &#F1F1F1Adventure&#57E39A."
+
+gamemode-spectator:
+  type: chat
+  message: "&#57E39AYour gamemode is now &#F1F1F1Spectator&#57E39A."
+
+gamemode-creative-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Creative&#57E39A."
+
+gamemode-survival-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Survival&#57E39A."
+
+gamemode-adventure-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Adventure&#57E39A."
+
+gamemode-spectator-other:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%target%&#57E39A's gamemode to &#F1F1F1Spectator&#57E39A."
 
 list-command:
   type: chat
-  message: "&aOnline players: %players%"
+  message: "&#5AC8FAOnline &#8A94A6» &#F1F1F1%players%"
 
 killall-done:
   type: chat
-  message: "&aKillAll completed."
+  message: "&#57E39ACleared entities."
 
 rename-no-item:
   type: chat
-  message: "&cYou must hold an item to rename."
+  message: "&#FF7070Hold an item to rename it."
 
 rename-usage:
   type: chat
   segments:
-    - text: "&eUsage: "
-    - text: "&f/rename <name...>"
-      hover: "&7Click to start renaming"
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/rename <name…>"
+      hover: "&#8A94A6Click to start renaming"
       click:
         action: suggest_command
         value: "/rename "
-    - text: " &7or "
-    - text: "&f/rename reset"
-      hover: "&7Click to reset the name"
+    - text: "&#8A94A6 or "
+    - text: "&#5AC8FA/rename reset"
+      hover: "&#8A94A6Click to clear the custom name"
       click:
         action: run_command
         value: "/rename reset"
 
 rename-cleared:
   type: chat
-  message: "&aCustom name removed."
+  message: "&#57E39ACustom name removed."
 
 rename-success:
   type: chat
-  message: "&aItem renamed."
+  message: "&#57E39AItem renamed."
 
 lore-no-item:
   type: chat
-  message: "&cYou must hold an item to edit lore."
+  message: "&#FF7070Hold an item to edit its lore."
 
 lore-usage:
   type: chat
   segments:
-    - text: "&eUsage: &f/itemlore "
-    - text: "&7show"
-      hover: "&7Display current lore"
+    - text: "&#8A94A6Usage: &#5AC8FA/itemlore "
+    - text: "&#F1F1F1show"
+      hover: "&#8A94A6Display current lore"
       click:
         action: run_command
         value: "/itemlore show"
-    - text: " &f| "
-    - text: "&7clear"
-      hover: "&7Remove all lore lines"
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1clear"
+      hover: "&#8A94A6Remove all lore lines"
       click:
         action: run_command
         value: "/itemlore clear"
-    - text: " &f| "
-    - text: "&7add"
-      hover: "&7Add a new lore line"
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1add"
+      hover: "&#8A94A6Add a new lore line"
       click:
         action: suggest_command
         value: "/itemlore add "
-    - text: " &f| "
-    - text: "&7insert"
-      hover: "&7Insert at a position"
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1insert"
+      hover: "&#8A94A6Insert at a position"
       click:
         action: suggest_command
         value: "/itemlore insert "
-    - text: " &f| "
-    - text: "&7set"
-      hover: "&7Set a specific lore line"
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1set"
+      hover: "&#8A94A6Set a specific lore line"
       click:
         action: suggest_command
         value: "/itemlore set "
-    - text: " &f| "
-    - text: "&7remove"
-      hover: "&7Remove a lore line"
+    - text: "&#8A94A6 | "
+    - text: "&#F1F1F1remove"
+      hover: "&#8A94A6Remove a lore line"
       click:
         action: suggest_command
         value: "/itemlore remove "
 
 lore-empty:
   type: chat
-  message: "&7This item has no lore."
-  hover: "&7Click to add a lore line"
+  message: "&#8A94A6This item has no lore."
+  hover: "&#8A94A6Click to add a lore line"
   click:
     action: suggest_command
     value: "/itemlore add "
 
 lore-cleared:
   type: chat
-  message: "&aLore cleared."
+  message: "&#57E39ALore cleared."
 
 lore-add-success:
   type: chat
-  message: "&aLore line added."
+  message: "&#57E39ALore line added."
 
 lore-insert-success:
   type: chat
-  message: "&aLore line inserted."
+  message: "&#57E39ALore line inserted."
 
 lore-set-success:
   type: chat
-  message: "&aLore line updated."
+  message: "&#57E39ALore line updated."
 
 lore-remove-success:
   type: chat
-  message: "&aLore line removed."
+  message: "&#57E39ALore line removed."
 
 lore-out-of-range:
   type: chat
-  message: "&cLine number out of range."
+  message: "&#FF7070Line number out of range."
 
 automsg1:
   type: chat
-  message: "&bJoin our Discord to get updates and support!"
-  hover: "&7Click to open Discord"
+  message: "&#5AC8FAJoin our Discord for updates and support!"
+  hover: "&#8A94A6Click to open Discord"
   click:
     action: open_url
     value: "https://discord.gg/example"
 
 automsg2:
   type: chat
-  message: "&aNeed help? Type &f/help &afor commands."
-  hover: "&7Click to run /help"
+  message: "&#57E39ANeed help? Type &#F1F1F1/help &#57E39Afor commands."
+  hover: "&#8A94A6Click to run /help"
   click:
     action: run_command
     value: "/help"
 
 automsg3:
   type: chat
-  message: "&dVote for rewards every day!"
-  hover: "&7Click to open the vote link"
+  message: "&#C792EAVote daily to earn rewards!"
+  hover: "&#8A94A6Click to open the vote link"
   click:
     action: open_url
     value: "https://example.com/vote"
 
 automsg4:
   type: chat
-  message: "&eRemember to claim your daily kit!"
-  hover: "&7Click to claim your kit"
+  message: "&#FFD64ADon't forget to claim your daily kit!"
+  hover: "&#8A94A6Click to claim it"
   click:
     action: suggest_command
     value: "/kit daily"
 
 afk-enabled:
   type: actionbar
-  message: "&7You are now AFK."
+  message: "&#8A94A6You are now AFK"
   duration: 60
 
 afk-disabled:
   type: actionbar
-  message: "&aYou are no longer AFK."
+  message: "&#57E39AWelcome back — no longer AFK"
   duration: 60
 
 afk-player:
   type: chat
-  message: "&7%player% is now AFK."
+  message: "&#8A94A6%player% is now AFK."
 
 afk-player-back:
   type: chat
-  message: "&a%player% is no longer AFK."
+  message: "&#57E39A%player% &#8A94A6is no longer AFK."
 
 afk-usage:
   type: chat
   segments:
-    - text: "&eUsage: "
-    - text: "&f/afk"
-      hover: "&7Toggle your own AFK status"
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/afk"
+      hover: "&#8A94A6Toggle your own AFK status"
       click:
         action: run_command
         value: "/afk"
-    - text: " &7| "
-    - text: "&f/afk <player>"
-      hover: "&7Toggle another player's AFK"
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FA/afk <player>"
+      hover: "&#8A94A6Toggle another player's AFK"
       click:
         action: suggest_command
         value: "/afk "
-    - text: " &7| "
-    - text: "&f/afk list"
-      hover: "&7Show all AFK players"
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FA/afk list"
+      hover: "&#8A94A6Show all AFK players"
       click:
         action: run_command
         value: "/afk list"
 
 afk-set-other:
   type: chat
-  message: "&aSet %target% to %status%."
+  message: "&#57E39ASet &#F1F1F1%target% &#57E39Ato &#F1F1F1%status%&#57E39A."
 
 afk-list-empty:
   type: chat
-  message: "&7No players are currently AFK."
+  message: "&#8A94A6No players are currently AFK."
 
 afk-list:
   type: chat
-  message: "&7AFK Players (%count%): &f%players%"
+  message: "&#5AC8FAAFK &#8A94A6(%count%) » &#F1F1F1%players%"
 
 back-teleported:
   type: actionbar
-  message: "&aTeleported to your last location."
+  message: "&#57E39ATeleported to your last location"
   duration: 60
 
 back-no-location:
   type: chat
-  message: "&cNo previous location found."
+  message: "&#FF7070No previous location to return to."
 
 back-world-blacklisted:
   type: chat
-  message: "&cYou cannot use /back to return to that world."
+  message: "&#FF7070You can't use /back to return to that world."
 
 teleport-countdown:
   type: actionbar
-  message: "&eTeleporting in &6%seconds%s&e..."
+  message: "&#FFC857Teleporting in &#F1F1F1%seconds%s&#FFC857…"
   duration: 25
 
 teleport-cancelled:
   type: actionbar
-  message: "&cTeleportation cancelled."
+  message: "&#FF7070Teleport cancelled — you moved"
   duration: 40
 
 home-teleported:
   type: actionbar
-  message: "&aTeleported to home &f%home%&a."
+  message: "&#57E39ATeleported to home &#F1F1F1%home%"
   duration: 60
 
 home-set:
   type: chat
-  message: "&aHome &f%home%&a set."
+  message: "&#57E39AHome &#F1F1F1%home% &#57E39Aset."
+  hover: "&#8A94A6Click to teleport to %home%"
+  click:
+    action: run_command
+    value: "/home %home%"
+
+home-limit-reached:
+  type: chat
+  message: "&#FF7070You've reached your home limit &#8A94A6(&#F1F1F1%max%&#8A94A6)&#FF7070. Delete a home first."
 
 home-deleted:
   type: chat
-  message: "&aHome &f%home%&a deleted."
+  message: "&#57E39AHome &#F1F1F1%home% &#57E39Adeleted."
 
 home-list:
   type: chat
-  message: "&7Your homes: &f%homes%"
+  message: "&#5AC8FAYour homes &#8A94A6» &#F1F1F1%homes%"
 
 home-not-found:
   type: chat
-  message: "&cHome '%home%' not found."
+  message: "&#FF7070Home &#F1F1F1%home% &#FF7070not found."
+  hover: "&#8A94A6Click to list your homes"
+  click:
+    action: run_command
+    value: "/homes"
 
 home-no-homes:
   type: chat
-  message: "&cYou have no homes set."
-  hover: "&7Click to set a home"
+  message: "&#FF7070You haven't set any homes yet."
+  hover: "&#8A94A6Click to set your first home"
   click:
     action: suggest_command
     value: "/sethome "
 
 reload-success:
   type: chat
-  message: "&aVelto configuration reloaded successfully."
+  message: "&#57E39AVelto configuration reloaded."
 
 alert-usage:
   type: chat
-  message: "&cUsage: /alert <chat|actionbar|bossbar|title> <ticks> <message...>"
+  segments:
+    - text: "&#8A94A6Usage: &#5AC8FA/alert &#F1F1F1<chat|actionbar|bossbar|title> <ticks> <message…>"
+      hover: "&#8A94A6Click to start an alert"
+      click:
+        action: suggest_command
+        value: "/alert "
 
 alert-invalid-type:
   type: chat
-  message: "&cInvalid type. Allowed: chat, actionbar, bossbar, title."
+  message: "&#FF7070Invalid type. Use &#F1F1F1chat&#FF7070, &#F1F1F1actionbar&#FF7070, &#F1F1F1bossbar&#FF7070, or &#F1F1F1title&#FF7070."
 
 alert-invalid-duration:
   type: chat
-  message: "&cInvalid duration. Must be a number of ticks (>= 1)."
+  message: "&#FF7070Invalid duration. Must be a number of ticks (&#F1F1F1≥ 1&#FF7070)."
 
 god-enabled-other:
   type: chat
-  message: "&aEnabled god mode for &e%target%&a."
+  message: "&#57E39AEnabled god mode for &#F1F1F1%target%&#57E39A."
 
 god-disabled-other:
   type: chat
-  message: "&cDisabled god mode for &e%target%&c."
+  message: "&#FF7070Disabled god mode for &#F1F1F1%target%&#FF7070."
 
 fly-enabled:
   type: actionbar
-  message: "&aFlight enabled."
+  message: "&#57E39AFlight enabled"
   duration: 60
 
 fly-disabled:
   type: actionbar
-  message: "&cFlight disabled."
+  message: "&#FF7070Flight disabled"
   duration: 60
 
 fly-enabled-other:
   type: chat
-  message: "&aEnabled flight for &e%target%&a."
+  message: "&#57E39AEnabled flight for &#F1F1F1%target%&#57E39A."
 
 fly-disabled-other:
   type: chat
-  message: "&cDisabled flight for &e%target%&c."
+  message: "&#FF7070Disabled flight for &#F1F1F1%target%&#FF7070."
 
 msg-usage:
   type: chat
-  message: "&eUsage: &f/msg <player> <message>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/msg <player> <message…>"
+      hover: "&#8A94A6Click to start a private message"
+      click:
+        action: suggest_command
+        value: "/msg "
 
 msg-self:
   type: chat
-  message: "&cYou cannot message yourself."
+  message: "&#FF7070You can't message yourself."
+
+msg-ignored:
+  type: chat
+  message: "&#FF7070%player% is ignoring you."
+
+ignore-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/ignore <player>"
+      hover: "&#8A94A6Click to ignore a player"
+      click:
+        action: suggest_command
+        value: "/ignore "
+
+ignore-self:
+  type: chat
+  message: "&#FF7070You can't ignore yourself."
+
+ignore-already:
+  type: chat
+  message: "&#FF7070You're already ignoring &#F1F1F1%player%&#FF7070."
+
+ignore-success:
+  type: chat
+  message: "&#57E39ANow ignoring &#F1F1F1%player%&#57E39A. You won't see their chat or messages."
+
+unignore-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/unignore <player>"
+      hover: "&#8A94A6Click to stop ignoring a player"
+      click:
+        action: suggest_command
+        value: "/unignore "
+
+unignore-not:
+  type: chat
+  message: "&#FF7070You're not ignoring &#F1F1F1%player%&#FF7070."
+
+unignore-success:
+  type: chat
+  message: "&#57E39ANo longer ignoring &#F1F1F1%player%&#57E39A."
 
 msg-sent:
   type: chat
   segments:
-    - text: "&7[&fYou &7-> &f%recipient%&7] "
-      hover: "&7Click to message &f%recipient% &7again"
+    - text: "&#8A94A6[&#F1F1F1You &#8A94A6→ &#F1F1F1%recipient%&#8A94A6] "
+      hover: "&#8A94A6Click to message %recipient% again"
       click:
         action: suggest_command
         value: "/msg %recipient% "
-    - text: "&f%message%"
+    - text: "&#F1F1F1%message%"
 
 msg-received:
   type: chat
   segments:
-    - text: "&7[&f%sender% &7-> &fYou&7] "
-      hover: "&7Click to reply to &f%sender%"
+    - text: "&#8A94A6[&#F1F1F1%sender% &#8A94A6→ &#F1F1F1You&#8A94A6] "
+      hover: "&#8A94A6Click to reply to %sender%"
       click:
         action: suggest_command
         value: "/reply "
-    - text: "&f%message%"
+    - text: "&#F1F1F1%message%"
 
 reply-usage:
   type: chat
-  message: "&eUsage: &f/reply <message>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/reply <message…>"
+      hover: "&#8A94A6Click to reply to your last conversation"
+      click:
+        action: suggest_command
+        value: "/reply "
 
 reply-no-target:
   type: chat
-  message: "&cNo one to reply to."
-  hover: "&7Click to start a new conversation"
+  message: "&#FF7070No one to reply to."
+  hover: "&#8A94A6Click to start a new conversation"
   click:
     action: suggest_command
     value: "/msg "
 
 reply-offline:
   type: chat
-  message: "&cThat player is no longer online."
+  message: "&#FF7070That player is no longer online."
 
 tpall-success:
   type: chat
-  message: "&aTeleported all players to your location."
+  message: "&#57E39ATeleported all players to you."
 
 tp-usage:
   type: chat
-  message: "&eUsage: &f/tp <player> &7| &f/tp <x> <y> <z> &7| &f/tp <player> <player> &7| &f/tp <player> <x> <y> <z>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/tp <player>"
+      hover: "&#8A94A6Teleport to a player"
+      click:
+        action: suggest_command
+        value: "/tp "
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FA<x> <y> <z>"
+      hover: "&#8A94A6Teleport to coordinates"
+      click:
+        action: suggest_command
+        value: "/tp "
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FA<player> <player>"
+      hover: "&#8A94A6Teleport one player to another"
+      click:
+        action: suggest_command
+        value: "/tp "
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FA<player> <x> <y> <z>"
+      hover: "&#8A94A6Teleport a player to coordinates"
+      click:
+        action: suggest_command
+        value: "/tp "
 
 tp-self-player:
   type: actionbar
-  message: "&aTeleported to &f%target%&a."
+  message: "&#57E39ATeleported to &#F1F1F1%target%"
   duration: 60
 
 tp-self-coords:
   type: actionbar
-  message: "&aTeleported to &f%x%&a, &f%y%&a, &f%z%&a."
+  message: "&#57E39ATeleported to &#F1F1F1%x%&#8A94A6, &#F1F1F1%y%&#8A94A6, &#F1F1F1%z%"
   duration: 60
 
 tp-other-success:
   type: chat
-  message: "&aTeleported &e%from% &ato &e%to%&a."
+  message: "&#57E39ATeleported &#F1F1F1%from% &#57E39Ato &#F1F1F1%to%&#57E39A."
 
 tpa-usage:
   type: chat
-  message: "&eUsage: &f/tpa <player>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/tpa <player>"
+      hover: "&#8A94A6Request to teleport to a player"
+      click:
+        action: suggest_command
+        value: "/tpa "
 
 tpa-self:
   type: chat
-  message: "&cYou cannot send a teleport request to yourself."
+  message: "&#FF7070You can't send a teleport request to yourself."
 
 tpa-sent:
   type: chat
-  message: "&aTeleport request sent to &e%target%&a."
+  message: "&#57E39ATeleport request sent to &#F1F1F1%target%&#57E39A."
 
 tpa-received:
   type: chat
   segments:
-    - text: "&e%requester% &awants to teleport to you. "
-    - text: "&a[Accept]"
-      hover: "&7Click to accept"
+    - text: "&#F1F1F1%requester% &#8A94A6wants to teleport to you.  "
+    - text: "&#57E39A[Accept]"
+      hover: "&#8A94A6Click to accept"
       click:
         action: run_command
         value: "/tpaaccept %requester%"
-    - text: " &7/ "
-    - text: "&c[Deny]"
-      hover: "&7Click to deny"
+    - text: "&#8A94A6   "
+    - text: "&#FF7070[Deny]"
+      hover: "&#8A94A6Click to deny"
       click:
         action: run_command
         value: "/tpadeny %requester%"
 
 tpa-accepted-requester:
   type: chat
-  message: "&e%target% &aaccepted your teleport request."
+  message: "&#F1F1F1%target% &#57E39Aaccepted your teleport request."
 
 tpa-accepted-target:
   type: chat
-  message: "&aYou accepted &e%requester%&a's teleport request."
+  message: "&#57E39AYou accepted &#F1F1F1%requester%&#57E39A's request."
 
 tpa-denied-requester:
   type: chat
-  message: "&e%target% &cdenied your teleport request."
+  message: "&#F1F1F1%target% &#FF7070denied your teleport request."
 
 tpa-denied-target:
   type: chat
-  message: "&cYou denied &e%requester%&c's teleport request."
+  message: "&#FF7070You denied &#F1F1F1%requester%&#FF7070's request."
 
 tpa-expired:
   type: chat
-  message: "&cYour teleport request to &e%target% &chas expired."
+  message: "&#FF7070Your teleport request to &#F1F1F1%target% &#FF7070expired."
+  hover: "&#8A94A6Click to send it again"
+  click:
+    action: suggest_command
+    value: "/tpa %target%"
 
 tpa-no-request:
   type: chat
-  message: "&cNo pending teleport requests."
-  hover: "&7Click to send a teleport request"
+  message: "&#FF7070No pending teleport requests."
+  hover: "&#8A94A6Click to send one"
   click:
     action: suggest_command
     value: "/tpa "
 
+tpa-requester-offline:
+  type: chat
+  message: "&#FF7070That player is no longer online."
+
 tpa-teleported:
   type: actionbar
-  message: "&aTeleported to &f%target%&a."
+  message: "&#57E39ATeleported to &#F1F1F1%target%"
   duration: 60
 
 sudo-usage:
   type: chat
-  message: "&eUsage: &f/sudo <player> <command...>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/sudo <player> <command…>"
+      hover: "&#8A94A6Click to force a player to run a command"
+      click:
+        action: suggest_command
+        value: "/sudo "
 
 sudo-success:
   type: chat
-  message: "&aForced &e%target% &ato run: &f%command%"
+  message: "&#57E39AForced &#F1F1F1%target% &#57E39Ato run: &#F1F1F1%command%"
 
 kit-list-header:
   type: chat
-  message: "&6Available kits &7(use /kit <name> to claim):"
+  message: "&#5AC8FAAvailable kits &#8A94A6(click a name to claim)"
+
+kit-list-entry:
+  type: chat
+  segments:
+    - text: "&#FFC857 - "
+    - text: "&#FFD64A%kit%"
+      hover: "&#8A94A6Click to claim &#FFD64A%kit%"
+      click:
+        action: run_command
+        value: "/kit %kit%"
+    - text: " &#8A94A6(%cooldown%&#8A94A6) &#5A6270[%items% items]"
 
 kit-list-empty:
   type: chat
-  message: "&cNo kits are available to you."
+  message: "&#FF7070No kits are available to you."
 
 kit-not-found:
   type: chat
-  message: "&cKit &f%kit% &cdoes not exist."
+  message: "&#FF7070Kit &#F1F1F1%kit% &#FF7070doesn't exist."
+  hover: "&#8A94A6Click to list available kits"
+  click:
+    action: run_command
+    value: "/kit"
 
 kit-no-permission:
   type: chat
-  message: "&cYou don't have access to this kit."
+  message: "&#FF7070You don't have access to this kit."
 
 kit-on-cooldown:
   type: chat
-  message: "&cKit &f%kit% &cis on cooldown. Time remaining: &f%time%&c."
+  message: "&#FF7070Kit &#F1F1F1%kit% &#FF7070is on cooldown &#8A94A6(%time% left)&#FF7070."
 
 kit-given-self:
   type: actionbar
-  message: "&aKit &f%kit% &areceived!"
+  message: "&#57E39AReceived kit &#F1F1F1%kit%"
   duration: 60
 
 kit-given-other:
   type: chat
-  message: "&aYou gave the &f%kit% &akit to &e%player%&a."
+  message: "&#57E39AGave the &#F1F1F1%kit% &#57E39Akit to &#F1F1F1%player%&#57E39A."
 
 kit-received:
   type: chat
-  message: "&aYou received the &f%kit% &akit from &e%sender%&a."
+  message: "&#57E39AReceived the &#F1F1F1%kit% &#57E39Akit from &#F1F1F1%sender%&#57E39A."
 
 kit-inventory-full:
   type: chat
-  message: "&eYour inventory was full — some items were dropped at your feet."
+  message: "&#FFC857Your inventory was full — some items were dropped at your feet."
 
 kit-already-claimed:
   type: chat
-  message: "&cYou have already claimed the &f%kit% &ckit."
+  message: "&#FF7070You've already claimed the &#F1F1F1%kit% &#FF7070kit."
 
 kit-give-failed:
   type: chat
-  message: "&cFailed to deliver kit &f%kit%&c. Please try again or contact an admin."
+  message: "&#FF7070Couldn't deliver kit &#F1F1F1%kit%&#FF7070. Try again or contact an admin."
 
 kit-preview-usage:
   type: chat
-  message: "&eUsage: &f/kit preview <name>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/kit preview <name>"
+      hover: "&#8A94A6Click to preview a kit"
+      click:
+        action: suggest_command
+        value: "/kit preview "
 
 kitreset-usage:
   type: chat
-  message: "&eUsage: &f/kitreset <player> <kit>"
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/kitreset <player> <kit>"
+      hover: "&#8A94A6Click to reset a player's kit cooldown"
+      click:
+        action: suggest_command
+        value: "/kitreset "
 
 kit-reset-success:
   type: chat
-  message: "&aReset kit &f%kit% &afor &e%player%&a."
+  message: "&#57E39AReset kit &#F1F1F1%kit% &#57E39Afor &#F1F1F1%player%&#57E39A."
+
+warp-teleported:
+  type: actionbar
+  message: "&#57E39ATeleported to warp &#F1F1F1%warp%"
+  duration: 60
+
+warp-set:
+  type: chat
+  message: "&#57E39AWarp &#F1F1F1%warp% &#57E39Aset."
+  hover: "&#8A94A6Click to warp to %warp%"
+  click:
+    action: run_command
+    value: "/warp %warp%"
+
+warp-not-found:
+  type: chat
+  message: "&#FF7070Warp &#F1F1F1%warp% &#FF7070not found."
+  hover: "&#8A94A6Click to list warps"
+  click:
+    action: run_command
+    value: "/warp"
+
+warp-list:
+  type: chat
+  message: "&#5AC8FAWarps &#8A94A6» &#F1F1F1%warps%"
+
+warp-no-warps:
+  type: chat
+  message: "&#8A94A6There are no warps set."
+
+setwarp-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/setwarp <name>"
+      hover: "&#8A94A6Click to create a warp here"
+      click:
+        action: suggest_command
+        value: "/setwarp "
+
+economy-disabled:
+  type: chat
+  message: "&#FF7070The economy module is currently disabled."
+
+economy-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: &#5AC8FA/economy "
+    - text: "&#57E39Agive"
+      hover: "&#8A94A6Add to a player's balance"
+      click:
+        action: suggest_command
+        value: "/economy give "
+    - text: "&#8A94A6 | "
+    - text: "&#FF7070take"
+      hover: "&#8A94A6Remove from a player's balance"
+      click:
+        action: suggest_command
+        value: "/economy take "
+    - text: "&#8A94A6 | "
+    - text: "&#5AC8FAset"
+      hover: "&#8A94A6Set a player's balance"
+      click:
+        action: suggest_command
+        value: "/economy set "
+    - text: "&#8A94A6 | "
+    - text: "&#FFC857reset"
+      hover: "&#8A94A6Reset a player's balance"
+      click:
+        action: suggest_command
+        value: "/economy reset "
+
+economy-invalid-amount:
+  type: chat
+  message: "&#FF7070Invalid amount. Must be a positive number."
+
+economy-give:
+  type: chat
+  message: "&#57E39AGave &#FFD64A%amount% &#57E39Ato &#F1F1F1%player%&#57E39A."
+
+economy-give-target:
+  type: chat
+  message: "&#57E39AYou received &#FFD64A%amount%&#57E39A."
+
+economy-take:
+  type: chat
+  message: "&#57E39ATook &#FFD64A%amount% &#57E39Afrom &#F1F1F1%player%&#57E39A."
+
+economy-take-target:
+  type: chat
+  message: "&#FF7070Removed &#FFD64A%amount% &#FF7070from your balance."
+
+economy-set:
+  type: chat
+  message: "&#57E39ASet &#F1F1F1%player%&#57E39A's balance to &#FFD64A%amount%&#57E39A."
+
+economy-set-target:
+  type: chat
+  message: "&#57E39AYour balance was set to &#FFD64A%amount%&#57E39A."
+
+economy-reset:
+  type: chat
+  message: "&#57E39AReset &#F1F1F1%player%&#57E39A's balance to &#FFD64A%amount%&#57E39A."
+
+economy-reset-target:
+  type: chat
+  message: "&#57E39AYour balance was reset to &#FFD64A%amount%&#57E39A."
+
+balance-self:
+  type: chat
+  message: "&#57E39ABalance &#8A94A6» &#FFD64A%balance%"
+  hover: "&#8A94A6Click to pay a player"
+  click:
+    action: suggest_command
+    value: "/pay "
+
+balance-other:
+  type: chat
+  message: "&#F1F1F1%player%&#57E39A's balance &#8A94A6» &#FFD64A%balance%"
+
+baltop-header:
+  type: chat
+  message: "&#8A94A6» &#57E39ATop Balances &#8A94A6(page &#FFD64A%page%&#8A94A6/&#FFD64A%pages%&#8A94A6)"
+
+baltop-entry:
+  type: chat
+  message: "&#8A94A6#&#FFD64A%rank% &#F1F1F1%player% &#8A94A6» &#FFD64A%balance%"
+
+baltop-footer:
+  type: chat
+  message: "&#8A94A6Page &#FFD64A%page%&#8A94A6/&#FFD64A%pages% &#8A94A6— &#5AC8FA/baltop <page>"
+
+baltop-empty:
+  type: chat
+  message: "&#FF7070No balances to show yet."
+
+pay-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/pay <player> <amount>"
+      hover: "&#8A94A6Click to send money"
+      click:
+        action: suggest_command
+        value: "/pay "
+
+pay-self:
+  type: chat
+  message: "&#FF7070You can't pay yourself."
+
+pay-insufficient-funds:
+  type: chat
+  message: "&#FF7070You don't have enough to send that."
+  hover: "&#8A94A6Click to check your balance"
+  click:
+    action: run_command
+    value: "/balance"
+
+pay-sent:
+  type: chat
+  message: "&#57E39APaid &#FFD64A%amount% &#57E39Ato &#F1F1F1%player%&#57E39A."
+  hover: "&#8A94A6Click to pay %player% again"
+  click:
+    action: suggest_command
+    value: "/pay %player% "
+
+pay-received:
+  type: chat
+  message: "&#57E39AReceived &#FFD64A%amount% &#57E39Afrom &#F1F1F1%player%&#57E39A."
+  hover: "&#8A94A6Click to pay %player% back"
+  click:
+    action: suggest_command
+    value: "/pay %player% "

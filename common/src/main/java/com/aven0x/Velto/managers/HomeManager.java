@@ -1,11 +1,14 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.utils.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +20,56 @@ public final class HomeManager {
     private HomeManager() {}
 
     public static final String DEFAULT_HOME = "home";
+
+    /**
+     * Additive home-bonus permission: {@code velto.homes.bonus.<name>.<amount>}.
+     * The trailing {@code <amount>} is added to the player's cap; {@code <name>} exists only
+     * to make each grant a distinct node, so bonuses of the same size stack across ranks
+     * (Minecraft permissions are a set — two identical nodes would otherwise collapse to one).
+     */
+    public static final String HOME_BONUS_PERMISSION_PREFIX = "velto.homes.bonus.";
+
+    /** Grant {@code velto.homes.unlimited} to remove the cap entirely. */
+    public static final String UNLIMITED_HOMES_PERMISSION = "velto.homes.unlimited";
+
+    /**
+     * True if the player may set an unbounded number of homes
+     * ({@code velto.homes.unlimited}).
+     */
+    public static boolean hasUnlimitedHomes(Player player) {
+        return player.hasPermission(UNLIMITED_HOMES_PERMISSION);
+    }
+
+    /**
+     * The maximum number of homes this player may have.
+     *
+     * Starts from the configured floor ({@code homes.default-limit}) and adds the amount of
+     * every {@code velto.homes.bonus.<name>.<amount>} permission the player holds — each is a
+     * distinct node, so bonuses stack (e.g. floor 3 + {@code bonus.vip.3} + {@code bonus.mvp.3}
+     * = 9). Returns {@link Integer#MAX_VALUE} when {@code velto.homes.unlimited} is granted.
+     */
+    public static int getMaxHomes(Player player) {
+        if (hasUnlimitedHomes(player)) return Integer.MAX_VALUE;
+
+        int max = ConfigUtil.getHomesDefaultLimit();
+        for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
+            if (!info.getValue()) continue;
+            String perm = info.getPermission();
+            if (!perm.regionMatches(true, 0, HOME_BONUS_PERMISSION_PREFIX, 0, HOME_BONUS_PERMISSION_PREFIX.length())) {
+                continue;
+            }
+            // Everything after the prefix is "<name>.<amount>"; the amount is the last segment.
+            String rest = perm.substring(HOME_BONUS_PERMISSION_PREFIX.length());
+            int lastDot = rest.lastIndexOf('.');
+            if (lastDot <= 0 || lastDot == rest.length() - 1) continue; // need a non-empty name and amount
+            try {
+                max += Integer.parseInt(rest.substring(lastDot + 1).trim());
+            } catch (NumberFormatException ignored) {
+                // Malformed amount (e.g. a wildcard "*") — not a real bonus, skip it.
+            }
+        }
+        return Math.max(0, max);
+    }
 
     private static Logger logger() {
         return VeltoPlugin.get().getLogger();

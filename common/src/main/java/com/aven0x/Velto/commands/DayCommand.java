@@ -30,6 +30,11 @@ public class DayCommand extends BaseCommand {
         if (world == null) {
             if (sender instanceof Player player) {
                 LangUtil.send(player, "invalid-world");
+            } else if (args.length > 0) {
+                sender.sendMessage("§cInvalid world: " + args[0]);
+            } else {
+                // Console has no world of its own — it must name one.
+                sender.sendMessage("§cUsage: /day <world>");
             }
             return true;
         }
@@ -38,6 +43,8 @@ public class DayCommand extends BaseCommand {
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "time-set-day");
+        } else {
+            sender.sendMessage("§aSet time to day in world §f" + world.getName() + "§a.");
         }
         return true;
     }

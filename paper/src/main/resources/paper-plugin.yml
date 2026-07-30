@@ -8,6 +8,9 @@ dependencies:
     PlaceholderAPI:
       load: BEFORE #
       required: false
+    Vault:
+      load: BEFORE
+      required: false
 
 permissions:
   velto.*:
@@ -18,11 +21,15 @@ permissions:
       velto.kill: true
       velto.killall: true
       velto.msg: true
+      velto.ignore: true
+      velto.ignore.exempt: true
       velto.reload: true
       velto.setspawn: true
       velto.spawn: true
       velto.back: true
       velto.craft: true
+      velto.enderchest: true
+      velto.enderchest.others: true
       velto.lore: true
       velto.alert: true
       velto.tp: true
@@ -59,9 +66,20 @@ permissions:
       velto.sethome: true
       velto.delhome: true
       velto.homes: true
+      velto.homes.unlimited: true
       velto.kit: true
       velto.kit.others: true
       velto.kit.reset: true
       velto.kit.cooldown.bypass: true
       velto.kit.starter: true
       velto.kit.daily: true
+      velto.warp: true
+      velto.setwarp: true
+      velto.economy.give: true
+      velto.economy.take: true
+      velto.economy.set: true
+      velto.economy.reset: true
+      velto.balance: true
+      velto.balance.others: true
+      velto.baltop: true
+      velto.pay: true

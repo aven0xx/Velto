@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.managers.MsgManager;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
@@ -42,6 +43,11 @@ public class ReplyCommand extends BaseCommand {
         Player to = Bukkit.getPlayer(targetId);
         if (to == null || !to.isOnline()) {
             LangUtil.send(from, "reply-offline");
+            return true;
+        }
+
+        if (IgnoreManager.isBlocked(from, to)) {
+            LangUtil.send(from, "msg-ignored", Map.of("%player%", to.getName()));
             return true;
         }
 
