@@ -42,4 +42,14 @@ public final class Schedulers {
         }
         return s;
     }
+
+    /**
+     * Cancels all scheduled work if a scheduler is installed; a no-op if one was never set
+     * (e.g. onEnable failed before {@link #set(VeltoScheduler)}). Safe to call from onDisable
+     * without risking an exception that would skip later shutdown steps such as the final save.
+     */
+    public static void cancelAllQuietly() {
+        VeltoScheduler s = instance;
+        if (s != null) s.cancelAll();
+    }
 }

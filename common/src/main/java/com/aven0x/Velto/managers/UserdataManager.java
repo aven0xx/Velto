@@ -1,9 +1,9 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public final class UserdataManager {
     private static File userdataFolder;
     private static Logger logger;
     private static volatile boolean initialized = false;
-    private static BukkitTask autosaveTask = null;
+    private static VeltoTask autosaveTask = null;
 
     private static final class PendingSave {
         YamlConfiguration snapshot;
@@ -133,13 +133,15 @@ public final class UserdataManager {
 
     public static void startAutosave(long intervalTicks) {
         if (autosaveTask != null) return;
-        autosaveTask = VeltoPlugin.get().getServer().getScheduler()
-                .runTaskTimer(VeltoPlugin.get(), () -> {
-                    for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
-                        YamlConfiguration snapshot = copyOf(entry.getValue());
-                        enqueueSave(entry.getKey(), snapshot);
-                    }
-                }, intervalTicks, intervalTicks);
+        // The sweep only copies cache entries and enqueues async writes — it touches no
+        // server state — so it runs on the async scheduler, off the tick loop entirely.
+        long millis = Math.max(1000L, intervalTicks * 50L);
+        autosaveTask = Schedulers.get().asyncTimer(() -> {
+            for (Map.Entry<UUID, YamlConfiguration> entry : cache.entrySet()) {
+                YamlConfiguration snapshot = copyOf(entry.getValue());
+                enqueueSave(entry.getKey(), snapshot);
+            }
+        }, millis, millis);
     }
 
     public static void stopAutosave() {
@@ -282,7 +284,7 @@ public final class UserdataManager {
         File target = fileFor(uuid);
         YamlConfiguration finalSnapshot = snapshot;
 
-        VeltoPlugin.get().getServer().getScheduler().runTaskAsynchronously(VeltoPlugin.get(), () -> {
+        Schedulers.get().async(() -> {
             try {
                 if (pendingSaves.get(uuid) == save) {
                     finalSnapshot.save(target);

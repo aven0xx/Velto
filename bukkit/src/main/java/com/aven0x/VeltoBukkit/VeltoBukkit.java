@@ -89,9 +89,12 @@ public class VeltoBukkit extends JavaPlugin {
             autoMsgManager.stop();
             autoMsgManager = null;
         }
+        TeleportManager tm = TeleportManager.getInstance();
+        if (tm != null) tm.cancelAll();
         UserdataManager.stopAutosave();
+        // Stop in-flight async writers before the exclusive final flush (report F-83).
+        Schedulers.cancelAllQuietly();
         UserdataManager.saveAll();
-        Schedulers.get().cancelAll();
     }
 
     public static VeltoBukkit getInstance() {

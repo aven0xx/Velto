@@ -1,14 +1,13 @@
 package com.aven0x.Velto.managers;
 
-import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.ServerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TeleportManager {
 
     private static TeleportManager instance;
-    private final Map<UUID, BukkitTask> pendingTeleports = new ConcurrentHashMap<>();
+    private final Map<UUID, VeltoTask> pendingTeleports = new ConcurrentHashMap<>();
 
     public TeleportManager() {
         instance = this;
@@ -47,38 +46,43 @@ public class TeleportManager {
         }
 
         Location origin = player.getLocation().clone();
+        UUID uuid = player.getUniqueId();
 
-        BukkitRunnable runnable = new BukkitRunnable() {
-            int remaining = seconds;
+        // Preserve the original 0-tick behaviour: the first countdown line shows immediately.
+        // The entity scheduler clamps any delay below 1 to 1, so the repeating timer starts one
+        // tick later and only handles the remaining seconds.
+        LangUtil.send(player, "teleport-countdown", Map.of("%seconds%", String.valueOf(seconds)));
 
-            @Override
-            public void run() {
-                if (!player.isOnline()) {
-                    pendingTeleports.remove(player.getUniqueId());
-                    this.cancel();
-                    return;
-                }
+        int[] remaining = { seconds - 1 };
+        VeltoTask[] handle = new VeltoTask[1];
 
-                if (ConfigUtil.isTeleportCancelOnMove() && hasMoved(player, origin)) {
-                    pendingTeleports.remove(player.getUniqueId());
-                    this.cancel();
-                    LangUtil.send(player, "teleport-cancelled");
-                    return;
-                }
+        handle[0] = Schedulers.get().entityTimer(player,
+                () -> {
+                    if (!player.isOnline()) {
+                        finish(uuid, handle[0]);
+                        return;
+                    }
 
-                if (remaining <= 0) {
-                    pendingTeleports.remove(player.getUniqueId());
-                    this.cancel();
-                    teleportAsync(player, location).thenAccept(success -> runCompletion(player, success, onComplete));
-                    return;
-                }
+                    if (ConfigUtil.isTeleportCancelOnMove() && hasMoved(player, origin)) {
+                        finish(uuid, handle[0]);
+                        LangUtil.send(player, "teleport-cancelled");
+                        return;
+                    }
 
-                LangUtil.send(player, "teleport-countdown", Map.of("%seconds%", String.valueOf(remaining)));
-                remaining--;
-            }
-        };
+                    if (remaining[0] <= 0) {
+                        finish(uuid, handle[0]);
+                        teleportAsync(player, location).thenAccept(success -> runCompletion(player, success, onComplete));
+                        return;
+                    }
 
-        pendingTeleports.put(player.getUniqueId(), runnable.runTaskTimer(VeltoPlugin.get(), 0L, 20L));
+                    LangUtil.send(player, "teleport-countdown", Map.of("%seconds%", String.valueOf(remaining[0])));
+                    remaining[0]--;
+                },
+                () -> pendingTeleports.remove(uuid),   // retired: player vanished before a tick fired
+                20L, 20L);
+
+        VeltoTask previous = pendingTeleports.put(uuid, handle[0]);
+        if (previous != null) previous.cancel();
     }
 
     // System/admin teleport: bypasses countdown entirely (AFK zone, /tpall, etc.)
@@ -100,8 +104,25 @@ public class TeleportManager {
 
     // Cancels any pending countdown for the given player.
     public void cancelPending(Player player) {
-        BukkitTask task = pendingTeleports.remove(player.getUniqueId());
+        VeltoTask task = pendingTeleports.remove(player.getUniqueId());
         if (task != null) task.cancel();
+    }
+
+    // Cancels every pending countdown. Called from onDisable, since entity-scheduled
+    // tasks are not covered by the scheduler's bulk cancelAll().
+    public void cancelAll() {
+        for (VeltoTask task : pendingTeleports.values()) {
+            task.cancel();
+        }
+        pendingTeleports.clear();
+    }
+
+    // Removes this player's pending entry only if it still points at `task`, then cancels it.
+    // The conditional remove keeps a concurrent re-teleport's newer entry intact.
+    private void finish(UUID uuid, VeltoTask task) {
+        if (task == null) return;
+        pendingTeleports.remove(uuid, task);
+        task.cancel();
     }
 
     private boolean bukkitTeleport(Player player, Location location) {
@@ -113,14 +134,16 @@ public class TeleportManager {
     private void runCompletion(Player player, boolean success, Runnable onComplete) {
         if (!success || onComplete == null) return;
 
-        if (Bukkit.isPrimaryThread()) {
+        // teleportAsync completes on an unspecified thread; only touch the player from the
+        // region that owns them.
+        if (Schedulers.get().owns(player)) {
             if (player.isOnline()) onComplete.run();
             return;
         }
 
-        Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> {
+        Schedulers.get().entity(player, () -> {
             if (player.isOnline()) onComplete.run();
-        });
+        }, null);
     }
 
     private int resolveCountdown(Player player) {
