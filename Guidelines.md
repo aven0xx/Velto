@@ -13,7 +13,7 @@ This file provides guidance for Claude Code/ChatGPT Codex when working in this r
 
 **Velto** is a lightweight Minecraft core plugin (alpha) targeting Paper/Spigot/Bukkit servers. It is intentionally minimal — no claims, towns, or minigame systems (an optional, fully toggleable economy module is the one exception — see "What Velto Intentionally Excludes" below). The goal is a plug-and-play core that plays well with other plugins with every command that can be disabled.
 
-- Current version: `0.7.6`
+- Current version: `0.8-Recode`
 - Supported MC versions: 1.21.8–26.2 (1.21.8 is LTS, supported until Fall 2026). 1.21.7 and earlier are unsupported/untested.
   - `api-version` in `plugin.yml`/`paper-plugin.yml` is intentionally kept at `1.21.4` — below the supported floor — so the plugin isn't refused by future server versions. This does **not** mean 1.21.4–1.21.7 are officially supported; it's a compatibility floor, not a support commitment.
 - Java package root: `com.aven0x`
@@ -73,7 +73,7 @@ data (userdata, warps, AFK positions) is covered separately in
 
 - Standard Java conventions; no Lombok.
 - Keep commands self-contained — avoid adding cross-cutting state.
-- Async teleportation via `TeleportManager` (already wired); don't block the main thread.
+- Schedule through the `VeltoScheduler` SPI (`Schedulers.get()`), never `BukkitScheduler`/`BukkitRunnable` — the plugin targets Folia. Teleport via `TeleportManager` only. See [`docs/FOLIA.md`](docs/FOLIA.md).
 - Tab completion should be added to every command that accepts a player argument.
 
 ## What Velto Intentionally Excludes

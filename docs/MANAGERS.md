@@ -13,7 +13,7 @@ directly. "Persisted?" points to [DATA_STORAGE.md](DATA_STORAGE.md) for detail.
 | `ConfigUtil` | Loads/caches `config.yml` into `volatile` static fields (`refreshCache()`); owns `spawn` and `afkzone` location read/write directly (uncached, since they change rarely and are read even more rarely). |
 | `LangUtil` | Loads/parses `lang.yml` into a pre-built message cache; `send`/`sendGlobal`/`sendGlobalRaw` are the only way commands should message players — see [CONFIGURATION.md](CONFIGURATION.md#langyml). |
 | `CommandUtil` | Loads `commands.yml`; answers `isEnabled(name)`, `getAliases(name)`, `getPermission(name, defaultPerm)` — the permission-override indirection every `BaseCommand.checkPermission` goes through. |
-| `TeleportManager` | The **only** path any code should use to move a player. Two modes: `teleport(player, loc[, onComplete])` (player-initiated — honours the countdown/cancel-on-move config; used by `/home`, `/warp`, `/spawn`, `/back`, `/tpaaccept`) and `teleportAsync(player, loc)` (system/admin-initiated — bypasses the countdown entirely; used by `/tp`, `/tpall`, and `AfkManager`'s zone entry/exit). Prefers Paper's native `teleportAsync` via reflection when available, falls back to a synchronous chunk-load + `Player#teleport` on plain Spigot. |
+| `TeleportManager` | The **only** path any code should use to move a player. Two modes: `teleport(player, loc[, onComplete])` (player-initiated — honours the countdown/cancel-on-move config; used by `/home`, `/warp`, `/spawn`, `/back`, `/tpaaccept`) and `teleportAsync(player, loc)` (system/admin-initiated — bypasses the countdown entirely; used by `/tp`, `/tpall`, and `AfkManager`'s zone entry/exit). Both delegate to the scheduler SPI's `teleport(entity, loc)` — `Entity#teleportAsync` on the owning region on Paper/Folia, the classic chunk-load + `Player#teleport` on Spigot — so no reflection is involved. The countdown runs as an entity timer on the player's own region; `cancelAll()` drops any pending countdowns on disable. See [FOLIA.md](FOLIA.md). |
 | `UserdataManager` | Per-player YAML cache + save queue. See [DATA_STORAGE.md](DATA_STORAGE.md) for the full lifecycle/timing model — read that before adding a new per-player-persisted feature. |
 
 ## Player state managers (in-memory, per-player)
@@ -28,7 +28,7 @@ All five below are pure `ConcurrentHashMap`/`Set`-backed, not persisted (see
 | `BackManager` | Last location per player, plus a `backing` flag used to avoid `/back` overwriting itself when `BackListener` sees the resulting teleport. | `BackCommand`, `BackListener` |
 | `GodManager` | The god-mode player set (pure toggle, no cooldown/duration logic). | `GodCommand`, `GodListener` |
 | `MsgManager` | `recipient → last sender` map, for `/reply`. | `MsgCommand`, `ReplyCommand`, `AtMentionHandler` |
-| `TpaManager` | Outgoing request per player (one at a time — sending a new one cancels the old), reverse index for incoming requests, each with its own expiry `BukkitTask`. | `TpaCommand`, `TpaAcceptCommand`, `TpaDenyCommand` |
+| `TpaManager` | Outgoing request per player (one at a time — sending a new one cancels the old), reverse index for incoming requests, each with its own expiry `VeltoTask` on the global scheduler (it only messages the requester). Captures the requester's UUID/name, not the `Player`, so nothing leaks across the expiry window. | `TpaCommand`, `TpaAcceptCommand`, `TpaDenyCommand` |
 
 ## Feature managers (persisted)
 
@@ -46,7 +46,7 @@ All five below are pure `ConcurrentHashMap`/`Set`-backed, not persisted (see
 
 | Class | Role |
 |---|---|
-| `AutoMsgManager` | Periodic broadcast rotation (random or sequential) from `config.yml: auto-messages`, driven by a repeating `BukkitTask`. Instance-based (not static) so `/veltoreload` can `restart()` it cleanly. |
+| `AutoMsgManager` | Periodic broadcast rotation (random or sequential) from `config.yml: auto-messages`, driven by a repeating timer on the global scheduler (a `VeltoTask` — a broadcast belongs to no region). Instance-based (not static) so `/veltoreload` can `restart()` it cleanly. |
 | `PlaceholderManager` | Registers `%velto_*%` placeholders with PlaceholderAPI *if installed* (`registerExpansion()` checks `isPluginEnabled("PlaceholderAPI")` before ever touching a PAPI class — see [EXTENDING.md](EXTENDING.md#adding-an-optional-soft-dependency) for why this ordering matters). Holds its own registry (`registerPlaceholder`/`unregisterPlaceholder`) so other managers can contribute placeholders without depending on PAPI directly. See [PLACEHOLDERS.md](PLACEHOLDERS.md) for the full `%velto_*%` catalog. |
 | `AtMentionHandler` | Parses `@player message` chat input into a private message; shared by both platforms' `ChatManager`s and by `MsgCommand`'s underlying logic. |
 | `ChatManager` (platform-specific: `paper`/`bukkit`) | Chat formatting, join/quit messages, PlaceholderAPI resolution. Duplicated per-platform because Paper's `AsyncChatEvent`/Adventure `Component` and Bukkit's `AsyncPlayerChatEvent`/plain `String` aren't interchangeable — see [ARCHITECTURE.md](ARCHITECTURE.md). |

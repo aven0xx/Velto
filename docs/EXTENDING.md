@@ -80,6 +80,32 @@ point is to act *on* another player from the console (admin commands like `/kill
 [COMMANDS.md](COMMANDS.md#the-basecommand-contract) for why this is deliberate, not
 inconsistent.
 
+## Scheduling & thread-safety (Folia)
+
+Velto runs on Folia, which has no main thread — so **never use `Bukkit.getScheduler()` or
+`BukkitRunnable`** in `common` or `paper`. Schedule through the `VeltoScheduler` SPI via
+`Schedulers.get()`; [FOLIA.md](FOLIA.md) is the full reference. The rules that matter when
+writing a command or manager:
+
+- **Timers / delayed / async work** → `Schedulers.get().global(...)`, `.entity(...)`, or
+  `.async(...)` depending on the lane (world/broadcast state, a specific player, or file
+  I/O respectively). Hold the returned `VeltoTask` if you need to cancel it later.
+- **Mutating or reading a player who may not be the sender** → wrap it in
+  `PlayerUtil.onOwningRegion(target, () -> { ... })`. It runs inline when you already own
+  the target (always so on Spigot, and for self-targeted commands) and only hops on Folia.
+  Keep the *sender's* own feedback outside the hop.
+- **World time/weather/game rules, console commands (`dispatchCommand`), server-wide
+  broadcasts** → `Schedulers.get().global(...)`.
+- **Teleporting** → go through `TeleportManager`; never call `Player#teleport` directly.
+- **Iterating players** → `PlayerUtil.onlineSnapshot()`, never the live
+  `Bukkit.getOnlinePlayers()`.
+- **A static cache refreshed by `/veltoreload`** → publish a fresh immutable value in one
+  `volatile` write; don't `clear()`-then-refill a shared collection in place.
+
+On Spigot every one of these runs inline on the main thread, so it's behaviourally
+identical to plain `BukkitScheduler` code — the SPI just makes the same code correct on
+Folia too.
+
 ## Adding a new manager / feature module
 
 First decide where the data lives — this is the actual design decision, everything
@@ -89,7 +115,7 @@ else is mechanical:
 |---|---|---|
 | One value, shared server-wide | Add a key to `config.yml`, read/write via `ConfigUtil` | `spawn`, `afkzone` |
 | A named collection, shared server-wide, written rarely | A dedicated manager owning its own YAML file, synchronous save-on-write | `WarpManager` → `warps.yml` |
-| A named collection, shared server-wide, written often | Same shape, but **async** save (snapshot + `runTaskAsynchronously`) | `AfkPositionStorage` → `afkposition.yml` |
+| A named collection, shared server-wide, written often | Same shape, but **async** save (snapshot + `Schedulers.get().async(...)`) | `AfkPositionStorage` → `afkposition.yml` |
 | Per-player data | `UserdataManager`, namespaced under your own top-level key | `HomeManager` (`homes.*`), `EconomyManager` (`economy.balance`), `KitManager` (`kit-cooldowns.*`) |
 | Admin-authored definitions, read-only at runtime | Your own YAML file, loaded once (+ on `/veltoreload`), no write path | `KitManager` reading `kits.yml` |
 
@@ -181,6 +207,8 @@ For a plain new command:
 - [ ] Messages in both `lang.yml`
 - [ ] Permission node(s) in both `plugin.yml` / `paper-plugin.yml`
 - [ ] Console-support decision made deliberately, not by omission
+- [ ] Scheduling / thread-safety reviewed for Folia (SPI, `onOwningRegion`, snapshots) —
+      see [FOLIA.md](FOLIA.md)
 - [ ] Manually reviewed for compile-correctness (imports, method signatures) since a
       real build may not be runnable in-session
 
