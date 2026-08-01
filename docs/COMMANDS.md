@@ -135,6 +135,7 @@ pattern in `FeedCommand`, `HealCommand`, `FlyCommand`, `GodCommand`,
 | `/homes` | — | `velto.homes` | ❌ | Lists your own homes. |
 | `/warp [name]` | — | `velto.warp` | ❌ | No args lists all warps (global, not per-player). |
 | `/setwarp <name>` | — | `velto.setwarp` | ❌ | Name is required (warps are shared/named, unlike `/sethome`). |
+| `/delwarp <name>` | — | `velto.delwarp` | ✅ | Removes a named warp; reports "not found" for an unknown name. Console-usable (no location needed). |
 | `/kit` / `/kit <name> [player]` / `/kit preview <name>` | — | `velto.kit` (+`.others`, `.<kitname>`, `.cooldown.bypass`) | ✅* | See `kits.yml`; `preview` opens a locked read-only inventory. |
 | `/kitreset <player> <kit>` | — | `velto.kit.reset` | ✅ | Clears cooldown + one-time-claim flag. |
 | `/economy give\|take\|set\|reset <player> [amount]` | `eco` | `velto.economy.give`/`take`/`set`/`reset` | ✅ | Gated live by `economy.yml: enabled`. Target may be offline (resolved from cached players). See [ECONOMY.md](ECONOMY.md). |

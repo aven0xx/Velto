@@ -60,6 +60,7 @@ public class CommandManager {
         register("kitreset", KitResetCommand::new);
         register("warp", WarpCommand::new);
         register("setwarp", SetWarpCommand::new);
+        register("delwarp", DelWarpCommand::new);
         register("economy", EconomyCommand::new);
         register("balance", BalanceCommand::new);
         register("baltop", BalTopCommand::new);

@@ -837,6 +837,10 @@ warp-set:
     action: run_command
     value: "/warp %warp%"
 
+warp-deleted:
+  type: chat
+  message: "&#57E39AWarp &#F1F1F1%warp% &#57E39Adeleted."
+
 warp-not-found:
   type: chat
   message: "&#FF7070Warp &#F1F1F1%warp% &#FF7070not found."
@@ -862,6 +866,16 @@ setwarp-usage:
       click:
         action: suggest_command
         value: "/setwarp "
+
+delwarp-usage:
+  type: chat
+  segments:
+    - text: "&#8A94A6Usage: "
+    - text: "&#5AC8FA/delwarp <name>"
+      hover: "&#8A94A6Click to fill in a warp to delete"
+      click:
+        action: suggest_command
+        value: "/delwarp "
 
 economy-disabled:
   type: chat

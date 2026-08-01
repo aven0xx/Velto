@@ -55,6 +55,15 @@ public final class WarpManager {
         save();
     }
 
+    // Removes a warp. Returns false if it didn't exist (or storage isn't ready).
+    public static boolean deleteWarp(String name) {
+        if (!initialized) return false;
+        if (data.getConfigurationSection("warps." + name) == null) return false;
+        data.set("warps." + name, null);
+        save();
+        return true;
+    }
+
     public static Location getWarp(String name) {
         if (!initialized) return null;
         ConfigurationSection sec = data.getConfigurationSection("warps." + name);

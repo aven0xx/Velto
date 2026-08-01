@@ -79,7 +79,7 @@ each took a different, deliberate approach:
 
 ### `WarpManager` → `warps.yml`
 
-Warps are named, shared, and written rarely (an admin runs `/setwarp`). `WarpManager`
+Warps are named, shared, and written rarely (an admin runs `/setwarp` or `/delwarp`). `WarpManager`
 keeps one `YamlConfiguration` in memory for the whole plugin (loaded once in `init()`),
 mutates it in place, and calls `data.save(file)` **synchronously** right after every
 write. This is simpler than `UserdataManager`'s async-queue machinery and is fine
@@ -87,7 +87,7 @@ specifically *because* warp writes are infrequent admin actions, not something t
 happens every tick under player load — don't copy this synchronous-save pattern for
 something that writes often. `WarpManager.reload()` re-reads the file from disk (so
 external edits are picked up by `/veltoreload`, not just in-memory changes made
-through `/setwarp`).
+through `/setwarp`/`/delwarp`).
 
 ### `AfkPositionStorage` → `afkposition.yml`
 
