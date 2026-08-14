@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.KitManager;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -99,38 +100,46 @@ public class KitCommand extends BaseCommand {
             }
         }
 
-        KitManager.GiveResult result = KitManager.giveKit(target, kit);
-        if (result == KitManager.GiveResult.ERROR) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "kit-give-failed", Map.of("%kit%", kit.name()));
+        // Kit delivery mutates the target's inventory and drops overflow into their world, so it
+        // runs on the region that owns the target — inline when that's us (always on Spigot, and
+        // for /kit on yourself), hopped otherwise. The cooldown/claim write and all feedback move
+        // inside too, since giveKit's result is only known once delivery has run.
+        final Player kitTarget = target;
+        final boolean isSelf = self;
+        PlayerUtil.onOwningRegion(kitTarget, () -> {
+            KitManager.GiveResult result = KitManager.giveKit(kitTarget, kit);
+            if (result == KitManager.GiveResult.ERROR) {
+                if (sender instanceof Player player) {
+                    LangUtil.send(player, "kit-give-failed", Map.of("%kit%", kit.name()));
+                } else {
+                    sender.sendMessage("Failed to fully deliver kit '" + kit.name() + "' to " + kitTarget.getName() + ".");
+                }
+                return;
+            }
+
+            if (kit.oneTime()) {
+                KitManager.markClaimedOnce(kitTarget.getUniqueId(), kit.name());
+            } else if (kit.cooldownSeconds() > 0) {
+                KitManager.setCooldown(kitTarget.getUniqueId(), kit.name());
+            }
+
+            boolean noOverflow = result != KitManager.GiveResult.OVERFLOW;
+
+            if (isSelf) {
+                if (sender instanceof Player player) {
+                    LangUtil.send(player, "kit-given-self", Map.of("%kit%", kit.name()));
+                    if (!noOverflow) LangUtil.send(player, "kit-inventory-full");
+                }
             } else {
-                sender.sendMessage("Failed to fully deliver kit '" + kit.name() + "' to " + target.getName() + ".");
+                if (sender instanceof Player player) {
+                    LangUtil.send(player, "kit-given-other", Map.of("%kit%", kit.name(), "%player%", kitTarget.getName()));
+                } else {
+                    sender.sendMessage("Gave kit " + kit.name() + " to " + kitTarget.getName() + ".");
+                }
+                LangUtil.send(kitTarget, "kit-received", Map.of("%kit%", kit.name(), "%sender%", sender.getName()));
+                if (!noOverflow) LangUtil.send(kitTarget, "kit-inventory-full");
             }
-            return true;
-        }
-
-        if (kit.oneTime()) {
-            KitManager.markClaimedOnce(target.getUniqueId(), kit.name());
-        } else if (kit.cooldownSeconds() > 0) {
-            KitManager.setCooldown(target.getUniqueId(), kit.name());
-        }
-
-        boolean noOverflow = result != KitManager.GiveResult.OVERFLOW;
-
-        if (self) {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "kit-given-self", Map.of("%kit%", kit.name()));
-                if (!noOverflow) LangUtil.send(player, "kit-inventory-full");
-            }
-        } else {
-            if (sender instanceof Player player) {
-                LangUtil.send(player, "kit-given-other", Map.of("%kit%", kit.name(), "%player%", target.getName()));
-            } else {
-                sender.sendMessage("Gave kit " + kit.name() + " to " + target.getName() + ".");
-            }
-            LangUtil.send(target, "kit-received", Map.of("%kit%", kit.name(), "%sender%", sender.getName()));
-            if (!noOverflow) LangUtil.send(target, "kit-inventory-full");
-        }
+        });
 
         return true;
     }
@@ -155,6 +164,7 @@ public class KitCommand extends BaseCommand {
             return true;
         }
 
+        // /kit preview is self-invoked, so this opens on the viewer's own region — safe as-is.
         player.openInventory(KitManager.buildPreviewInventory(kit));
         return true;
     }
@@ -243,7 +253,7 @@ public class KitCommand extends BaseCommand {
         if (args.length == 2 && sender.hasPermission("velto.kit.others")) {
             String typed = args[1].toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) names.add(p.getName());
             }
             return names;

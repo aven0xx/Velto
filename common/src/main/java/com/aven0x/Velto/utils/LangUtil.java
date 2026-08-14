@@ -1,6 +1,9 @@
 package com.aven0x.Velto.utils;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
+import com.aven0x.Velto.utils.PlayerUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -16,7 +19,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,8 +31,10 @@ import java.util.regex.Pattern;
 
 public class LangUtil {
 
-    private static FileConfiguration lang;
-    private static final Map<String, ParsedMessage> cache = new HashMap<>();
+    private static volatile FileConfiguration lang;
+    // volatile + rebuilt-then-swapped in buildCache(), so a reader mid-reload never sees a
+    // half-refilled message map (which would flash "missing message").
+    private static volatile Map<String, ParsedMessage> cache = new HashMap<>();
 
     // Matches &#RRGGBB hex color codes (Minecraft 1.16+).
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
@@ -158,11 +162,12 @@ public class LangUtil {
     }
 
     private static void buildCache() {
-        cache.clear();
+        Map<String, ParsedMessage> fresh = new HashMap<>();
         for (String key : lang.getKeys(false)) {
             ConfigurationSection sec = lang.getConfigurationSection(key);
-            if (sec != null) cache.put(key, new ParsedMessage(sec));
+            if (sec != null) fresh.put(key, new ParsedMessage(sec));
         }
+        cache = fresh;   // publish the fully-built map in one volatile write
     }
 
     // ===== Per-player send =====
@@ -230,12 +235,12 @@ public class LangUtil {
             case "chat" -> {
                 if (msg.segments != null) {
                     BaseComponent[] components = buildSegmentedComponents(msg, placeholders);
-                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                    for (Player p : PlayerUtil.onlineSnapshot()) p.spigot().sendMessage(components);
                 } else if (msg.clickAction != null || msg.rawHover != null) {
                     BaseComponent[] components = buildInteractive(msg, colored, placeholders);
-                    for (Player p : Bukkit.getOnlinePlayers()) p.spigot().sendMessage(components);
+                    for (Player p : PlayerUtil.onlineSnapshot()) p.spigot().sendMessage(components);
                 } else {
-                    Bukkit.broadcastMessage(colored);
+                    broadcast(colored);
                 }
             }
 
@@ -246,7 +251,7 @@ public class LangUtil {
 
             case "title" -> {
                 String subtitle = resolveColored(msg.rawSubtitle, msg.coloredSubtitle, placeholders);
-                for (Player p : Bukkit.getOnlinePlayers()) {
+                for (Player p : PlayerUtil.onlineSnapshot()) {
                     p.sendTitle(colored, subtitle, 10, Math.max(1, msg.duration), 10);
                 }
             }
@@ -255,9 +260,9 @@ public class LangUtil {
                 BossBar bar = Bukkit.createBossBar(colored, msg.barColor, BarStyle.SOLID);
                 bar.setProgress(1.0);
                 bar.setVisible(true);
-                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
+                for (Player p : PlayerUtil.onlineSnapshot()) bar.addPlayer(p);
                 int dur = msg.duration;
-                Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+                Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
                     bar.setVisible(false);
                 }, Math.max(1L, dur));
@@ -277,12 +282,12 @@ public class LangUtil {
         String colored = colorize(rawMessage);
 
         switch (type.toLowerCase()) {
-            case "chat" -> Bukkit.broadcastMessage(colored);
+            case "chat" -> broadcast(colored);
 
             case "actionbar" -> sendGlobalActionBar(TextComponent.fromLegacyText(colored), durationTicks);
 
             case "title" -> {
-                for (Player p : Bukkit.getOnlinePlayers()) {
+                for (Player p : PlayerUtil.onlineSnapshot()) {
                     p.sendTitle(colored, "", 10, Math.max(1, durationTicks), 10);
                 }
             }
@@ -291,8 +296,8 @@ public class LangUtil {
                 BossBar bar = Bukkit.createBossBar(colored, BarColor.BLUE, BarStyle.SOLID);
                 bar.setProgress(1.0);
                 bar.setVisible(true);
-                for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
-                Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+                for (Player p : PlayerUtil.onlineSnapshot()) bar.addPlayer(p);
+                Schedulers.get().globalDelayed(() -> {
                     bar.removeAll();
                     bar.setVisible(false);
                 }, Math.max(1L, durationTicks));
@@ -300,6 +305,14 @@ public class LangUtil {
 
             default -> Bukkit.getLogger().warning("Invalid global raw notification type: " + type);
         }
+    }
+
+    // Broadcasts a plain string to all online players and the console. Snapshots the player view
+    // so we never iterate the live collection off the owning thread — Bukkit.broadcastMessage
+    // iterates it internally, which is unsafe from a region thread on Folia.
+    private static void broadcast(String message) {
+        for (Player p : PlayerUtil.onlineSnapshot()) p.sendMessage(message);
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
     // ===== Helpers =====
@@ -422,28 +435,30 @@ public class LangUtil {
 
     private static void sendActionBar(Player player, BaseComponent[] components, int durationTicks) {
         int repetitions = Math.max(1, durationTicks / 20);
-        new BukkitRunnable() {
-            int count = 0;
-            @Override
-            public void run() {
-                if (count++ >= repetitions || !player.isOnline()) { cancel(); return; }
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+        int[] count = { 0 };
+        VeltoTask[] handle = new VeltoTask[1];
+        handle[0] = Schedulers.get().entityTimer(player, () -> {
+            if (count[0]++ >= repetitions || !player.isOnline()) {
+                if (handle[0] != null) handle[0].cancel();
+                return;
             }
-        }.runTaskTimer(VeltoPlugin.get(), 0L, 20L);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+        }, null, 1L, 20L);
     }
 
     private static void sendGlobalActionBar(BaseComponent[] components, int durationTicks) {
         int repetitions = Math.max(1, durationTicks / 20);
-        new BukkitRunnable() {
-            int count = 0;
-            @Override
-            public void run() {
-                if (count++ >= repetitions) { cancel(); return; }
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
-                }
+        int[] count = { 0 };
+        VeltoTask[] handle = new VeltoTask[1];
+        handle[0] = Schedulers.get().globalTimer(() -> {
+            if (count[0]++ >= repetitions) {
+                if (handle[0] != null) handle[0].cancel();
+                return;
             }
-        }.runTaskTimer(VeltoPlugin.get(), 0L, 20L);
+            for (Player p : PlayerUtil.onlineSnapshot()) {
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, components);
+            }
+        }, 1L, 20L);
     }
 
     private static void sendBossBar(Player player, String title, BarColor color, int durationTicks) {
@@ -451,8 +466,12 @@ public class LangUtil {
         bar.setProgress(1.0);
         bar.addPlayer(player);
         bar.setVisible(true);
-        Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+        // retired: tear the bar down if the player disconnects before the timer fires.
+        Schedulers.get().entityDelayed(player, () -> {
             bar.removePlayer(player);
+            bar.setVisible(false);
+        }, () -> {
+            bar.removeAll();
             bar.setVisible(false);
         }, Math.max(1L, durationTicks));
     }

@@ -163,6 +163,9 @@ warp:
 setwarp:
   enabled: true
   aliases: []
+delwarp:
+  enabled: true
+  aliases: []
 economy:
   enabled: true
   aliases: ["eco"]

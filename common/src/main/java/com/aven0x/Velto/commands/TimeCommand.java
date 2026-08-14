@@ -1,5 +1,6 @@
 package com.aven0x.Velto.commands;
 
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -75,7 +76,9 @@ public class TimeCommand extends BaseCommand {
             return true;
         }
 
-        world.setTime(time);
+        final World targetWorld = world;
+        // World time belongs to the global region on Folia; the message stays on this region.
+        Schedulers.get().global(() -> targetWorld.setTime(time));
 
         if (sender instanceof Player player) {
             LangUtil.send(player, "time-set");

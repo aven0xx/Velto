@@ -19,7 +19,8 @@ public final class WarpManager {
     private WarpManager() {}
 
     private static File file;
-    private static YamlConfiguration data;
+    // volatile: reload() swaps this whole object; readers on other regions must see the new one.
+    private static volatile YamlConfiguration data;
     private static volatile boolean initialized = false;
 
     private static Logger logger() {
@@ -52,6 +53,15 @@ public final class WarpManager {
         data.set(base + "yaw", (double) location.getYaw());
         data.set(base + "pitch", (double) location.getPitch());
         save();
+    }
+
+    // Removes a warp. Returns false if it didn't exist (or storage isn't ready).
+    public static boolean deleteWarp(String name) {
+        if (!initialized) return false;
+        if (data.getConfigurationSection("warps." + name) == null) return false;
+        data.set("warps." + name, null);
+        save();
+        return true;
     }
 
     public static Location getWarp(String name) {

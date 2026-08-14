@@ -1,6 +1,8 @@
 package com.aven0x.VeltoBukkit.managers;
 
+import com.aven0x.Velto.managers.AfkManager;
 import com.aven0x.Velto.managers.IgnoreManager;
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.AtMentionHandler;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
@@ -40,6 +42,7 @@ public class ChatManager implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
+        AfkManager.updateActivity(player);   // keep chat-as-activity consistent with the Paper path
         String rawMessage = event.getMessage();
 
         if (isAtMentionMessage(rawMessage)) {
@@ -86,12 +89,9 @@ public class ChatManager implements Listener {
     }
 
     private void runSync(Runnable runnable) {
-        if (Bukkit.isPrimaryThread()) {
-            runnable.run();
-            return;
-        }
-
-        Bukkit.getScheduler().runTask(plugin, runnable);
+        // Chat events fire off-tick; defer the formatting + send to the global region.
+        // Conservative migration — a full event.renderer rewrite belongs to the chat phase.
+        Schedulers.get().global(runnable);
     }
 
     private String resolveChatFormat(Player player) {

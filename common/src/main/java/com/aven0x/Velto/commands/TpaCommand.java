@@ -2,6 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.TpaManager;
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,7 +54,7 @@ public class TpaCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length <= 1 && sender instanceof Player) {
             String typed = args.length == 0 ? "" : args[0].toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
+            return PlayerUtil.onlineSnapshot().stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(typed))
                     .toList();

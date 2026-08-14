@@ -67,6 +67,7 @@ permissions:
       velto.kit.daily: true
       velto.warp: true
       velto.setwarp: true
+      velto.delwarp: true
       velto.economy.give: true
       velto.economy.take: true
       velto.economy.set: true

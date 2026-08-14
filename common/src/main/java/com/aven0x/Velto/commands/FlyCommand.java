@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,21 +37,20 @@ public class FlyCommand extends BaseCommand {
             return true;
         }
 
-        boolean flying = !target.getAllowFlight();
-        target.setAllowFlight(flying);
-        if (!flying) target.setFlying(false);
+        // Read the current flight state and flip it on the region that owns the target; the
+        // resulting messages depend on that state, and packet sends are safe from there.
+        PlayerUtil.onOwningRegion(target, () -> {
+            boolean flying = !target.getAllowFlight();
+            target.setAllowFlight(flying);
+            if (!flying) target.setFlying(false);
 
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("%target%", target.getName());
-
-        if (self) {
             LangUtil.send(target, flying ? "fly-enabled" : "fly-disabled");
-        } else {
-            LangUtil.send(target, flying ? "fly-enabled" : "fly-disabled");
-            if (sender instanceof Player playerSender) {
+            if (!self && sender instanceof Player playerSender) {
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("%target%", target.getName());
                 LangUtil.send(playerSender, flying ? "fly-enabled-other" : "fly-disabled-other", placeholders);
             }
-        }
+        });
 
         return true;
     }
@@ -60,7 +60,7 @@ public class FlyCommand extends BaseCommand {
         if (args.length <= 1 && sender.hasPermission("velto.fly.others")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }

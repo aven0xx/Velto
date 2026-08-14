@@ -9,7 +9,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class CommandUtil {
-    private static FileConfiguration commands;
+    // volatile: load() swaps this whole object; readers on other regions must see the new one.
+    private static volatile FileConfiguration commands;
 
     public static void load() {
         File file = new File(VeltoPlugin.get().getDataFolder(), "commands.yml");

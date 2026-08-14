@@ -16,17 +16,20 @@ Velto/
 │       ├── managers/       stateful singletons (TeleportManager, UserdataManager, EconomyManager, ...)
 │       ├── listeners/      Bukkit event listeners
 │       ├── integrations/   optional soft-dependency hooks (Vault)
+│       ├── platform/       the scheduler SPI (VeltoScheduler, VeltoTask, Schedulers) — see FOLIA.md
 │       └── utils/          stateless/static helpers (LangUtil, ConfigUtil, CommandUtil, ...)
 ├── bukkit/   Bukkit/Spigot entry point (com.aven0x.VeltoBukkit.VeltoBukkit)
 │   └── src/main/java/com/aven0x/VeltoBukkit/
 │       ├── managers/CommandManager.java       registers every command
 │       ├── managers/ChatManager.java          legacy chat formatting (AsyncPlayerChatEvent)
+│       ├── platform/BukkitSchedulerAdapter.java  VeltoScheduler on the classic BukkitScheduler
 │       └── utils/DynamicCommandRegistrar.java reflection-based command registration
 ├── paper/    Paper entry point (com.aven0x.VeltoPaper.VeltoPaper)
 │   └── src/main/java/com/aven0x/VeltoPaper/
 │       ├── commands/AnvilCommand.java         Paper-only (needs Paper's openAnvil API)
 │       ├── managers/CommandManager.java       registers every command (+ anvil)
 │       ├── managers/ChatManager.java          Adventure-based chat formatting (AsyncChatEvent)
+│       ├── platform/FoliaScheduler.java       VeltoScheduler on Folia's region schedulers
 │       └── utils/DynamicCommandRegistrar.java Brigadier-based command registration
 ├── build.gradle           root: shared repos, blocks the root `build` task on purpose
 ├── settings.gradle        declares the 3 modules
@@ -88,12 +91,31 @@ whichever platform's `onEnable()` runs calls `VeltoPlugin.set(this)` as its **ve
 first line**, and every manager/util in `common` calls `VeltoPlugin.get()` instead of
 holding its own plugin reference.
 
+## Scheduling: the `VeltoScheduler` SPI
+
+`common` must schedule work (timers, delayed tasks, async I/O) but compiles against the
+Spigot API, which has none of Folia's region-scheduler types — and Folia has no main
+thread, so `BukkitScheduler` throws there. The fix is a platform-neutral scheduling
+interface, `VeltoScheduler` (`common/.../platform/`), that `common` code reaches through
+the `Schedulers.get()` static holder. Each module installs its own implementation in
+`onEnable` — `FoliaScheduler` on Paper, `BukkitSchedulerAdapter` on Bukkit — so `common`
+stays free of any Paper/Folia type and there's one choke point for every scheduling
+decision. The same jars then run correctly on Spigot, Paper, and Folia.
+
+**All scheduling in `common` and `paper` goes through `Schedulers.get()` — never
+`BukkitScheduler` or `BukkitRunnable`.** The full model (the four lanes, the region-safety
+patterns, the Bukkit-compat guarantee, and how to test it) is in [FOLIA.md](FOLIA.md);
+read it before adding anything that schedules, teleports, mutates another player, or
+iterates the online-player list.
+
 ## Plugin lifecycle (`onEnable`)
 
 Both `VeltoPaper.onEnable()` and `VeltoBukkit.onEnable()` follow the same sequence
 (they're kept in lock-step manually — there's no shared base class):
 
-1. `VeltoPlugin.set(this)` — must happen before anything else touches `VeltoPlugin.get()`.
+1. `VeltoPlugin.set(this)`, immediately followed by `Schedulers.set(...)` (the platform's
+   `FoliaScheduler`/`BukkitSchedulerAdapter`) — both must happen before anything else
+   touches `VeltoPlugin.get()` or schedules work.
 2. `saveDefaultConfig()` + `ConfigUtil.refreshCache()` — load `config.yml`, cache its values.
 3. Load the other shipped config files: `LangUtil.load()`, `CommandUtil.load()`,
    `KitManager.load()`, `WarpManager.init(getDataFolder())`, `EconomyManager.load()`,
@@ -121,9 +143,12 @@ up-to-date settings.
 ### `onDisable`
 
 Much shorter: `AfkManager.stop()`, `AutoMsgManager.stop()`,
-`UserdataManager.stopAutosave()` + `UserdataManager.saveAll()` (synchronous — this is
-the one place a blocking save is correct, since the server is shutting down and there
-won't be another tick for an async task to run on).
+`TeleportManager.getInstance().cancelAll()` (cancel pending countdowns),
+`UserdataManager.stopAutosave()`, then `Schedulers.cancelAllQuietly()` to stop in-flight
+async writers **before** the exclusive `UserdataManager.saveAll()` (synchronous — this is
+the one place a blocking save is correct, since the server is shutting down; cancelling
+the async writers first means the final flush can't race one). The pre-`saveAll` ordering
+matters on Folia, where async tasks aren't halted automatically before `onDisable`.
 
 ### `/veltoreload`
 
@@ -137,9 +162,17 @@ next full restart, since command registration happens once during `onEnable`.
 
 ## Cross-platform compatibility shim
 
-`ServerUtil.isPaper()` (`common/.../utils/ServerUtil.java`) detects Paper at runtime by
-probing for `io.papermc.paper.configuration.Configuration` via `Class.forName`. This
-is used inside shared `common` code (e.g. `TeleportManager` prefers Paper's
-`teleportAsync` when available, falling back to a synchronous chunk-load + teleport on
-plain Spigot) — it's how `common` code can behave slightly differently on the two
-platforms without a hard compile-time dependency on Paper's API.
+`ServerUtil` (`common/.../utils/ServerUtil.java`) detects the platform at runtime by
+probing for marker classes via `Class.forName` (a string, so it adds no compile-time
+dependency): `isPaper()` looks for `io.papermc.paper.configuration.Configuration`, and
+`isFolia()` looks for `io.papermc.paper.threadedregions.RegionizedServer`. These let
+`common` behave differently per platform without naming a Paper/Folia type — `isFolia()`
+is what makes `/killall` fall back to a caller-region entity sweep on Folia while staying
+world-wide on Spigot/Paper.
+
+Platform-specific *behaviour* that used to live behind `isPaper()` reflection — notably
+teleportation — now goes through the [scheduler SPI](#scheduling-the-veltoscheduler-spi)
+instead. `TeleportManager.teleportAsync` delegates to `Schedulers.get().teleport(...)`,
+which each module implements natively (`Entity#teleportAsync` on Paper/Folia, the classic
+chunk-load-then-`teleport` on Spigot); no reflection is involved anymore. See
+[FOLIA.md](FOLIA.md) for the whole model.

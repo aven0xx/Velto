@@ -30,7 +30,7 @@ economy balances — anything keyed by a single player rather than shared global
 **Save timing — the part that's easy to get wrong:**
 
 - `UserdataManager.save(uuid)` snapshots the current in-memory `YamlConfiguration` and
-  immediately enqueues an **async** disk write (`runTaskAsynchronously`) — it does not
+  immediately enqueues an **async** disk write (the scheduler SPI's `async` lane) — it does not
   wait for any interval. Every mutating manager method (`HomeManager.setHome`,
   `EconomyManager.setBalance`, `KitManager.setCooldown`, ...) calls `save()` itself
   right after mutating, so changes reach disk within roughly a tick, not up to 5
@@ -79,7 +79,7 @@ each took a different, deliberate approach:
 
 ### `WarpManager` → `warps.yml`
 
-Warps are named, shared, and written rarely (an admin runs `/setwarp`). `WarpManager`
+Warps are named, shared, and written rarely (an admin runs `/setwarp` or `/delwarp`). `WarpManager`
 keeps one `YamlConfiguration` in memory for the whole plugin (loaded once in `init()`),
 mutates it in place, and calls `data.save(file)` **synchronously** right after every
 write. This is simpler than `UserdataManager`'s async-queue machinery and is fine
@@ -87,15 +87,15 @@ specifically *because* warp writes are infrequent admin actions, not something t
 happens every tick under player load — don't copy this synchronous-save pattern for
 something that writes often. `WarpManager.reload()` re-reads the file from disk (so
 external edits are picked up by `/veltoreload`, not just in-memory changes made
-through `/setwarp`).
+through `/setwarp`/`/delwarp`).
 
 ### `AfkPositionStorage` → `afkposition.yml`
 
 Holds the "teleport back here" location for a player who quit *while* AFK (so the
 return can still happen after they rejoin, even though `AfkManager`'s live state was
 already cleared on quit). Same shape as `WarpManager` — one in-memory
-`Map<UUID, Location>`, loaded once — but saves **async** (`runTaskAsynchronously`,
-snapshotting the map on the calling thread first), because this can be written on
+`Map<UUID, Location>`, loaded once — but saves **async** (the scheduler SPI's `async`
+lane, snapshotting the map on the calling thread first), because this can be written on
 every AFK transition for every player, which is a much hotter path than `/setwarp`.
 
 > **Note:** `afkposition.yml` also exists as a checked-in file under

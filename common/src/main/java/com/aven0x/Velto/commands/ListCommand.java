@@ -1,7 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
-import org.bukkit.Bukkit;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,7 +31,7 @@ public class ListCommand extends BaseCommand {
             return true;
         }
 
-        String players = Bukkit.getOnlinePlayers()
+        String players = PlayerUtil.onlineSnapshot()
                 .stream()
                 .map(Player::getName)
                 .collect(Collectors.joining(", "));

@@ -2,7 +2,7 @@ package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.managers.EconomyManager;
 import com.aven0x.Velto.utils.LangUtil;
-import org.bukkit.Bukkit;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -65,7 +65,7 @@ public class BalanceCommand extends BaseCommand {
         if (args.length <= 1 && sender.hasPermission("velto.balance.others")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) names.add(p.getName());
             }
             return names;

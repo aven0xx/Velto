@@ -39,23 +39,22 @@ public class HealCommand extends BaseCommand {
             return true;
         }
 
-        AttributeInstance attr = target.getAttribute(Attribute.MAX_HEALTH);
-        if (attr != null) {
-            target.setHealth(attr.getValue());
-        }
-
-        target.setFoodLevel(20);
-        target.setSaturation(20f);
-
-        if (self) {
+        PlayerUtil.onOwningRegion(target, () -> {
+            AttributeInstance attr = target.getAttribute(Attribute.MAX_HEALTH);
+            if (attr != null) {
+                target.setHealth(attr.getValue());
+            }
+            target.setFoodLevel(20);
+            target.setSaturation(20f);
             LangUtil.send(target, "healed-self");
-        } else {
+        });
+
+        if (!self) {
             if (sender instanceof Player playerSender) {
                 LangUtil.send(playerSender, "healed-other", Map.of("%target%", target.getName()));
             } else {
                 sender.sendMessage("§aHealed: " + target.getName());
             }
-            LangUtil.send(target, "healed-self");
         }
 
         return true;
@@ -65,7 +64,7 @@ public class HealCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length <= 1 && sender.hasPermission("velto.heal.others")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
+            return PlayerUtil.onlineSnapshot().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(typed))

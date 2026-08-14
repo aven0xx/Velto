@@ -1,6 +1,7 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -44,7 +45,9 @@ public final class KitManager {
 
     private record ParsedItems(List<KitItem> items, int skipped) {}
 
-    private static final LinkedHashMap<String, Kit> kits = new LinkedHashMap<>();
+    // volatile + rebuilt-then-swapped on reload, so a reader during /veltoreload never sees a
+    // half-refilled map (an empty or partial kit list).
+    private static volatile Map<String, Kit> kits = new LinkedHashMap<>();
     private static Logger logger;
 
     public static LoadResult load() {
@@ -55,11 +58,12 @@ public final class KitManager {
             VeltoPlugin.get().saveResource("kits.yml", false);
         }
 
-        kits.clear();
+        LinkedHashMap<String, Kit> fresh = new LinkedHashMap<>();
         YamlConfiguration config = YamlConfiguration.loadConfiguration(kitsFile);
         ConfigurationSection kitsSection = config.getConfigurationSection("kits");
         if (kitsSection == null) {
             logger.warning("[Velto] kits.yml has no 'kits' section — no kits loaded.");
+            kits = fresh;
             return new LoadResult(0, 0);
         }
 
@@ -73,9 +77,10 @@ public final class KitManager {
             List<String> commands = kitSec.getStringList("commands");
             ParsedItems parsed = parseItems(kitSec.getMapList("items"), kitName);
             totalSkipped += parsed.skipped();
-            kits.put(kitName.toLowerCase(), new Kit(kitName, cooldown, oneTime, commands, parsed.items()));
+            fresh.put(kitName.toLowerCase(), new Kit(kitName, cooldown, oneTime, commands, parsed.items()));
         }
 
+        kits = fresh;   // publish the fully-built map in one volatile write
         logger.info("[Velto] Loaded " + kits.size() + " kit(s)"
                 + (totalSkipped > 0 ? " (" + totalSkipped + " item(s) skipped due to invalid material/enchantment)" : "")
                 + ".");
@@ -134,8 +139,10 @@ public final class KitManager {
     }
 
     // Builds the actual items + runs any configured commands. Returns ERROR (and gives
-    // nothing further) if delivery fails partway, so the caller can skip setting the
-    // cooldown/claim instead of burning it on a botched delivery.
+    // nothing further) if the item delivery fails, so the caller can skip setting the
+    // cooldown/claim instead of burning it on a botched delivery. Reward commands are now
+    // dispatched on the global region (fire-and-forget), so a command that fails later no
+    // longer forces ERROR — only item-delivery failures do.
     public static GiveResult giveKit(Player player, Kit kit) {
         boolean overflowed = false;
         try {
@@ -151,7 +158,9 @@ public final class KitManager {
             }
             for (String command : kit.commands()) {
                 String parsed = command.replace("%player%", player.getName());
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed);
+                // Console commands run on the global region; dispatching there makes them
+                // fire-and-forget relative to giveKit (see the method note above).
+                Schedulers.get().global(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsed));
             }
         } catch (Exception e) {
             logger.warning("[Velto] Failed to fully deliver kit '" + kit.name() + "' to " + player.getName() + ": " + e.getMessage());

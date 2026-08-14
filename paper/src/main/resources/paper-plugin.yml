@@ -3,6 +3,8 @@ version: ${version}
 main: com.aven0x.VeltoPaper.VeltoPaper
 api-version: "1.21.4"
 
+folia-supported: true
+
 dependencies:
   server:
     PlaceholderAPI:
@@ -75,6 +77,7 @@ permissions:
       velto.kit.daily: true
       velto.warp: true
       velto.setwarp: true
+      velto.delwarp: true
       velto.economy.give: true
       velto.economy.take: true
       velto.economy.set: true

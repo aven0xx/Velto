@@ -28,7 +28,7 @@
 | | |
 |---|---|
 | **Teleportation** | `/spawn`, `/home`, `/warp`, `/tp`, `/tpa`, `/tpall`, `/back` — with a configurable teleport countdown and cancel-on-move. |
-| **Homes & Warps** | Per-player homes (`/home`, `/sethome`, `/delhome`, `/homes`) and shared, admin-set warps (`/warp`, `/setwarp`). |
+| **Homes & Warps** | Per-player homes (`/home`, `/sethome`, `/delhome`, `/homes`) and shared, admin-set warps (`/warp`, `/setwarp`, `/delwarp`). |
 | **Kits** | Admin-defined kits (`kits.yml`) with cooldowns, one-time claims, and a locked preview GUI. |
 | **Economy** *(optional)* | A single-currency economy — `/economy`, `/balance`, `/pay`, `/baltop` — backed by per-player balances, with an optional [Vault](https://github.com/MilkBowl/Vault) hook. Fully toggleable; see [below](#-economy-optional). |
 | **Player utilities** | `/heal`, `/feed`, `/speed`, `/fly`, `/god`, `/gamemode`, `/kill`, `/killall`, `/enderchest` (yours or another player's), item renaming & lore editing. |
@@ -45,7 +45,7 @@ A quick reference, grouped by category. Every command's exact permission node an
 aliases are in **[`docs/COMMANDS.md`](docs/COMMANDS.md)**.
 
 **Teleportation & locations**
-`/spawn` `/setspawn` `/home` `/sethome` `/delhome` `/homes` `/warp` `/setwarp`
+`/spawn` `/setspawn` `/home` `/sethome` `/delhome` `/homes` `/warp` `/setwarp` `/delwarp`
 `/tp` `/tpa` `/tpaaccept` `/tpadeny` `/tpall` `/back`
 
 **Player utilities**

@@ -1,6 +1,8 @@
 package com.aven0x.Velto.managers;
 
 import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.utils.ConfigUtil;
@@ -13,13 +15,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +43,7 @@ public class AfkManager implements Listener {
     private static long getAfkTimeout() {
         return ConfigUtil.getAfkTimeoutMillis();
     }
-    private static BukkitRunnable afkChecker;
+    private static VeltoTask afkChecker;
 
     private static Logger log() {
         return VeltoPlugin.get().getLogger();
@@ -57,27 +57,23 @@ public class AfkManager implements Listener {
             afkChecker.cancel();
         }
 
-        afkChecker = new BukkitRunnable() {
-            @Override
-            public void run() {
-                long currentTime = System.currentTimeMillis();
+        // Check every 30 seconds. The sweep only reads the concurrent maps and hands each
+        // affected player to setAfk, which routes itself onto that player's own region.
+        afkChecker = Schedulers.get().globalTimer(() -> {
+            long currentTime = System.currentTimeMillis();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    UUID uuid = player.getUniqueId();
-                    long lastActivityTime = lastActivity.getOrDefault(uuid, currentTime);
+            for (Player player : PlayerUtil.onlineSnapshot()) {
+                UUID uuid = player.getUniqueId();
+                long lastActivityTime = lastActivity.getOrDefault(uuid, currentTime);
 
-                    boolean wasAfk = afkPlayers.contains(uuid);
-                    boolean shouldBeAfk = (currentTime - lastActivityTime) >= getAfkTimeout();
+                boolean wasAfk = afkPlayers.contains(uuid);
+                boolean shouldBeAfk = (currentTime - lastActivityTime) >= getAfkTimeout();
 
-                    if (!wasAfk && shouldBeAfk) {
-                        setAfk(player, true);
-                    }
+                if (!wasAfk && shouldBeAfk) {
+                    setAfk(player, true);
                 }
             }
-        };
-
-        // Check every 30 seconds
-        afkChecker.runTaskTimer(VeltoPlugin.get(), 600L, 600L);
+        }, 600L, 600L);
     }
 
     /**
@@ -102,14 +98,15 @@ public class AfkManager implements Listener {
 
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
+        Long last = lastActivity.get(uuid);
+        boolean afk = afkPlayers.contains(uuid);
 
-        if (now - lastActivity.getOrDefault(uuid, 0L) < 1000L && !afkPlayers.contains(uuid)) return;
+        // Common case (recent activity, not AFK) is a single read of each map.
+        if (!afk && last != null && now - last < 1000L) return;
 
         lastActivity.put(uuid, now);
 
-        if (afkPlayers.contains(uuid)) {
-            setAfk(player, false);
-        }
+        if (afk) setAfk(player, false);
     }
 
     public static boolean isAfk(Player player) {
@@ -122,19 +119,20 @@ public class AfkManager implements Listener {
     public static void setAfk(Player player, boolean afk) {
         if (player == null || !player.isOnline()) return;
 
-        // Airbag: ensure main thread
-        if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> setAfk(player, afk));
+        // Airbag: setAfk teleports and reads player.getLocation(), so ensure we run it
+        // on the region that owns the player.
+        if (!Schedulers.get().owns(player)) {
+            Schedulers.get().entity(player, () -> setAfk(player, afk), null);
             return;
         }
 
         UUID uuid = player.getUniqueId();
-        boolean wasAfk = afkPlayers.contains(uuid);
 
-        if (afk && !wasAfk) {
+        if (afk) {
+            // Atomically claim AFK; a false return means another caller already set it.
+            if (!afkPlayers.add(uuid)) return;
+
             // Becoming AFK
-            afkPlayers.add(uuid);
-
             boolean afkzoneEnabled = ConfigUtil.isAfkzoneOn();
 
             if (afkzoneEnabled) {
@@ -161,9 +159,11 @@ public class AfkManager implements Listener {
                 LangUtil.sendGlobal("afk-player", placeholders);
             }
 
-        } else if (!afk && wasAfk) {
+        } else {
+            // Atomically release AFK; a false return means another caller already cleared it.
+            if (!afkPlayers.remove(uuid)) return;
+
             // Leaving AFK
-            afkPlayers.remove(uuid);
             lastActivity.put(uuid, System.currentTimeMillis());
 
             if (ConfigUtil.isAfkzoneOn()) {
@@ -246,14 +246,9 @@ public class AfkManager implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (event.isCancelled()) return;
-
-        // Async event -> schedule on main thread
-        Player p = event.getPlayer();
-        Bukkit.getScheduler().runTask(VeltoPlugin.get(), () -> updateActivity(p));
-    }
+    // Chat activity is fed in from the platform chat listeners (paper/bukkit ChatManager):
+    // Paper routes chat through AsyncChatEvent, which AfkManager (common, Spigot API) can't name,
+    // and the legacy AsyncPlayerChatEvent doesn't fire there — so a common-side handler missed it.
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
@@ -290,7 +285,7 @@ public class AfkManager implements Listener {
         if (AfkPositionStorage.isInitialized() && AfkPositionStorage.has(uuid)) {
             Location back = AfkPositionStorage.get(uuid);
 
-            Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
+            Schedulers.get().entityDelayed(player, () -> {
                 if (player.isOnline() && back != null && back.getWorld() != null) {
                     ignoreMoveUntil.put(player.getUniqueId(), System.currentTimeMillis() + 1000);
                     TeleportManager.getInstance().teleportAsync(player, back);
@@ -300,7 +295,7 @@ public class AfkManager implements Listener {
 
                 AfkPositionStorage.remove(uuid);
                 AfkPositionStorage.save();
-            }, 1L);
+            }, null, 1L);
         }
     }
 

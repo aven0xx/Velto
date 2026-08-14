@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -109,17 +110,12 @@ public class GamemodeCommands {
                 return true;
             }
 
-            target.setGameMode(mode);
-
-            /*
-             * Envoie au joueur ciblé le message correspondant :
-             *
-             * gamemode-creative
-             * gamemode-survival
-             * gamemode-adventure
-             * gamemode-spectator
-             */
-            LangUtil.send(target, getGamemodeLangKey(mode));
+            // Game mode is per-entity state; set it on the region that owns the target and send
+            // that player their message from there (packet sends are region-safe).
+            PlayerUtil.onOwningRegion(target, () -> {
+                target.setGameMode(mode);
+                LangUtil.send(target, getGamemodeLangKey(mode));
+            });
 
             /*
              * Envoie une confirmation à la personne ayant modifié
@@ -174,7 +170,7 @@ public class GamemodeCommands {
                 String typed = args[1].toLowerCase();
                 List<String> names = new ArrayList<>();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : PlayerUtil.onlineSnapshot()) {
                     if (player.getName()
                             .toLowerCase()
                             .startsWith(typed)) {
@@ -287,13 +283,12 @@ public class GamemodeCommands {
                 return true;
             }
 
-            target.setGameMode(mode);
-
-            /*
-             * Envoie le message correspondant au nouveau mode
-             * au joueur ciblé.
-             */
-            LangUtil.send(target, getGamemodeLangKey(mode));
+            // Game mode is per-entity state; set it on the region that owns the target and send
+            // that player their message from there (packet sends are region-safe).
+            PlayerUtil.onOwningRegion(target, () -> {
+                target.setGameMode(mode);
+                LangUtil.send(target, getGamemodeLangKey(mode));
+            });
 
             /*
              * Envoie une confirmation lorsque le mode d'un autre
@@ -335,7 +330,7 @@ public class GamemodeCommands {
 
                 List<String> names = new ArrayList<>();
 
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : PlayerUtil.onlineSnapshot()) {
                     if (player.getName()
                             .toLowerCase()
                             .startsWith(typed)) {

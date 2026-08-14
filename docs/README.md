@@ -12,6 +12,7 @@ read these docs to understand *how* the code works.
 | Doc | What's in it |
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Module layout (`common`/`bukkit`/`paper`), plugin lifecycle, Paper vs Bukkit differences, build system |
+| [FOLIA.md](FOLIA.md) | Folia support: the `VeltoScheduler` SPI, the four scheduler lanes, region-safety patterns, what's deferred, and how to test on Folia |
 | [COMMANDS.md](COMMANDS.md) | The `BaseCommand` contract, the full command catalog, and how permissions/aliases/enable-toggles are resolved |
 | [CONFIGURATION.md](CONFIGURATION.md) | Every shipped YAML file (`config.yml`, `lang.yml`, `commands.yml`, `kits.yml`, `economy.yml`, `plugin.yml`) explained field by field |
 | [DATA_STORAGE.md](DATA_STORAGE.md) | Runtime/generated data: per-player userdata, warps, AFK positions — caching, save timing, persistence guarantees |
@@ -31,6 +32,9 @@ read these docs to understand *how* the code works.
 - **"I want to know how balances / homes / warps are actually stored and when they hit
   disk"** → [DATA_STORAGE.md](DATA_STORAGE.md).
 - **"I'm working on the economy module or Vault"** → [ECONOMY.md](ECONOMY.md).
+- **"I'm adding code that schedules, teleports, or touches another player — will it work on
+  Folia?"** → [FOLIA.md](FOLIA.md), then
+  [EXTENDING.md](EXTENDING.md#scheduling--thread-safety-folia).
 - **"I want to add a whole new feature module (own config file, own manager, maybe an
   optional integration)"** → [EXTENDING.md](EXTENDING.md), using Warp (simple) and
   Economy (complex) as worked examples.

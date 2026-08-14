@@ -1,6 +1,7 @@
 package com.aven0x.Velto.commands;
 
 import com.aven0x.Velto.utils.LangUtil;
+import com.aven0x.Velto.utils.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -45,15 +46,16 @@ public class SudoCommand extends BaseCommand {
             return true;
         }
 
-        String cmd = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        if (cmd.startsWith("/")) cmd = cmd.substring(1);
+        String rawCmd = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        final String command = rawCmd.startsWith("/") ? rawCmd.substring(1) : rawCmd;
 
-        Bukkit.dispatchCommand(target, cmd);
+        // A command executed as a player must run on the region owning that player.
+        PlayerUtil.onOwningRegion(target, () -> Bukkit.dispatchCommand(target, command));
 
         if (sender instanceof Player player) {
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%target%", target.getName());
-            placeholders.put("%command%", cmd);
+            placeholders.put("%command%", command);
             LangUtil.send(player, "sudo-success", placeholders);
         }
 
@@ -65,7 +67,7 @@ public class SudoCommand extends BaseCommand {
         if (args.length <= 1 && sender.hasPermission("velto.sudo")) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
             List<String> names = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
+            for (Player p : PlayerUtil.onlineSnapshot()) {
                 if (p.getName().toLowerCase().startsWith(typed)) {
                     names.add(p.getName());
                 }

@@ -15,12 +15,14 @@ import com.aven0x.Velto.managers.PlaceholderManager;
 import com.aven0x.Velto.managers.TeleportManager;
 import com.aven0x.Velto.managers.UserdataManager;
 import com.aven0x.Velto.managers.WarpManager;
+import com.aven0x.Velto.platform.Schedulers;
 import com.aven0x.Velto.utils.AfkPositionStorage;
 import com.aven0x.Velto.utils.CommandUtil;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.VeltoPaper.managers.ChatManager;
 import com.aven0x.VeltoPaper.managers.CommandManager;
+import com.aven0x.VeltoPaper.platform.FoliaScheduler;
 import com.aven0x.VeltoPaper.utils.DynamicCommandRegistrar;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -34,6 +36,7 @@ public class VeltoPaper extends JavaPlugin {
     @Override
     public void onEnable() {
         VeltoPlugin.set(this);
+        Schedulers.set(new FoliaScheduler(this));
 
         Bukkit.getLogger().info("[Velto] has been enabled");
         Bukkit.getLogger().info("[Velto] Paper detected. All features enabled.");
@@ -85,7 +88,11 @@ public class VeltoPaper extends JavaPlugin {
             autoMsgManager.stop();
             autoMsgManager = null;
         }
+        TeleportManager tm = TeleportManager.getInstance();
+        if (tm != null) tm.cancelAll();
         UserdataManager.stopAutosave();
+        // Stop in-flight async writers before the exclusive final flush (report F-83).
+        Schedulers.cancelAllQuietly();
         UserdataManager.saveAll();
     }
 

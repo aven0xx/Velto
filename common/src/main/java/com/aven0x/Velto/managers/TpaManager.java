@@ -1,11 +1,11 @@
 package com.aven0x.Velto.managers;
 
-import com.aven0x.Velto.VeltoPlugin;
+import com.aven0x.Velto.platform.Schedulers;
+import com.aven0x.Velto.platform.VeltoTask;
 import com.aven0x.Velto.utils.ConfigUtil;
 import com.aven0x.Velto.utils.LangUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,28 +24,36 @@ public class TpaManager {
     private static final Map<UUID, PendingTpa> outgoing = new ConcurrentHashMap<>();
     private static final Map<UUID, Set<UUID>> incomingByTarget = new ConcurrentHashMap<>();
 
-    private record PendingTpa(TpaRequest request, BukkitTask expiryTask) {}
+    private record PendingTpa(TpaRequest request, VeltoTask expiryTask) {}
 
     // Sends a request from requester to target, cancelling any previous outgoing request.
     public static void sendRequest(Player requester, Player target) {
-        cancelRequest(requester.getUniqueId());
+        UUID requesterId = requester.getUniqueId();
+        UUID targetId = target.getUniqueId();
+        String targetName = target.getName();
+
+        cancelRequest(requesterId);
 
         long expiresAt = System.currentTimeMillis() + ConfigUtil.getTpaExpireSeconds() * 1000L;
-        TpaRequest request = new TpaRequest(requester.getUniqueId(), requester.getName(), target.getUniqueId(), expiresAt);
+        TpaRequest request = new TpaRequest(requesterId, requester.getName(), targetId, expiresAt);
 
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(VeltoPlugin.get(), () -> {
-            PendingTpa pending = outgoing.get(requester.getUniqueId());
-            if (pending != null && pending.request().target().equals(target.getUniqueId())) {
-                removeRequest(requester.getUniqueId(), false);
-                if (requester.isOnline()) {
-                    LangUtil.send(requester, "tpa-expired", Map.of("%target%", target.getName()));
+        // The expiry only messages the requester, which is safe from the global region.
+        // Capture ids/name rather than the Player objects: holding a Player across the whole
+        // expiry window leaks the reference (and would be a cross-region hold on Folia).
+        VeltoTask task = Schedulers.get().globalDelayed(() -> {
+            PendingTpa pending = outgoing.get(requesterId);
+            if (pending != null && pending.request().target().equals(targetId)) {
+                removeRequest(requesterId, false);
+                Player requesterPlayer = Bukkit.getPlayer(requesterId);
+                if (requesterPlayer != null && requesterPlayer.isOnline()) {
+                    LangUtil.send(requesterPlayer, "tpa-expired", Map.of("%target%", targetName));
                 }
             }
         }, ConfigUtil.getTpaExpireSeconds() * 20L);
 
-        outgoing.put(requester.getUniqueId(), new PendingTpa(request, task));
-        incomingByTarget.computeIfAbsent(target.getUniqueId(), ignored -> ConcurrentHashMap.newKeySet())
-                .add(requester.getUniqueId());
+        outgoing.put(requesterId, new PendingTpa(request, task));
+        incomingByTarget.computeIfAbsent(targetId, ignored -> ConcurrentHashMap.newKeySet())
+                .add(requesterId);
     }
 
     // Returns the pending outgoing request for this player if it has not expired.

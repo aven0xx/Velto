@@ -1,6 +1,6 @@
 allprojects {
     group = 'Velto'
-    version = '0.7.6'
+    version = '0.8-Recode'
 
     repositories {
         mavenCentral()

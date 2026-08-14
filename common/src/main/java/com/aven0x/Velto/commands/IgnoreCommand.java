@@ -3,7 +3,6 @@ package com.aven0x.Velto.commands;
 import com.aven0x.Velto.managers.IgnoreManager;
 import com.aven0x.Velto.utils.LangUtil;
 import com.aven0x.Velto.utils.PlayerUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -60,7 +59,7 @@ public class IgnoreCommand extends BaseCommand {
     public List<String> complete(CommandSender sender, String label, String[] args) {
         if (args.length <= 1) {
             String typed = (args.length == 0 ? "" : args[0]).toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
+            return PlayerUtil.onlineSnapshot().stream()
                     .filter(player -> !PlayerUtil.isVanished(player))
                     .filter(player -> !(sender instanceof Player p && p.getUniqueId().equals(player.getUniqueId())))
                     .map(Player::getName)
