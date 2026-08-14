@@ -117,9 +117,8 @@ format.
 | Minecraft Version | Status |
 |:-----------------:|:------:|
 | 1.21.7 and less | ❌ Unsupported |
-| 1.21.8 | 🟢 LTS (until Fall 2026) |
-| 1.21.9 / 1.21.10 | ✅ Supported |
-| 1.21.11 | ✅ Supported |
+| 1.21.8 | 🟢 LTS (until October 2026) |
+| 1.21.9 - 1.21.11 | ✅ Supported |
 | 26.1 / 26.2 | ✅ Supported |
 
 > **LTS** (Long-Term Support) versions receive priority bug fixes and compatibility updates.
